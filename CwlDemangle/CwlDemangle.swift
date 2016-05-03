@@ -1097,22 +1097,19 @@ public struct ScalarScanner<T> {
 	/// Entirely for user use
 	public var context: T
 
-	let array: Array<UnicodeScalar>
-	let scalars: UnsafeMutableBufferPointer<UnicodeScalar>
+	let scalars: Array<UnicodeScalar>
 	var index: Int
 	
 	/// Construct from a String.UnicodeScalarView and a context value
 	public init(scalars: Array<UnicodeScalar>, context: T) {
-		self.array = scalars
-		self.scalars = self.array.withUnsafeMutableBufferPointer { $0 }
+		self.scalars = scalars
 		self.index = self.scalars.startIndex
 		self.context = context
 	}
 	
 	/// Construct from a String and a context value
 	public init(string: String, context: T) {
-		self.array = Array(string.unicodeScalars)
-		self.scalars = self.array.withUnsafeMutableBufferPointer { $0 }
+		self.scalars = Array(string.unicodeScalars)
 		self.index = self.scalars.startIndex
 		self.context = context
 	}
