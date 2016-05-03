@@ -391,12 +391,14 @@ class CwlDemangleTests: XCTestCase {
 	func test_TtP3foo3bar_() {
 		let input = "_TtP3foo3bar_"
 		let output = "foo.bar"
+for _ in 0..<1_000_000 {
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
 			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
+}
 	}
 	
 	func test_TtP3foo3barS_3bas_() {

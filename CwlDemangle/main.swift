@@ -31,7 +31,7 @@ do {
 
 for (input, output) in splitLines {
 	do {
-		let result = try demangleSwiftName(input).print()
+		let result = try demangleSwiftName(input).description
 		if result != output {
 			print("Failed to demangle \(input). Got \(result), expected \(output)")
 		}
