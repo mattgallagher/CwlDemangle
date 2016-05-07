@@ -1075,11 +1075,11 @@ extension Array {
 	func at(index: Int) -> Element? {
 		return self.indices.contains(index) ? self[index] : nil
 	}
-	func slice(range: Range<Int>) -> ArraySlice<Element> {
-		if range.startIndex > self.endIndex || range.endIndex < self.startIndex {
+	func slice(from: Int, _ to: Int) -> ArraySlice<Element> {
+		if from > to || from > self.endIndex || to < self.startIndex {
 			return ArraySlice()
 		} else {
-			return self[max(range.startIndex, self.startIndex)..<min(range.endIndex, self.endIndex)]
+			return self[max(from, self.startIndex)..<min(to, self.endIndex)]
 		}
 	}
 }
@@ -1271,9 +1271,8 @@ public struct SwiftName: CustomStringConvertible {
 	}
 	
 	func printBoundGenericNoSugar<T: OutputStreamType>(inout output: T) {
-		guard children.count >= 2 else { return }
 		children.at(0)?.print(&output)
-		output.write(children[1..<children.endIndex], prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
+		output.write(children.slice(1, children.endIndex), prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
 	}
 	
 	func printBoundGeneric<T: OutputStreamType>(inout output: T) {
@@ -1357,7 +1356,7 @@ public struct SwiftName: CustomStringConvertible {
 			output.write(indexFromContents() == 1 ? "indirect " : "direct ")
 		case .Extension:
 			var index = 0
-			output.write(children.slice(0..<3), labels: ["(extension in ", "):"]) { o, e in
+			output.write(children.prefix(3), labels: ["(extension in ", "):"]) { o, e in
 				e.print(&o, index == 2 ? PrintOptions.asContext : options)
 				index += 1
 			}
@@ -1426,7 +1425,7 @@ public struct SwiftName: CustomStringConvertible {
 		case .VariadicTuple:
 			output.write(children, prefix: "(", separator: ", ", suffix: kind == .VariadicTuple ? "...)" : ")") { $1.print(&$0) }
 		case .TupleElement:
-			output.write(children.slice(0..<2)) { $1.print(&$0) }
+			output.write(children.prefix(2)) { $1.print(&$0) }
 		case .TupleElementName:
 			output.write(contents.description)
 			output.write(" : ")
@@ -1493,15 +1492,15 @@ public struct SwiftName: CustomStringConvertible {
 					}
 				case .Some(.ConstantPropInteger): fallthrough
 				case .Some(.ConstantPropFloat):
-					output.write(children.slice(index...(index + 1)), prefix: "[", separator: " : ", suffix: "]") { $1.print(&$0) }
+					output.write(children.slice(index, (index + 2)), prefix: "[", separator: " : ", suffix: "]") { $1.print(&$0) }
 					index += 1
 				case .Some(.ConstantPropString):
-					output.write(children.slice(index...(index + 2)), labels: ["[", " : ", "'", "']"]) { $1.print(&$0) }
+					output.write(children.slice(index, (index + 3)), labels: ["[", " : ", "'", "']"]) { $1.print(&$0) }
 					index += 2
 				case .Some(.ClosureProp):
-					output.write(children.slice(index...(index + 1)), labels: ["[", " : ", ", Argument Types : ["]) { $1.print(&$0) }
+					output.write(children.slice(index, (index + 2)), labels: ["[", " : ", ", Argument Types : ["]) { $1.print(&$0) }
 					index += 2
-					output.write(children.slice(index..<children.endIndex), separator: ", ", suffix: "]") { $1.print(&$0) }
+					output.write(children.slice(index, children.endIndex), separator: ", ", suffix: "]") { $1.print(&$0) }
 					index = children.endIndex
 				default: children.at(index)?.print(&output)
 				}
@@ -1550,9 +1549,9 @@ public struct SwiftName: CustomStringConvertible {
 		case .PostfixOperator:
 			output.write(contents.description + " postfix")
 		case .LazyProtocolWitnessTableAccessor:
-			output.write(children.slice(0..<2), labels: ["lazy protocol witness table accessor for type ", " and conformance "]) { $1.print(&$0) }
+			output.write(children.prefix(2), labels: ["lazy protocol witness table accessor for type ", " and conformance "]) { $1.print(&$0) }
 		case .LazyProtocolWitnessTableCacheVariable:
-			output.write(children.slice(0..<2), labels: ["lazy protocol witness table cache variable for type ", " and conformance "]) { $1.print(&$0) }
+			output.write(children.prefix(2), labels: ["lazy protocol witness table cache variable for type ", " and conformance "]) { $1.print(&$0) }
 		case .ProtocolWitnessTableAccessor:
 			output.write(children.at(0), prefix: "protocol witness table accessor for ") { $1.print(&$0) }
 		case .ProtocolWitnessTable:
@@ -1570,7 +1569,7 @@ public struct SwiftName: CustomStringConvertible {
 			output.write("partial apply ObjC forwarder")
 			output.write(children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
 		case .FieldOffset:
-			output.write(children.slice(0..<2), separator: "field offset for ") { $1.print(&$0) }
+			output.write(children.prefix(2), separator: "field offset for ") { $1.print(&$0) }
 		case .ReabstractionThunk: fallthrough
 		case .ReabstractionThunkHelper:
 			output.write("reabstraction thunk ")
@@ -1708,7 +1707,7 @@ public struct SwiftName: CustomStringConvertible {
 		case .IVarDestroyer:
 			printEntity(&output, extraName: "__ivar_destroyer", options: options)
 		case .ProtocolConformance:
-			output.write(children.slice(0..<3), labels: [nil, " : ", " in "]) { $1.print(&$0) }
+			output.write(children.prefix(3), labels: [nil, " : ", " in "]) { $1.print(&$0) }
 		case .TypeList:
 			output.write(children) { $1.print(&$0) }
 		case .ImplConvention:
@@ -1735,7 +1734,7 @@ public struct SwiftName: CustomStringConvertible {
 				}
 			}
 			let prefix: String? = (lastDepth + 1 < children.endIndex) ? " where " : nil
-			let s = children.slice((lastDepth + 1)..<children.endIndex)
+			let s = children.slice(lastDepth + 1, children.endIndex)
 			output.write(s, prefix: prefix, separator: ", ", suffix: ">") { $1.print(&$0) }
 		case .DependentGenericParamCount: return
 		case .DependentGenericConformanceRequirement:
