@@ -23,25 +23,22 @@ public func demangleSwiftName(mangled: String) throws -> SwiftName {
 public func demangleSwiftName(mangled: Array<UnicodeScalar>) throws -> SwiftName {
 	var scanner = ScalarScanner(scalars: mangled, context: [SwiftName]())
 	
-	try scanner.requireMatch("_T")
+	try scanner.matchString("_T")
 	var children = [SwiftName]()
 	
-	if scanner.conditionalString("TS") {
+	switch (try scanner.readScalar(), try scanner.readScalar()) {
+	case ("T", "S"):
 		repeat {
 			children.append(try demangleSpecializedAttribute(&scanner))
 			scanner.context.removeAll()
 		} while scanner.conditionalString("_TTS")
-		try scanner.requireMatch("_T")
-	} else if scanner.conditionalString("To") {
-		children.append(SwiftName(kind: .ObjCAttribute))
-	} else if scanner.conditionalString("TO") {
-		children.append(SwiftName(kind: .NonObjCAttribute))
-	} else if scanner.conditionalString("TD") {
-		children.append(SwiftName(kind: .DynamicAttribute))
-	} else if scanner.conditionalString("Td") {
-		children.append(SwiftName(kind: .DirectMethodReferenceAttribute))
-	} else if scanner.conditionalString("TV") {
-		children.append(SwiftName(kind: .VTableAttribute))
+		try scanner.matchString("_T")
+	case ("T", "o"): children.append(SwiftName(kind: .ObjCAttribute))
+	case ("T", "O"): children.append(SwiftName(kind: .NonObjCAttribute))
+	case ("T", "D"): children.append(SwiftName(kind: .DynamicAttribute))
+	case ("T", "d"): children.append(SwiftName(kind: .DirectMethodReferenceAttribute))
+	case ("T", "v"): children.append(SwiftName(kind: .VTableAttribute))
+	default: try scanner.backtrack(2)
 	}
 
 	children.append(try demangleGlobal(&scanner))
@@ -54,125 +51,85 @@ public func demangleSwiftName(mangled: Array<UnicodeScalar>) throws -> SwiftName
 	return SwiftName(kind: .Global, children: children)
 }
 
-func demangleGlobal(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("M") {
-		if scanner.conditionalScalar("P") {
-			return SwiftName(kind: .GenericTypeMetadataPattern, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("a") {
-			return SwiftName(kind: .TypeMetadataAccessFunction, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("L") {
-			return SwiftName(kind: .TypeMetadataLazyCache, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("m") {
-			return SwiftName(kind: .Metaclass, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("n") {
-			return SwiftName(kind: .NominalTypeDescriptor, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("f") {
-			return SwiftName(kind: .FullTypeMetadata, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("p") {
-			return SwiftName(kind: .ProtocolDescriptor, children: [try demangleProtocolName(&scanner)])
-		} else{
-			return SwiftName(kind: .TypeMetadata, children: [try demangleType(&scanner)])
-		}
-	} else if scanner.conditionalScalar("P") {
-		try scanner.requireMatch("A")
+func demangleGlobal<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	let c1 = try scanner.readScalar()
+	let c2 = try scanner.readScalar()
+	switch (c1, c2) {
+	case ("M", "P"): return SwiftName(kind: .GenericTypeMetadataPattern, children: [try demangleType(&scanner)])
+	case ("M", "a"): return SwiftName(kind: .TypeMetadataAccessFunction, children: [try demangleType(&scanner)])
+	case ("M", "L"): return SwiftName(kind: .TypeMetadataLazyCache, children: [try demangleType(&scanner)])
+	case ("M", "m"): return SwiftName(kind: .Metaclass, children: [try demangleType(&scanner)])
+	case ("M", "n"): return SwiftName(kind: .NominalTypeDescriptor, children: [try demangleType(&scanner)])
+	case ("M", "f"): return SwiftName(kind: .FullTypeMetadata, children: [try demangleType(&scanner)])
+	case ("M", "p"): return SwiftName(kind: .ProtocolDescriptor, children: [try demangleProtocolName(&scanner)])
+	case ("M", _):
+		try scanner.backtrack()
+		return SwiftName(kind: .TypeMetadata, children: [try demangleType(&scanner)])
+	case ("P", "A"):
 		return SwiftName(kind: scanner.conditionalScalar("o") ? .PartialApplyObjCForwarder : .PartialApplyForwarder, children: scanner.conditionalString("__T") ? [try demangleGlobal(&scanner)] : [])
-	} else if scanner.conditionalScalar("t") {
+	case ("P", _): throw scanner.unexpectedError()
+	case ("t", _):
+		try scanner.backtrack()
 		return SwiftName(kind: .TypeMangling, children: [try demangleType(&scanner)])
-	} else if scanner.conditionalScalar("w") {
-		let twoChars = try scanner.requireScalars(2)
+	case ("w", _):
+		let c3 = try scanner.readScalar()
 		let value: UInt32
-		switch twoChars {
-		case "al": value = ValueWitnessKind.AllocateBuffer.rawValue
-		case "ca": value = ValueWitnessKind.AssignWithCopy.rawValue
-		case "ta": value = ValueWitnessKind.AssignWithTake.rawValue
-		case "de": value = ValueWitnessKind.DeallocateBuffer.rawValue
-		case "xx": value = ValueWitnessKind.Destroy.rawValue
-		case "XX": value = ValueWitnessKind.DestroyBuffer.rawValue
-		case "CP": value = ValueWitnessKind.InitializeBufferWithCopyOfBuffer.rawValue
-		case "Cp": value = ValueWitnessKind.InitializeBufferWithCopy.rawValue
-		case "cp": value = ValueWitnessKind.InitializeWithCopy.rawValue
-		case "Cc": value = ValueWitnessKind.InitializeArrayWithCopy.rawValue
-		case "TK": value = ValueWitnessKind.InitializeBufferWithTakeOfBuffer.rawValue
-		case "Tk": value = ValueWitnessKind.InitializeBufferWithTake.rawValue
-		case "tk": value = ValueWitnessKind.InitializeWithTake.rawValue
-		case "Tt": value = ValueWitnessKind.InitializeArrayWithTakeFrontToBack.rawValue
-		case "tT": value = ValueWitnessKind.InitializeArrayWithTakeBackToFront.rawValue
-		case "pr": value = ValueWitnessKind.ProjectBuffer.rawValue
-		case "Xx": value = ValueWitnessKind.DestroyArray.rawValue
-		case "xs": value = ValueWitnessKind.StoreExtraInhabitant.rawValue
-		case "xg": value = ValueWitnessKind.GetExtraInhabitantIndex.rawValue
-		case "ug": value = ValueWitnessKind.GetEnumTag.rawValue
-		case "up": value = ValueWitnessKind.DestructiveProjectEnumData.rawValue
+		switch (c2, c3) {
+		case ("a", "l"): value = ValueWitnessKind.AllocateBuffer.rawValue
+		case ("c", "a"): value = ValueWitnessKind.AssignWithCopy.rawValue
+		case ("t", "a"): value = ValueWitnessKind.AssignWithTake.rawValue
+		case ("d", "e"): value = ValueWitnessKind.DeallocateBuffer.rawValue
+		case ("x", "x"): value = ValueWitnessKind.Destroy.rawValue
+		case ("X", "X"): value = ValueWitnessKind.DestroyBuffer.rawValue
+		case ("C", "P"): value = ValueWitnessKind.InitializeBufferWithCopyOfBuffer.rawValue
+		case ("C", "p"): value = ValueWitnessKind.InitializeBufferWithCopy.rawValue
+		case ("c", "p"): value = ValueWitnessKind.InitializeWithCopy.rawValue
+		case ("C", "c"): value = ValueWitnessKind.InitializeArrayWithCopy.rawValue
+		case ("T", "K"): value = ValueWitnessKind.InitializeBufferWithTakeOfBuffer.rawValue
+		case ("T", "k"): value = ValueWitnessKind.InitializeBufferWithTake.rawValue
+		case ("t", "k"): value = ValueWitnessKind.InitializeWithTake.rawValue
+		case ("T", "t"): value = ValueWitnessKind.InitializeArrayWithTakeFrontToBack.rawValue
+		case ("t", "T"): value = ValueWitnessKind.InitializeArrayWithTakeBackToFront.rawValue
+		case ("p", "r"): value = ValueWitnessKind.ProjectBuffer.rawValue
+		case ("X", "x"): value = ValueWitnessKind.DestroyArray.rawValue
+		case ("x", "s"): value = ValueWitnessKind.StoreExtraInhabitant.rawValue
+		case ("x", "g"): value = ValueWitnessKind.GetExtraInhabitantIndex.rawValue
+		case ("u", "g"): value = ValueWitnessKind.GetEnumTag.rawValue
+		case ("u", "p"): value = ValueWitnessKind.DestructiveProjectEnumData.rawValue
 		default: throw scanner.unexpectedError()
 		}
 		return SwiftName(kind: .ValueWitness, children: [try demangleType(&scanner)], contents: .Index(value))
-	} else if scanner.conditionalScalar("W") {
-		if scanner.conditionalScalar("V") {
-			return SwiftName(kind: .ValueWitnessTable, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("o") {
-			return SwiftName(kind: .WitnessTableOffset, children: [try demangleEntity(&scanner)])
-		} else if scanner.conditionalScalar("v") {
-			let directness: UInt32
-			if scanner.conditionalScalar("d") {
-				directness = 0
-			} else {
-				try scanner.requireMatch("i")
-				directness = 1
-			}
-			let child = SwiftName(kind: .Directness, contents: .Index(directness))
-			return SwiftName(kind: .FieldOffset, children: [child, try demangleEntity(&scanner)])
-		} else if scanner.conditionalScalar("P") {
-			return SwiftName(kind: .ProtocolWitnessTable, children: [try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("G") {
-			return SwiftName(kind: .GenericProtocolWitnessTable, children: [try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("I") {
-			return SwiftName(kind: .GenericProtocolWitnessTableInstantiationFunction, children: [try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("l") {
-			return SwiftName(kind: .LazyProtocolWitnessTableAccessor, children: [try demangleType(&scanner), try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("L") {
-			return SwiftName(kind: .LazyProtocolWitnessTableCacheVariable, children: [try demangleType(&scanner), try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("a") {
-			return SwiftName(kind: .ProtocolWitnessTableAccessor, children: [try demangleProtocolConformance(&scanner)])
-		} else if scanner.conditionalScalar("t") {
-			return SwiftName(kind: .AssociatedTypeMetadataAccessor, children: [try demangleProtocolConformance(&scanner), try demangleDeclName(&scanner)])
-		} else if scanner.conditionalScalar("T") {
-			return SwiftName(kind: .AssociatedTypeWitnessTableAccessor, children: [try demangleProtocolConformance(&scanner), try demangleDeclName(&scanner), try demangleProtocolName(&scanner)])
-		} else {
-			throw scanner.unexpectedError()
-		}
-	} else if scanner.conditionalScalar("T") {
-		if scanner.conditionalScalar("W") {
-			return SwiftName(kind: .ProtocolWitness, children: [try demangleProtocolConformance(&scanner), try demangleEntity(&scanner)])
-		}
-		
-		let kind: SwiftName.Kind
-		if scanner.conditionalScalar("R") {
-			kind = .ReabstractionThunkHelper
-		} else {
-			try scanner.requireMatch("r")
-			kind = .ReabstractionThunk
-		}
-		var children = [SwiftName]()
-		if scanner.conditionalScalar("G") {
-			children.append(try demangleGenericSignature(&scanner))
-		}
-		children.append(try demangleType(&scanner))
-		children.append(try demangleType(&scanner))
-		return SwiftName(kind: kind, children: children)
-	} else {
+	case ("W", "V"): return SwiftName(kind: .ValueWitnessTable, children: [try demangleType(&scanner)])
+	case ("W", "o"): return SwiftName(kind: .WitnessTableOffset, children: [try demangleEntity(&scanner)])
+	case ("W", "v"): return SwiftName(kind: .FieldOffset, children: [SwiftName(kind: .Directness, contents: .Index(try scanner.readScalar() == "d" ? 0 : 1)), try demangleEntity(&scanner)])
+	case ("W", "P"): return SwiftName(kind: .ProtocolWitnessTable, children: [try demangleProtocolConformance(&scanner)])
+	case ("W", "G"): return SwiftName(kind: .GenericProtocolWitnessTable, children: [try demangleProtocolConformance(&scanner)])
+	case ("W", "I"): return SwiftName(kind: .GenericProtocolWitnessTableInstantiationFunction, children: [try demangleProtocolConformance(&scanner)])
+	case ("W", "l"): return SwiftName(kind: .LazyProtocolWitnessTableAccessor, children: [try demangleType(&scanner), try demangleProtocolConformance(&scanner)])
+	case ("W", "L"): return SwiftName(kind: .LazyProtocolWitnessTableCacheVariable, children: [try demangleType(&scanner), try demangleProtocolConformance(&scanner)])
+	case ("W", "a"): return SwiftName(kind: .ProtocolWitnessTableAccessor, children: [try demangleProtocolConformance(&scanner)])
+	case ("W", "t"): return SwiftName(kind: .AssociatedTypeMetadataAccessor, children: [try demangleProtocolConformance(&scanner), try demangleDeclName(&scanner)])
+	case ("W", "T"): return SwiftName(kind: .AssociatedTypeWitnessTableAccessor, children: [try demangleProtocolConformance(&scanner), try demangleDeclName(&scanner), try demangleProtocolName(&scanner)])
+	case ("W", _): throw scanner.unexpectedError()
+	case ("T","W"): return SwiftName(kind: .ProtocolWitness, children: [try demangleProtocolConformance(&scanner), try demangleEntity(&scanner)])
+	case ("T", "R"): fallthrough
+	case ("T", "r"): return SwiftName(kind: c2 == "R" ? SwiftName.Kind.ReabstractionThunkHelper : SwiftName.Kind.ReabstractionThunk, children: scanner.conditionalScalar("G") ? [try demangleGenericSignature(&scanner), try demangleType(&scanner), try demangleType(&scanner)] : [try demangleType(&scanner), try demangleType(&scanner)])
+	default:
+		try scanner.backtrack(2)
 		return try demangleEntity(&scanner)
 	}
 }
 
-
-func demangleSpecializedAttribute(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	let c = try scanner.requireScalar()
+func demangleSpecializedAttribute<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	let c = try scanner.readScalar()
 	var children = [SwiftName]()
 	if scanner.conditionalScalar("q") {
 		children.append(SwiftName(kind: .SpecializationIsFragile))
 	}
-	children.append(SwiftName(kind: .SpecializationPassID, contents: .Index(try scanner.requireScalar().value - 48)))
-	if c == "r" || c == "g" {
+	children.append(SwiftName(kind: .SpecializationPassID, contents: .Index(try scanner.readScalar().value - 48)))
+	switch c {
+	case "r": fallthrough
+	case "g":
 		while !scanner.conditionalScalar("_") {
 			var parameterChildren = [SwiftName]()
 			parameterChildren.append(try demangleType(&scanner))
@@ -182,105 +139,91 @@ func demangleSpecializedAttribute(inout scanner: ScalarScanner<[SwiftName]>) thr
 			children.append(SwiftName(kind: .GenericSpecializationParam, children: parameterChildren))
 		}
 		return SwiftName(kind: c == "r" ? .GenericSpecializationNotReAbstracted : .GenericSpecialization, children: children)
-	} else if c == "f" {
+	case "f":
 		var count: UInt32 = 0
 		while !scanner.conditionalScalar("_") {
 			var paramChildren = [SwiftName]()
-			if scanner.conditionalString("n_") {
-				// empty
-			} else if scanner.conditionalString("cp") {
-				paramChildren.appendContentsOf(try demangleFuncSigSpecializationConstantProp(&scanner))
-			} else if scanner.conditionalString("cl") {
+			let c = try scanner.readScalar()
+			switch (c, try scanner.readScalar()) {
+			case ("n", "_"): break
+			case ("c", "p"): paramChildren.appendContentsOf(try demangleFuncSigSpecializationConstantProp(&scanner))
+			case ("c", "l"):
 				paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ClosureProp.rawValue)))
 				paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: try demangleIdentifier(&scanner).contents))
 				while !scanner.conditionalScalar("_") {
 					paramChildren.append(try demangleType(&scanner))
 				}
-			} else if scanner.conditionalString("i_") {
-				paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.BoxToValue.rawValue)))
-			} else if scanner.conditionalString("k_") {
-				paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.BoxToStack.rawValue)))
-			} else {
+			case ("i", "_"): fallthrough
+			case ("k", "_"): paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(c == "i" ? FunctionSigSpecializationParamKind.BoxToValue.rawValue : FunctionSigSpecializationParamKind.BoxToStack.rawValue)))
+			default:
+				try scanner.backtrack(2)
 				var value: UInt32 = 0
-				if scanner.conditionalScalar("d") {
-					value |= FunctionSigSpecializationParamKind.Dead.rawValue
-				}
-				if scanner.conditionalScalar("g") {
-					value |= FunctionSigSpecializationParamKind.OwnedToGuaranteed.rawValue
-				}
-				if scanner.conditionalScalar("s") {
-					value |= FunctionSigSpecializationParamKind.SROA.rawValue
-				}
-				try scanner.requireMatch("_")
+				value |= scanner.conditionalScalar("d") ? FunctionSigSpecializationParamKind.Dead.rawValue : 0
+				value |= scanner.conditionalScalar("g") ? FunctionSigSpecializationParamKind.OwnedToGuaranteed.rawValue : 0
+				value |= scanner.conditionalScalar("s") ? FunctionSigSpecializationParamKind.SROA.rawValue : 0
+				try scanner.matchScalar("_")
 				paramChildren.append(SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(value)))
 			}
 			children.append(SwiftName(kind: .FunctionSignatureSpecializationParam, children: paramChildren, contents: .Index(count)))
 			count += 1
 		}
 		return SwiftName(kind: .FunctionSignatureSpecialization, children: children)
-	} else {
-		throw scanner.unexpectedError()
+	default: throw scanner.unexpectedError()
 	}
 }
 
-func demangleFuncSigSpecializationConstantProp(inout scanner: ScalarScanner<[SwiftName]>) throws -> [SwiftName] {
-	if scanner.conditionalString("fr") {
+func demangleFuncSigSpecializationConstantProp<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> [SwiftName] {
+	switch (try scanner.readScalar(), try scanner.readScalar()) {
+	case ("f", "r"):
 		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: try demangleIdentifier(&scanner).contents)
-		try scanner.requireMatch("_")
+		try scanner.matchScalar("_")
 		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropFunction.rawValue))
 		return [kind, name]
-	} else if scanner.conditionalScalar("g") {
+	case ("g", _):
+		try scanner.backtrack()
 		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: try demangleIdentifier(&scanner).contents)
-		try scanner.requireMatch("_")
+		try scanner.matchScalar("_")
 		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropGlobal.rawValue))
 		return [kind, name]
-	} else if scanner.conditionalScalar("i") {
-		var string: String = ""
-		while !scanner.conditionalScalar("_") {
-			string.append(try scanner.requireScalar())
-		}
+	case ("i", _):
+		try scanner.backtrack()
+		let string = try scanner.readUntil("_")
+		try scanner.matchScalar("_")
 		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: .Name(string))
 		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropInteger.rawValue))
 		return [kind, name]
-	} else if scanner.conditionalScalar("i") {
+	case ("f", "l"):
 		let string = try scanner.readUntil("_")
-		try scanner.requireMatch("_")
-		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: .Name(string))
-		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropInteger.rawValue))
-		return [kind, name]
-	} else if scanner.conditionalString("fl") {
-		let string = try scanner.readUntil("_")
-		try scanner.requireMatch("_")
+		try scanner.matchScalar("_")
 		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: .Name(string))
 		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropFloat.rawValue))
 		return [kind, name]
-	} else if scanner.conditionalScalar("s") {
-		try scanner.requireMatch("e")
+	case ("s", "e"):
 		var string: String
-		switch try scanner.requireScalar() {
+		switch try scanner.readScalar() {
 		case "0": string = "u8"
 		case "1": string = "u16"
 		default: throw scanner.unexpectedError()
 		}
-		try scanner.requireMatch("v")
+		try scanner.matchScalar("v")
 		let name = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: try demangleIdentifier(&scanner).contents)
 		let encoding = SwiftName(kind: .FunctionSignatureSpecializationParamPayload, contents: .Name(string))
 		let kind = SwiftName(kind: .FunctionSignatureSpecializationParamKind, contents: .Index(FunctionSigSpecializationParamKind.ConstantPropString.rawValue))
-		try scanner.requireMatch("_")
+		try scanner.matchScalar("_")
 		return [kind, encoding, name]
+	default: throw scanner.unexpectedError()
 	}
-	throw scanner.unexpectedError()
 }
 
 
-func demangleProtocolConformance(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleProtocolConformance<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let type = try demangleType(&scanner)
 	let prot = try demangleProtocolName(&scanner)
 	let context = try demangleContext(&scanner)
 	return SwiftName(kind: .ProtocolConformance, children: [type, prot, context])
 }
 
-func demangleProtocolName(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleProtocolName<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let name: SwiftName
 	if scanner.conditionalScalar("S") {
 		let index = try demangleSubstitutionIndex(&scanner)
@@ -299,137 +242,66 @@ func demangleProtocolName(inout scanner: ScalarScanner<[SwiftName]>) throws -> S
 	return SwiftName(kind: .Type, children: [name])
 }
 
-func demangleProtocolNameGivenContext(inout scanner: ScalarScanner<[SwiftName]>, context: SwiftName) throws -> SwiftName {
+func demangleProtocolNameGivenContext<C>(inout scanner: ScalarScanner<C, [SwiftName]>, context: SwiftName) throws -> SwiftName {
 	let name = try demangleDeclName(&scanner)
 	let result = SwiftName(kind: .Protocol, children: [context, name])
 	scanner.context.append(result)
 	return result
 }
 
-func demangleEntity(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleEntity<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let isStatic = scanner.conditionalScalar("Z")
 	
 	let basicKind: SwiftName.Kind
-	if scanner.conditionalScalar("F") {
-		basicKind = .Function
-	} else if scanner.conditionalScalar("v") {
-		basicKind = .Variable
-	} else if scanner.conditionalScalar("I") {
-		basicKind = .Initializer
-	} else if scanner.conditionalScalar("i") {
-		basicKind = .Subscript
-	} else if scanner.conditionalScalar("S") {
-		return try demangleSubstitutionIndex(&scanner)
-	} else if scanner.conditionalScalar("V") {
-		return try demangleDeclarationName(&scanner, kind: .Structure)
-	} else if scanner.conditionalScalar("O") {
-		return try demangleDeclarationName(&scanner, kind: .Enum)
-	} else if scanner.conditionalScalar("C") {
-		return try demangleDeclarationName(&scanner, kind: .Class)
-	} else if scanner.conditionalScalar("P") {
-		return try demangleDeclarationName(&scanner, kind: .Protocol)
-	} else {
-		throw scanner.unexpectedError()
+	switch try scanner.readScalar() {
+	case "F": basicKind = .Function
+	case "v": basicKind = .Variable
+	case "I": basicKind = .Initializer
+	case "i": basicKind = .Subscript
+	case "S": return try demangleSubstitutionIndex(&scanner)
+	case "V": return try demangleDeclarationName(&scanner, kind: .Structure)
+	case "O": return try demangleDeclarationName(&scanner, kind: .Enum)
+	case "C": return try demangleDeclarationName(&scanner, kind: .Class)
+	case "P": return try demangleDeclarationName(&scanner, kind: .Protocol)
+	default: throw scanner.unexpectedError()
 	}
 	
 	let context = try demangleContext(&scanner)
-
 	let kind: SwiftName.Kind
 	let hasType: Bool
 	var name: SwiftName? = nil
 	
-	if scanner.conditionalScalar("D") {
-		kind = .Deallocator
-		hasType = false
-	} else if scanner.conditionalScalar("d") {
-		kind = .Destructor
-		hasType = false
-	} else if scanner.conditionalScalar("e") {
-		kind = .IVarInitializer
-		hasType = false
-	} else if scanner.conditionalScalar("E") {
-		kind = .IVarDestroyer
-		hasType = false
-	} else if scanner.conditionalScalar("C") {
-		kind = .Allocator
-		hasType = true
-	} else if scanner.conditionalScalar("c") {
-		kind = .Constructor
-		hasType = true
-	} else if scanner.conditionalScalar("a") {
-		if scanner.conditionalScalar("O") {
-			kind = .OwningMutableAddressor
-		} else if scanner.conditionalScalar("o") {
-			kind = .NativeOwningMutableAddressor
-		} else if scanner.conditionalScalar("p") {
-			kind = .NativePinningMutableAddressor
-		} else if scanner.conditionalScalar("u") {
-			kind = .UnsafeMutableAddressor
-		} else {
-			throw scanner.unexpectedError()
+	let c = try scanner.readScalar()
+	switch c {
+	case "D": (kind, hasType) = (.Deallocator, false)
+	case "d": (kind, hasType) = (.Destructor, false)
+	case "e": (kind, hasType) = (.IVarInitializer, false)
+	case "E": (kind, hasType) = (.IVarDestroyer, false)
+	case "C": (kind, hasType) = (.Allocator, true)
+	case "c": (kind, hasType) = (.Constructor, true)
+	case "a": fallthrough
+	case "l":
+		switch try scanner.readScalar() {
+		case "O": (kind, hasType, name) = (c == "a" ? .OwningMutableAddressor : .OwningAddressor, true, try demangleDeclName(&scanner))
+		case "o": (kind, hasType, name) = (c == "a" ? .NativeOwningMutableAddressor : .NativeOwningAddressor, true, try demangleDeclName(&scanner))
+		case "p": (kind, hasType, name) = (c == "a" ? .NativePinningMutableAddressor : .NativePinningAddressor, true, try demangleDeclName(&scanner))
+		case "u": (kind, hasType, name) = (c == "a" ? .UnsafeMutableAddressor : .UnsafeAddressor, true, try demangleDeclName(&scanner))
+		default: throw scanner.unexpectedError()
 		}
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("l") {
-		if scanner.conditionalScalar("O") {
-			kind = .OwningAddressor
-		} else if scanner.conditionalScalar("o") {
-			kind = .NativeOwningAddressor
-		} else if scanner.conditionalScalar("p") {
-			kind = .NativePinningAddressor
-		} else if scanner.conditionalScalar("u") {
-			kind = .UnsafeAddressor
-		} else {
-			throw scanner.unexpectedError()
-		}
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("g") {
-		kind = .Getter
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("G") {
-		kind = .GlobalGetter
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("s") {
-		kind = .Setter
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("m") {
-		kind = .MaterializeForSet
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("w") {
-		kind = .WillSet
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("W") {
-		kind = .DidSet
-		hasType = true
-		name = try demangleDeclName(&scanner)
-	} else if scanner.conditionalScalar("U") {
-		kind = .ExplicitClosure
-		hasType = true
-		name = SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner)))
-	} else if scanner.conditionalScalar("u") {
-		kind = .ImplicitClosure
-		hasType = true
-		name = SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner)))
-	} else if case .Initializer = basicKind {
-		if scanner.conditionalScalar("A") {
-			kind = .DefaultArgumentInitializer
-			name = SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner)))
-		} else if scanner.conditionalScalar("i") {
-			kind = .Initializer
-		} else {
-			throw scanner.unexpectedError()
-		}
-		hasType = false
-	} else {
-		kind = basicKind
-		hasType = true
-		name = try demangleDeclName(&scanner)
+	case "g": (kind, hasType, name) = (.Getter, true, try demangleDeclName(&scanner))
+	case "G": (kind, hasType, name) = (.GlobalGetter, true, try demangleDeclName(&scanner))
+	case "s": (kind, hasType, name) = (.Setter, true, try demangleDeclName(&scanner))
+	case "m": (kind, hasType, name) = (.MaterializeForSet, true, try demangleDeclName(&scanner))
+	case "w": (kind, hasType, name) = (.WillSet, true, try demangleDeclName(&scanner))
+	case "W": (kind, hasType, name) = (.DidSet, true, try demangleDeclName(&scanner))
+	case "U": (kind, hasType, name) = (.ExplicitClosure, true, SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner))))
+	case "u": (kind, hasType, name) = (.ImplicitClosure, true, SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner))))
+	case "A" where basicKind == .Initializer: (kind, hasType, name) = (.DefaultArgumentInitializer, false, SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner))))
+	case "i" where basicKind == .Initializer: (kind, hasType) = (.Initializer, false)
+	case _ where basicKind == .Initializer: throw scanner.unexpectedError()
+	default:
+		try scanner.backtrack()
+		(kind, hasType, name) = (basicKind, true, try demangleDeclName(&scanner))
 	}
 	
 	var children = [context]
@@ -440,37 +312,25 @@ func demangleEntity(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftNa
 		children.append(try demangleType(&scanner))
 	}
 	let entity = SwiftName(kind: kind, children: children)
-	if isStatic {
-		return SwiftName(kind: .Static, children: [entity])
-	} else {
-		return entity
-	}
+	return isStatic ? SwiftName(kind: .Static, children: [entity]) : entity
 }
 
-func demangleDeclarationName(inout scanner: ScalarScanner<[SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
+func demangleDeclarationName<C>(inout scanner: ScalarScanner<C, [SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
 	let result = SwiftName(kind: kind, children: [try demangleContext(&scanner), try demangleDeclName(&scanner)])
 	scanner.context.append(result)
 	return result
 }
 
-func demangleContext(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("E") {
-		let module = try demangleModule(&scanner)
-		let type = try demangleContext(&scanner)
-		return SwiftName(kind: .Extension, children: [module, type])
-	} else if scanner.conditionalScalar("e") {
+func demangleContext<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "E": return SwiftName(kind: .Extension, children: [try demangleModule(&scanner), try demangleContext(&scanner)])
+	case "e":
 		let module = try demangleModule(&scanner)
 		let signature = try demangleGenericSignature(&scanner)
 		let type = try demangleContext(&scanner)
 		return SwiftName(kind: .Extension, children: [module, type, signature])
-	} else if scanner.conditionalScalar("S") {
-		return try demangleSubstitutionIndex(&scanner)
-	} else if scanner.conditionalScalar("s") {
-		return SwiftName(kind: .Module, children: [], contents: .Name(stdlibName))
-	}
-	
-	let c = try scanner.requirePeek()
-	switch c {
+	case "S": return try demangleSubstitutionIndex(&scanner)
+	case "s": return SwiftName(kind: .Module, children: [], contents: .Name(stdlibName))
 	case "F": fallthrough
 	case "I": fallthrough
 	case "v": fallthrough
@@ -479,82 +339,71 @@ func demangleContext(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftN
 	case "Z": fallthrough
 	case "C": fallthrough
 	case "V": fallthrough
-	case "O": return try demangleEntity(&scanner)
-	default: break
+	case "O":
+		try scanner.backtrack()
+		return try demangleEntity(&scanner)
+	default:
+		try scanner.backtrack()
+		return try demangleModule(&scanner)
 	}
-	
-	return try demangleModule(&scanner)
 }
 
-func demangleModule(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("S") {
-		return try demangleSubstitutionIndex(&scanner)
-	} else if scanner.conditionalScalar("s") {
-		return SwiftName(kind: .Module, children: [], contents: .Name("Swift"))
+func demangleModule<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "S": return try demangleSubstitutionIndex(&scanner)
+	case "s": return SwiftName(kind: .Module, children: [], contents: .Name("Swift"))
+	default:
+		try scanner.backtrack()
+		let module = try demangleIdentifier(&scanner, kind: .Module)
+		scanner.context.append(module)
+		return module
 	}
-	let module = try demangleIdentifier(&scanner, kind: .Module)
-	scanner.context.append(module)
-	return module
 }
 
-
-func demangleSubstitutionIndex(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("o") {
-		return SwiftName(kind: .Module, contents: .Name(objcModule))
-	} else if scanner.conditionalScalar("C") {
-		return SwiftName(kind: .Module, contents: .Name(cModule))
-	} else if scanner.conditionalScalar("a") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Array"))])
-	} else if scanner.conditionalScalar("b") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Bool"))])
-	} else if scanner.conditionalScalar("c") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UnicodeScalar"))])
-	} else if scanner.conditionalScalar("d") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Double"))])
-	} else if scanner.conditionalScalar("f") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Float"))])
-	} else if scanner.conditionalScalar("i") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Int"))])
-	} else if scanner.conditionalScalar("P") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UnsafePointer"))])
-	} else if scanner.conditionalScalar("p") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UnsafeMutablePointer"))])
-	} else if scanner.conditionalScalar("q") {
-		return SwiftName(kind: .Enum, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("Optional"))])
-	} else if scanner.conditionalScalar("Q") {
-		return SwiftName(kind: .Enum, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("ImplicitlyUnwrappedOptional"))])
-	} else if scanner.conditionalScalar("R") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UnsafeBufferPointer"))])
-	} else if scanner.conditionalScalar("r") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UnsafeMutableBufferPointer"))])
-	} else if scanner.conditionalScalar("S") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("String"))])
-	} else if scanner.conditionalScalar("u") {
-		return SwiftName(kind: .Structure, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name("UInt"))])
-	}
-	let index = try demangleIndex(&scanner)
-	if Int(index) >= scanner.context.count {
-		throw scanner.unexpectedError()
-	}
-	return scanner.context[Int(index)]
+func swiftStdLibType(kind: SwiftName.Kind, named: String) -> SwiftName {
+	return SwiftName(kind: kind, children: [SwiftName(kind: .Module, contents: .Name(stdlibName)), SwiftName(kind: .Identifier, contents: .Name(named))])
 }
 
-func demangleGenericSignature(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	var count: UInt32 = ~0
-	var children = [SwiftName]()
-	while try scanner.requirePeek() != "R" && scanner.requirePeek() != "r" {
-		if scanner.conditionalScalar("z") {
-			count = 0
-		} else {
-			count = try demangleIndex(&scanner) + 1
+func demangleSubstitutionIndex<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "o": return SwiftName(kind: .Module, contents: .Name(objcModule))
+	case "C": return SwiftName(kind: .Module, contents: .Name(cModule))
+	case "a": return swiftStdLibType(.Structure, named: "Array")
+	case "b": return swiftStdLibType(.Structure, named: "Bool")
+	case "c": return swiftStdLibType(.Structure, named: "UnicodeScalar")
+	case "d": return swiftStdLibType(.Structure, named: "Double")
+	case "f": return swiftStdLibType(.Structure, named: "Float")
+	case "i": return swiftStdLibType(.Structure, named: "Int")
+	case "P": return swiftStdLibType(.Structure, named: "UnsafePointer")
+	case "p": return swiftStdLibType(.Structure, named: "UnsafeMutablePointer")
+	case "q": return swiftStdLibType(.Enum, named: "Optional")
+	case "Q": return swiftStdLibType(.Enum, named: "ImplicitlyUnwrappedOptional")
+	case "R": return swiftStdLibType(.Structure, named: "UnsafeBufferPointer")
+	case "r": return swiftStdLibType(.Structure, named: "UnsafeMutableBufferPointer")
+	case "S": return swiftStdLibType(.Structure, named: "String")
+	case "u": return swiftStdLibType(.Structure, named: "UInt")
+	default:
+		try scanner.backtrack()
+		let index = try demangleIndex(&scanner)
+		if Int(index) >= scanner.context.count {
+			throw scanner.unexpectedError()
 		}
-		children.append(SwiftName(kind: .DependentGenericParamCount, contents: .Index(count)))
+		return scanner.context[Int(index)]
 	}
-	if count == ~0 {
+}
+
+func demangleGenericSignature<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	var children = [SwiftName]()
+	var c = try scanner.requirePeek()
+	while c != "R" && c != "r" {
+		children.append(SwiftName(kind: .DependentGenericParamCount, contents: .Index(scanner.conditionalScalar("z") ? 0 : (try demangleIndex(&scanner) + 1))))
+		c = try scanner.requirePeek()
+	}
+	if children.isEmpty {
 		children.append(SwiftName(kind: .DependentGenericParamCount, contents: .Index(1)))
 	}
 	if !scanner.conditionalScalar("r") {
-		try scanner.requireMatch("R")
+		try scanner.matchScalar("R")
 		while !scanner.conditionalScalar("r") {
 			children.append(try demangleGenericRequirement(&scanner))
 		}
@@ -562,7 +411,7 @@ func demangleGenericSignature(inout scanner: ScalarScanner<[SwiftName]>) throws 
 	return SwiftName(kind: .DependentGenericSignature, children: children)
 }
 
-func demangleGenericRequirement(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleGenericRequirement<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let constrainedType = try demangleConstrainedType(&scanner)
 	if scanner.conditionalScalar("z") {
 		return SwiftName(kind: .DependentGenericSameTypeRequirement, children: [constrainedType, try demangleType(&scanner)])
@@ -572,7 +421,7 @@ func demangleGenericRequirement(inout scanner: ScalarScanner<[SwiftName]>) throw
 	if c == "C" {
 		constraint = try demangleType(&scanner)
 	} else if c == "S" {
-		try scanner.requireMatch("S")
+		try scanner.matchScalar("S")
 		let index = try demangleSubstitutionIndex(&scanner)
 		let typename: SwiftName
 		switch index.kind {
@@ -588,7 +437,7 @@ func demangleGenericRequirement(inout scanner: ScalarScanner<[SwiftName]>) throw
 	return SwiftName(kind: .DependentGenericConformanceRequirement, children: [constrainedType, constraint])
 }
 
-func demangleConstrainedType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleConstrainedType<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	if scanner.conditionalScalar("w") {
 		return try demangleAssociatedTypeSimple(&scanner)
 	} else if scanner.conditionalScalar("W") {
@@ -597,12 +446,12 @@ func demangleConstrainedType(inout scanner: ScalarScanner<[SwiftName]>) throws -
 	return try demangleGenericParamIndex(&scanner)
 }
 
-func demangleAssociatedTypeSimple(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleAssociatedTypeSimple<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let base = try demangleGenericParamIndex(&scanner)
 	return try demangleDependentMemberTypeName(&scanner, base: SwiftName(kind: .Type, children: [base]))
 }
 
-func demangleAssociatedTypeCompound(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleAssociatedTypeCompound<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	var base = try demangleGenericParamIndex(&scanner)
 	while !scanner.conditionalScalar("_") {
 		let type = SwiftName(kind: .Type, children: [base])
@@ -611,25 +460,20 @@ func demangleAssociatedTypeCompound(inout scanner: ScalarScanner<[SwiftName]>) t
 	return base
 }
 
-func demangleGenericParamIndex(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleGenericParamIndex<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let depth: UInt32
 	let index: UInt32
-	if scanner.conditionalScalar("d") {
-		depth = try demangleIndex(&scanner) + 1
-		index = try demangleIndex(&scanner)
-	} else if scanner.conditionalScalar("x") {
-		depth = 0
-		index = 0
-	} else {
-		index = try demangleIndex(&scanner) + 1
-		depth = 0
+	switch try scanner.readScalar() {
+	case "d": (depth, index) = (try demangleIndex(&scanner) + 1, try demangleIndex(&scanner))
+	case "x": (depth, index) = (0, 0)
+	default:
+		try scanner.backtrack()
+		(depth, index) = (0, try demangleIndex(&scanner) + 1)
 	}
-	let depthChild = SwiftName(kind: .Index, contents: .Index(depth))
-	let indexChild = SwiftName(kind: .Index, contents: .Index(index))
-	return SwiftName(kind: .DependentGenericParamType, children: [depthChild, indexChild], contents: .Name(archetypeName(index, depth)))
+	return SwiftName(kind: .DependentGenericParamType, children: [SwiftName(kind: .Index, contents: .Index(depth)), SwiftName(kind: .Index, contents: .Index(index))], contents: .Name(archetypeName(index, depth)))
 }
 
-func demangleDependentMemberTypeName(inout scanner: ScalarScanner<[SwiftName]>, base: SwiftName) throws -> SwiftName {
+func demangleDependentMemberTypeName<C>(inout scanner: ScalarScanner<C, [SwiftName]>, base: SwiftName) throws -> SwiftName {
 	let associatedType: SwiftName
 	if scanner.conditionalScalar("S") {
 		associatedType = try demangleSubstitutionIndex(&scanner)
@@ -652,96 +496,76 @@ func demangleDependentMemberTypeName(inout scanner: ScalarScanner<[SwiftName]>, 
 	return SwiftName(kind: .DependentMemberType, children: [base, associatedType])
 }
 
-func demangleDeclName(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("L") {
-		let discriminator = SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner)))
-		let name = try demangleIdentifier(&scanner)
-		return SwiftName(kind: .LocalDeclName, children: [discriminator, name])
-	} else if scanner.conditionalScalar("P") {
-		let discriminator = try demangleIdentifier(&scanner)
-		let name = try demangleIdentifier(&scanner)
-		return SwiftName(kind: .PrivateDeclName, children: [discriminator, name])
+func demangleDeclName<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "L": return SwiftName(kind: .LocalDeclName, children: [SwiftName(kind: .Number, contents: .Index(try demangleIndex(&scanner))), try demangleIdentifier(&scanner)])
+	case "P": return SwiftName(kind: .PrivateDeclName, children: [try demangleIdentifier(&scanner), try demangleIdentifier(&scanner)])
+	default:
+		try scanner.backtrack()
+		return try demangleIdentifier(&scanner)
 	}
-	
-	return try demangleIdentifier(&scanner)
 }
 
-func demangleIndex(inout scanner: ScalarScanner<[SwiftName]>) throws -> UInt32 {
+func demangleIndex<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> UInt32 {
 	if scanner.conditionalScalar("_") {
 		return 0
 	}
-	let value = UInt32(try scanner.requireInt()) + 1
-	try scanner.requireMatch("_")
+	let value = UInt32(try scanner.readInt()) + 1
+	try scanner.matchScalar("_")
 	return value
 }
 
-func demangleType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
+func demangleType<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
 	let type: SwiftName
-	if scanner.conditionalScalar("B") {
-		if scanner.conditionalScalar("b") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.BridgeObject"))
-		} else if scanner.conditionalScalar("B") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.UnsafeValueBuffer"))
-		} else if scanner.conditionalScalar("f") {
-			let size = try scanner.requireInt()
-			try scanner.requireMatch("_")
+	switch try scanner.readScalar() {
+	case "B":
+		switch try scanner.readScalar() {
+		case "b": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.BridgeObject"))
+		case "B": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.UnsafeValueBuffer"))
+		case "f":
+			let size = try scanner.readInt()
+			try scanner.matchScalar("_")
 			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.Float\(size)"))
-		} else if scanner.conditionalScalar("i") {
-			let size = try scanner.requireInt()
-			try scanner.requireMatch("_")
+		case "i":
+			let size = try scanner.readInt()
+			try scanner.matchScalar("_")
 			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.Int\(size)"))
-		} else if scanner.conditionalScalar("v") {
-			let elements = try scanner.requireInt()
-			try scanner.requireMatch("B")
+		case "v":
+			let elements = try scanner.readInt()
+			try scanner.matchScalar("B")
 			let name: String
 			let size: String
-			if scanner.conditionalScalar("i") {
-				name = "xInt"
-				size = try "\(scanner.requireInt())"
-				try scanner.requireMatch("_")
-			} else if scanner.conditionalScalar("f") {
-				name = "xFloat"
-				size = try "\(scanner.requireInt())"
-				try scanner.requireMatch("_")
-			} else {
-				try scanner.requireMatch("p")
-				name = "xRawPointer"
-				size = ""
+			let c = try scanner.readScalar()
+			switch c {
+			case "p": (name, size) = ("xRawPointer", "")
+			case "i": fallthrough
+			case "f":
+				(name, size) = (c == "i" ? "xInt" : "xFloat", try "\(scanner.readInt())")
+				try scanner.matchScalar("_")
+			default: throw scanner.unexpectedError()
 			}
 			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.Vec\(elements)\(name)\(size)"))
-		} else if scanner.conditionalScalar("O") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.UnknownObject"))
-		} else if scanner.conditionalScalar("o") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.NativeObject"))
-		} else if scanner.conditionalScalar("p") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.RawPointer"))
-		} else if scanner.conditionalScalar("w") {
-			type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.Word"))
-		} else {
-			throw scanner.unexpectedError()
+		case "O": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.UnknownObject"))
+		case "o": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.NativeObject"))
+		case "p": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.RawPointer"))
+		case "w": type = SwiftName(kind: .BuiltinTypeName, contents: .Name("Builtin.Word"))
+		default: throw scanner.unexpectedError()
 		}
-	} else if scanner.conditionalScalar("a") {
-		type = try demangleDeclarationName(&scanner, kind: .TypeAlias)
-	} else if scanner.conditionalScalar("b") {
-		type = try demangleFunctionType(&scanner, kind: .ObjCBlock)
-	} else if scanner.conditionalScalar("c") {
-		type = try demangleFunctionType(&scanner, kind: .CFunctionPointer)
-	} else if scanner.conditionalScalar("D") {
-		type = SwiftName(kind: .DynamicSelf, children: [try demangleType(&scanner)])
-	} else if scanner.conditionalScalar("E") {
-		guard try scanner.requireScalars(2) == "RR" else { throw scanner.unexpectedError() }
+	case "a": type = try demangleDeclarationName(&scanner, kind: .TypeAlias)
+	case "b": type = try demangleFunctionType(&scanner, kind: .ObjCBlock)
+	case "c": type = try demangleFunctionType(&scanner, kind: .CFunctionPointer)
+	case "D": type = SwiftName(kind: .DynamicSelf, children: [try demangleType(&scanner)])
+	case "E":
+		guard try scanner.readScalars(2) == "RR" else { throw scanner.unexpectedError() }
 		type = SwiftName(kind: .ErrorType, children: [], contents: .Name(""))
-	} else if scanner.conditionalScalar("F") {
-		type = try demangleFunctionType(&scanner, kind: .FunctionType)
-	} else if scanner.conditionalScalar("f") {
-		type = try demangleFunctionType(&scanner, kind: .UncurriedFunctionType)
-	} else if scanner.conditionalScalar("G") {
+	case "F": type = try demangleFunctionType(&scanner, kind: .FunctionType)
+	case "f": type = try demangleFunctionType(&scanner, kind: .UncurriedFunctionType)
+	case "G":
 		let unboundType = try demangleType(&scanner)
 		var children = [SwiftName]()
 		while !scanner.conditionalScalar("_") {
 			children.append(try demangleType(&scanner))
 		}
-		let typeList = SwiftName(kind: .TypeList, children: children)
 		let kind: SwiftName.Kind
 		switch unboundType.children.first?.kind {
 		case .Some(.Class): kind = .BoundGenericClass
@@ -749,79 +573,45 @@ func demangleType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName
 		case .Some(.Enum): kind = .BoundGenericEnum
 		default: throw scanner.unexpectedError()
 		}
-		type = SwiftName(kind: kind, children: [unboundType, typeList])
-	} else if scanner.conditionalScalar("X") {
-		if scanner.conditionalScalar("b") {
-			type = SwiftName(kind: .SILBoxType, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("M") {
+		type = SwiftName(kind: kind, children: [unboundType, SwiftName(kind: .TypeList, children: children)])
+	case "X":
+		let c = try scanner.readScalar()
+		switch c {
+		case "b": type = SwiftName(kind: .SILBoxType, children: [try demangleType(&scanner)])
+		case "P" where scanner.conditionalScalar("M"): fallthrough
+		case "M":
 			let value: String
-			if scanner.conditionalScalar("t") {
-				value = "@thick"
-			} else if scanner.conditionalScalar("T") {
-				value = "@thin"
-			} else {
-				try scanner.requireMatch("o")
-				value = "@objc_metatype"
+			switch try scanner.readScalar() {
+			case "t": value = "@thick"
+			case "T": value = "@thin"
+			case "o": value = "@objc_metatype"
+			default: throw scanner.unexpectedError()
 			}
-			let metatypeRepresentation = SwiftName(kind: .MetatypeRepresentation, contents: .Name(value))
-			type = SwiftName(kind: .Metatype, children: [metatypeRepresentation, try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("P") {
-			if scanner.conditionalScalar("M") {
-				let value: String
-				if scanner.conditionalScalar("t") {
-					value = "@thick"
-				} else if scanner.conditionalScalar("T") {
-					value = "@thin"
-				} else {
-					try scanner.requireMatch("o")
-					value = "@objc_metatype"
-				}
-				let metatypeRepresentation = SwiftName(kind: .MetatypeRepresentation, contents: .Name(value))
-				type = SwiftName(kind: .ExistentialMetatype, children: [metatypeRepresentation, try demangleType(&scanner)])
-			} else {
-				var children = [SwiftName]()
-				while !scanner.conditionalScalar("_") {
-					children.append(try demangleProtocolName(&scanner))
-				}
-				let typeList = SwiftName(kind: .TypeList)
-				type = SwiftName(kind: .ProtocolList, children: [typeList])
-			}
-		} else if scanner.conditionalScalar("f") {
-			type = try demangleFunctionType(&scanner, kind: .ThinFunctionType)
-		} else if scanner.conditionalScalar("o") {
-			type = SwiftName(kind: .Unowned, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("u") {
-			type = SwiftName(kind: .Unmanaged, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("w") {
-			type = SwiftName(kind: .Weak, children: [try demangleType(&scanner)])
-		} else if scanner.conditionalScalar("F") {
+			type = SwiftName(kind: c == "P" ? .ExistentialMetatype : .Metatype, children: [SwiftName(kind: .MetatypeRepresentation, contents: .Name(value)), try demangleType(&scanner)])
+		case "P":
 			var children = [SwiftName]()
-			var attr: String
-			if scanner.conditionalScalar("t") {
-				attr = "@convention(thin)"
-			} else {
-				switch try scanner.requireScalar() {
-				case "d": attr = "@callee_unowned"
-				case "g": attr = "@callee_guaranteed"
-				case "o": attr = "@callee_owned"
-				default: attr = ""
-				}
+			while !scanner.conditionalScalar("_") {
+				children.append(try demangleProtocolName(&scanner))
 			}
-			children.append(SwiftName(kind: .ImplConvention, contents: .Name(attr)))
+			type = SwiftName(kind: .ProtocolList, children: [SwiftName(kind: .TypeList)])
+		case "f": type = try demangleFunctionType(&scanner, kind: .ThinFunctionType)
+		case "o": type = SwiftName(kind: .Unowned, children: [try demangleType(&scanner)])
+		case "u": type = SwiftName(kind: .Unmanaged, children: [try demangleType(&scanner)])
+		case "w": type = SwiftName(kind: .Weak, children: [try demangleType(&scanner)])
+		case "F":
+			var children = [SwiftName]()
+			children.append(SwiftName(kind: .ImplConvention, contents: .Name(try demangleImplConvention(&scanner, kind: .ImplConvention))))
 			if scanner.conditionalScalar("C") {
-				if scanner.conditionalScalar("b") {
-					children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@convention(block)")))
-				} else if scanner.conditionalScalar("c") {
-					children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@convention(c)")))
-				} else if scanner.conditionalScalar("m") {
-					children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@convention(method)")))
-				} else if scanner.conditionalScalar("O") {
-					children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@convention(objc_method)")))
-				} else if scanner.conditionalScalar("w") {
-					children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@convention(witness_method)")))
-				} else {
-					throw scanner.unexpectedError()
+				let name: String
+				switch try scanner.readScalar() {
+				case "b": name = "@convention(block)"
+				case "c": name = "@convention(c)"
+				case "m": name = "@convention(method)"
+				case "O": name = "@convention(objc_method)"
+				case "w": name = "@convention(witness_method)"
+				default: throw scanner.unexpectedError()
 				}
+				children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name(name)))
 			}
 			if scanner.conditionalScalar("N") {
 				children.append(SwiftName(kind: .ImplFunctionAttribute, contents: .Name("@noreturn")))
@@ -829,7 +619,7 @@ func demangleType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName
 			if scanner.conditionalScalar("G") {
 				children.append(try demangleGenericSignature(&scanner))
 			}
-			try scanner.requireMatch("_")
+			try scanner.matchScalar("_")
 			while !scanner.conditionalScalar("_") {
 				children.append(try demangleImplParameterOrResult(&scanner, kind: .ImplParameter))
 			}
@@ -837,75 +627,49 @@ func demangleType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName
 				children.append(try demangleImplParameterOrResult(&scanner, kind: .ImplResult))
 			}
 			type = SwiftName(kind: .ImplFunctionType, children: children)
-		} else {
-			throw scanner.unexpectedError()
+		default: throw scanner.unexpectedError()
 		}
-	} else if scanner.conditionalScalar("K") {
-		type = try demangleFunctionType(&scanner, kind: .AutoClosureType)
-	} else if scanner.conditionalScalar("M") {
-		type = SwiftName(kind: .Metatype, children: [try demangleType(&scanner)])
-	} else if scanner.conditionalScalar("P") {
-		if scanner.conditionalScalar("M") {
-			type = SwiftName(kind: .ExistentialMetatype, children: [try demangleType(&scanner)])
-		} else {
-			var children = [SwiftName]()
-			while !scanner.conditionalScalar("_") {
-				children.append(try demangleProtocolName(&scanner))
-			}
-			let typeList = SwiftName(kind: .TypeList, children: children)
-			type = SwiftName(kind: .ProtocolList, children: [typeList])
+	case "K": type = try demangleFunctionType(&scanner, kind: .AutoClosureType)
+	case "M": type = SwiftName(kind: .Metatype, children: [try demangleType(&scanner)])
+	case "P" where scanner.conditionalScalar("M"): type = SwiftName(kind: .ExistentialMetatype, children: [try demangleType(&scanner)])
+	case "P":
+		var children = [SwiftName]()
+		while !scanner.conditionalScalar("_") {
+			children.append(try demangleProtocolName(&scanner))
 		}
-	} else if scanner.conditionalScalar("Q") {
-		type = try demangleArchetypeType(&scanner)
-	} else if scanner.conditionalScalar("q") {
+		type = SwiftName(kind: .ProtocolList, children: [SwiftName(kind: .TypeList, children: children)])
+	case "Q": type = try demangleArchetypeType(&scanner)
+	case "q":
 		let c = try scanner.requirePeek()
 		if c != "d" && c != "_" && c < "0" && c > "9" {
 			type = try demangleDependentMemberTypeName(&scanner, base: demangleType(&scanner))
 		} else {
 			type = try demangleGenericParamIndex(&scanner)
 		}
-	} else if scanner.conditionalScalar("x") {
-		let depthChild = SwiftName(kind: .Index, contents: .Index(0))
-		let indexChild = SwiftName(kind: .Index, contents: .Index(0))
-		type = SwiftName(kind: .DependentGenericParamType, children: [depthChild, indexChild], contents: .Name(archetypeName(0, 0)))
-	} else if scanner.conditionalScalar("w") {
-		type = try demangleAssociatedTypeSimple(&scanner)
-	} else if scanner.conditionalScalar("W") {
-		type = try demangleAssociatedTypeCompound(&scanner)
-	} else if scanner.conditionalScalar("R") {
-		let t = try demangleType(&scanner)
-		type = SwiftName(kind: .InOut, children: t.children)
-	} else if scanner.conditionalScalar("S") {
-		type = try demangleSubstitutionIndex(&scanner)
-	} else if scanner.conditionalScalar("T") {
-		type = try demangleTuple(&scanner, variadic: false)
-	} else if scanner.conditionalScalar("t") {
-		type = try demangleTuple(&scanner, variadic: true)
-	} else if scanner.conditionalScalar("u") {
-		let sig = try demangleGenericSignature(&scanner)
-		let sub = try demangleType(&scanner)
-		type = SwiftName(kind: .DependentGenericType, children: [sig, sub])
-	} else {
-		let kind: SwiftName.Kind
-		switch try scanner.requireScalar() {
-		case "C": kind = .Class
-		case "V": kind = .Structure
-		case "O": kind = .Enum
-		default: throw scanner.unexpectedError()
-		}
-		type = try demangleDeclarationName(&scanner, kind: kind)
+	case "x": type = SwiftName(kind: .DependentGenericParamType, children: [SwiftName(kind: .Index, contents: .Index(0)), SwiftName(kind: .Index, contents: .Index(0))], contents: .Name(archetypeName(0, 0)))
+	case "w": type = try demangleAssociatedTypeSimple(&scanner)
+	case "W": type = try demangleAssociatedTypeCompound(&scanner)
+	case "R": type = SwiftName(kind: .InOut, children: try demangleType(&scanner).children)
+	case "S": type = try demangleSubstitutionIndex(&scanner)
+	case "T": type = try demangleTuple(&scanner, variadic: false)
+	case "t": type = try demangleTuple(&scanner, variadic: true)
+	case "u": type = SwiftName(kind: .DependentGenericType, children: [try demangleGenericSignature(&scanner), try demangleType(&scanner)])
+	case "C": type = try demangleDeclarationName(&scanner, kind: .Class)
+	case "V": type = try demangleDeclarationName(&scanner, kind: .Structure)
+	case "O": type = try demangleDeclarationName(&scanner, kind: .Enum)
+	default: throw scanner.unexpectedError()
 	}
 	return SwiftName(kind: .Type, children: [type])
 }
 
-func demangleArchetypeType(inout scanner: ScalarScanner<[SwiftName]>) throws -> SwiftName {
-	if scanner.conditionalScalar("P") {
-		return SwiftName(kind: .SelfTypeRef, children: [try demangleProtocolName(&scanner)])
-	} else if scanner.conditionalScalar("Q") {
+func demangleArchetypeType<C>(inout scanner: ScalarScanner<C, [SwiftName]>) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "P": return SwiftName(kind: .SelfTypeRef, children: [try demangleProtocolName(&scanner)])
+	case "Q":
 		let result = SwiftName(kind: .AssociatedTypeRef, children: [try demangleArchetypeType(&scanner), try demangleIdentifier(&scanner)])
 		scanner.context.append(result)
 		return result
-	} else if scanner.conditionalScalar("S") {
+	case "S":
 		let index = try demangleSubstitutionIndex(&scanner)
 		if case .Protocol = index.kind {
 			return SwiftName(kind: .SelfTypeRef, children: [index])
@@ -914,60 +678,70 @@ func demangleArchetypeType(inout scanner: ScalarScanner<[SwiftName]>) throws -> 
 			scanner.context.append(result)
 			return result
 		}
-	} else if scanner.conditionalScalar("s") {
+	case "s":
 		let root = SwiftName(kind: .Module, contents: .Name(stdlibName))
 		let result = SwiftName(kind: .AssociatedTypeRef, children: [root, try demangleIdentifier(&scanner)])
 		scanner.context.append(result)
 		return result
-	} else if scanner.conditionalScalar("d") {
+	case "d":
 		let depth = try demangleIndex(&scanner) + 1
 		let index = try demangleIndex(&scanner)
 		let depthChild = SwiftName(kind: .Index, contents: .Index(depth))
 		let indexChild = SwiftName(kind: .Index, contents: .Index(index))
 		return SwiftName(kind: .ArchetypeRef, children: [depthChild, indexChild], contents: .Name(archetypeName(index, depth)))
-	} else if scanner.conditionalScalar("q") {
+	case "q":
 		let index = SwiftName(kind: .Index, contents: .Index(try demangleIndex(&scanner)))
 		let context = try demangleContext(&scanner)
 		let declContext = SwiftName(kind: .DeclContext, children: [context])
 		return SwiftName(kind: .QualifiedArchetype, children: [index, declContext])
+	default:
+		try scanner.backtrack()
+		let index = try demangleIndex(&scanner)
+		let depthChild = SwiftName(kind: .Index, contents: .Index(0))
+		let indexChild = SwiftName(kind: .Index, contents: .Index(index))
+		return SwiftName(kind: .ArchetypeRef, children: [depthChild, indexChild], contents: .Name(archetypeName(index, 0)))
 	}
-
-	let index = try demangleIndex(&scanner)
-	let depthChild = SwiftName(kind: .Index, contents: .Index(0))
-	let indexChild = SwiftName(kind: .Index, contents: .Index(index))
-	return SwiftName(kind: .ArchetypeRef, children: [depthChild, indexChild], contents: .Name(archetypeName(index, 0)))
 }
 
-func demangleImplParameterOrResult(inout scanner: ScalarScanner<[SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
-	var k = kind
+func demangleImplConvention<C>(inout scanner: ScalarScanner<C, [SwiftName]>, kind: SwiftName.Kind) throws -> String {
+	switch (try scanner.readScalar(), (kind == .ImplErrorResult ? .ImplResult : kind)) {
+	case ("a", .ImplResult): return "@autoreleased"
+	case ("d", .ImplConvention): return "@callee_unowned"
+	case ("d", _): return "@unowned"
+	case ("D", .ImplResult): return "@unowned_inner_pointer"
+	case ("g", .ImplParameter): return "@guaranteed"
+	case ("e", .ImplParameter): return "@deallocating"
+	case ("g", .ImplConvention): return "@callee_guaranteed"
+	case ("i", .ImplParameter): return "@in"
+	case ("i", .ImplResult): return "@out"
+	case ("l", .ImplParameter): return "@inout"
+	case ("o", .ImplConvention): return "@callee_owned"
+	case ("o", _): return "@owned"
+	case ("t", .ImplConvention): return "@convention(thin)"
+	default: throw scanner.unexpectedError()
+	}
+}
+
+func demangleImplParameterOrResult<C>(inout scanner: ScalarScanner<C, [SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
+	var k: SwiftName.Kind
 	if scanner.conditionalScalar("z") {
-		if case .ImplResult = k {
+		if case .ImplResult = kind {
 			k = .ImplErrorResult
 		} else {
 			throw scanner.unexpectedError()
 		}
+	} else {
+		k = kind
 	}
 	
-	let convention: String
-	switch (try scanner.requireScalar(), k) {
-	case ("a", .ImplResult): convention = "@autoreleased"
-	case ("d", _): convention = "@unowned"
-	case ("D", .ImplResult): convention = "@unowned_inner_pointer"
-	case ("g", .ImplParameter): convention = "@guaranteed"
-	case ("e", .ImplParameter): convention = "@deallocating"
-	case ("i", .ImplParameter): convention = "@in"
-	case ("i", .ImplResult): convention = "@out"
-	case ("l", .ImplParameter): convention = "@inout"
-	case ("o", _): convention = "@owned"
-	default: throw scanner.unexpectedError()
-	}
+	let convention = try demangleImplConvention(&scanner, kind: k)
 	let type = try demangleType(&scanner)
 	let conventionNode = SwiftName(kind: .ImplConvention, contents: .Name(convention))
 	return SwiftName(kind: k, children: [conventionNode, type])
 }
 
 
-func demangleTuple(inout scanner: ScalarScanner<[SwiftName]>, variadic: Bool) throws -> SwiftName {
+func demangleTuple<C>(inout scanner: ScalarScanner<C, [SwiftName]>, variadic: Bool) throws -> SwiftName {
 	var children = [SwiftName]()
 	while !scanner.conditionalScalar("_") {
 		var elementChildren = [SwiftName]()
@@ -981,7 +755,7 @@ func demangleTuple(inout scanner: ScalarScanner<[SwiftName]>, variadic: Bool) th
 	return SwiftName(kind: variadic ? .VariadicTuple : .NonVariadicTuple, children: children)
 }
 
-func demangleFunctionType(inout scanner: ScalarScanner<[SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
+func demangleFunctionType<C>(inout scanner: ScalarScanner<C, [SwiftName]>, kind: SwiftName.Kind) throws -> SwiftName {
 	var children = [SwiftName]()
 	if scanner.conditionalScalar("z") {
 		children.append(SwiftName(kind: .ThrowsAnnotation))
@@ -991,35 +765,23 @@ func demangleFunctionType(inout scanner: ScalarScanner<[SwiftName]>, kind: Swift
 	return SwiftName(kind: kind, children: children)
 }
 
-func demangleIdentifier(inout scanner: ScalarScanner<[SwiftName]>, kind: SwiftName.Kind? = nil) throws -> SwiftName {
-	let isPunycode: Bool
-	if scanner.conditionalScalar("X") {
-		isPunycode = true
-	} else {
-		isPunycode = false
-	}
-
+func demangleIdentifier<C>(inout scanner: ScalarScanner<C, [SwiftName]>, kind: SwiftName.Kind? = nil) throws -> SwiftName {
+	let isPunycode = scanner.conditionalScalar("X")
 	let k: SwiftName.Kind
 	let isOperator: Bool
 	if scanner.conditionalScalar("o") {
 		guard kind == nil else { throw scanner.unexpectedError() }
-		isOperator = true
-		
-		if scanner.conditionalScalar("p") {
-			k = .PrefixOperator
-		} else if scanner.conditionalScalar("P") {
-			k = .PostfixOperator
-		} else if scanner.conditionalScalar("i") {
-			k = .InfixOperator
-		} else {
-			throw scanner.unexpectedError()
+		switch try scanner.readScalar() {
+		case "p": (isOperator, k) = (true, .PrefixOperator)
+		case "P": (isOperator, k) = (true, .PostfixOperator)
+		case "i": (isOperator, k) = (true, .InfixOperator)
+		default: throw scanner.unexpectedError()
 		}
 	} else {
-		isOperator = false
-		k = kind ?? SwiftName.Kind.Identifier
+		(isOperator, k) = (false, kind ?? SwiftName.Kind.Identifier)
 	}
 	
-	var identifier = try scanner.requireScalars(scanner.requireInt())
+	var identifier = try scanner.readScalars(scanner.readInt())
 	if isPunycode {
 		identifier = decodeSwiftPunycode(identifier)
 	}
@@ -1065,11 +827,10 @@ func archetypeName(index: UInt32, _ depth: UInt32) -> String {
 		i /= 26
 	} while i > 0
 	if depth != 0 {
-		result += "\(depth)"
+		result += depth.description
 	}
 	return result
 }
-
 
 /// A type for representing the different possible failure conditions when using ScalarScanner
 public enum ScalarScannerError: ErrorType {
@@ -1090,38 +851,50 @@ public enum ScalarScannerError: ErrorType {
 }
 
 /// A structure for traversing a `String.UnicodeScalarView`. A `context` field is provided but is not used by the scanner (it is entirely for storage by the scanner's user).
-public struct ScalarScanner<T> {
-	public typealias Index = String.UnicodeScalarView.Index
-	public typealias Collection = String.UnicodeScalarView
+public struct ScalarScanner<C: CollectionType, T where C.Generator.Element == UnicodeScalar, C.Index: BidirectionalIndexType, C.Index: Comparable> {
+	// The underlying storage
+	let scalars: C
+	
+	// Current scanning index
+	var index: C.Index
 	
 	/// Entirely for user use
 	public var context: T
 
-	let scalars: Array<UnicodeScalar>
-	var index: Int
-	
 	/// Construct from a String.UnicodeScalarView and a context value
-	public init(scalars: Array<UnicodeScalar>, context: T) {
+	public init(scalars: C, context: T) {
 		self.scalars = scalars
 		self.index = self.scalars.startIndex
 		self.context = context
 	}
 	
-	/// Construct from a String and a context value
-	public init(string: String, context: T) {
-		self.scalars = Array(string.unicodeScalars)
-		self.index = self.scalars.startIndex
-		self.context = context
+	// Private utility for getting the index as an Int (used in errors)
+	var absoluteIndex: Int {
+		var i = index
+		var count = 0
+		while i > scalars.startIndex {
+			i = i.predecessor()
+			count += 1
+		}
+		return count
 	}
 	
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
-	public mutating func requireMatch(value: String) throws {
+	public mutating func matchString(value: String) throws {
 		index = try value.unicodeScalars.reduce(index) { i, scalar in
 			if i == self.scalars.endIndex || scalar != self.scalars[i] {
-				throw ScalarScannerError.MatchFailed(wanted: value, at: self.scalars.startIndex.distanceTo(index))
+				throw ScalarScannerError.MatchFailed(wanted: value, at: absoluteIndex)
 			}
 			return i.successor()
 		}
+	}
+	
+	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
+	public mutating func matchScalar(value: UnicodeScalar) throws {
+		if index == scalars.endIndex || scalars[index] != value {
+			throw ScalarScannerError.MatchFailed(wanted: String(value), at: absoluteIndex)
+		}
+		index = index.advancedBy(1)
 	}
 	
 	/// Consume scalars from the contained collection until `scalar` is found. `index` is advanced to immediately after `scalar`. Throws if `scalar` is never found.
@@ -1138,33 +911,63 @@ public struct ScalarScanner<T> {
 			}
 		}
 		if i == scalars.endIndex {
-			throw ScalarScannerError.SearchFailed(wanted: String(scalar), after: self.scalars.startIndex.distanceTo(index))
+			throw ScalarScannerError.SearchFailed(wanted: String(scalar), after: absoluteIndex)
 		}
 		index = i
 		return string
 	}
 	
-	/// Peeks at the scalar at the current `index`, testing it with function `f`. If `f` returns `true`, the `index` increased.
-	public mutating func skipWhileTrue(f: UnicodeScalar -> Bool) {
-		while index != scalars.endIndex {
-			if !f(scalars[index]) {
-				break
-			}
-			index += 1
-		}
-	}
-	
 	/// Peeks at the scalar at the current `index`, testing it with function `f`. If `f` returns `true`, the scalar is appended to a `String` and the `index` increased. The `String` is returned at the end.
-	public mutating func readWhileTrue(f: UnicodeScalar -> Bool) -> String {
+	public mutating func readWhileTrue(@noescape f: UnicodeScalar -> Bool) -> String {
 		var string = ""
 		while index != scalars.endIndex {
 			if !f(scalars[index]) {
 				break
 			}
 			string.append(scalars[index])
-			index += 1
+			index = index.advancedBy(1)
 		}
 		return string
+	}
+	
+	/// Repeatedly peeks at the scalar at the current `index`, testing it with function `f`. If `f` returns `true`, the `index` increased. If `false`, the function returns.
+	public mutating func skipWhileTrue(@noescape f: UnicodeScalar -> Bool) {
+		while index != scalars.endIndex {
+			if !f(scalars[index]) {
+				return
+			}
+			index = index.advancedBy(1)
+		}
+	}
+	
+	/// Attempt to advance the `index` by count, returning `false` and `index` unchanged if `index` would advance past the end, otherwise returns `true` and `index` is advanced.
+	public mutating func skip(count: Int = 1) throws {
+		var i = index
+		var c = count
+		while c > 0 && i != scalars.endIndex {
+			i = i.successor()
+			c -= 1
+		}
+		if c > 0 {
+			throw ScalarScannerError.EndedPrematurely(count: count, at: absoluteIndex)
+		} else {
+			index = i
+		}
+	}
+	
+	/// Attempt to advance the `index` by count, returning `false` and `index` unchanged if `index` would advance past the end, otherwise returns `true` and `index` is advanced.
+	public mutating func backtrack(count: Int = 1) throws {
+		var i = index
+		var c = count
+		while c > 0 && i != scalars.startIndex {
+			i = i.predecessor()
+			c -= 1
+		}
+		if c > 0 {
+			throw ScalarScannerError.EndedPrematurely(count: -count, at: absoluteIndex)
+		} else {
+			index = i
+		}
 	}
 	
 	/// Returns all content after the current `index`. `index` is advanced to the end.
@@ -1181,10 +984,10 @@ public struct ScalarScanner<T> {
 	public mutating func conditionalString(value: String) -> Bool {
 		var i = index
 		for c in value.unicodeScalars {
-			if i >= scalars.endIndex || c != scalars[i] {
+			if i == scalars.endIndex || c != scalars[i] {
 				return false
 			}
-			i += 1
+			i = i.successor()
 		}
 		index = i
 		return true
@@ -1192,34 +995,39 @@ public struct ScalarScanner<T> {
 	
 	/// If the next scalar after the current `index` match `value`, advance over it and return `true`, otherwise, leave `index` unchanged and return `false`.
 	public mutating func conditionalScalar(value: UnicodeScalar) -> Bool {
-		if index >= scalars.endIndex || value != scalars[index] {
+		if index == scalars.endIndex || value != scalars[index] {
 			return false
 		}
-		index += 1
+		index = index.successor()
 		return true
 	}
 	
 	/// If the `index` is at the end, throw, otherwise, return the next scalar at the current `index` without advancing `index`.
 	public func requirePeek() throws -> UnicodeScalar {
 		if index == scalars.endIndex {
-			throw ScalarScannerError.EndedPrematurely(count: 1, at: scalars.count)
+			throw ScalarScannerError.EndedPrematurely(count: 1, at: absoluteIndex)
 		}
 		return scalars[index]
 	}
 	
 	/// If `index` + `ahead` is within bounds, return the scalar at that location, otherwise return `nil`. The `index` will not be changed in any case.
-	public func conditionalPeek(ahead: Int = 0) -> UnicodeScalar? {
-		let targetIndex = index + ahead
-		if targetIndex >= scalars.endIndex || targetIndex < 0 {
+	public func peek(ahead: Int = 0) -> UnicodeScalar? {
+		var i = index
+		var c = ahead
+		while c > 0 && i != scalars.endIndex {
+			i = i.successor()
+			c -= 1
+		}
+		if i == scalars.endIndex {
 			return nil
 		}
-		return scalars[targetIndex]
+		return scalars[i]
 	}
 	
 	/// If the `index` is at the end, throw, otherwise, return the next scalar at the current `index`, advancing `index` by one.
-	public mutating func requireScalar() throws -> UnicodeScalar {
+	public mutating func readScalar() throws -> UnicodeScalar {
 		if index == scalars.endIndex {
-			throw ScalarScannerError.EndedPrematurely(count: 1, at: scalars.count)
+			throw ScalarScannerError.EndedPrematurely(count: 1, at: absoluteIndex)
 		}
 		let result = scalars[index]
 		index = index.successor()
@@ -1227,7 +1035,7 @@ public struct ScalarScanner<T> {
 	}
 	
 	/// Throws if scalar at the current `index` is not in the range `"0"` to `"9"`. Consume scalars `"0"` to `"9"` until a scalar outside that range is encountered. Return the integer representation of the value scanned, interpreted as a base 10 integer. `index` is advanced to the end of the number.
-	public mutating func requireInt() throws -> Int {
+	public mutating func readInt() throws -> Int {
 		var result = 0
 		var i = index
 		while i != scalars.endIndex && scalars[i] >= "0" && scalars[i] <= "9" {
@@ -1235,30 +1043,131 @@ public struct ScalarScanner<T> {
 			i = i.successor()
 		}
 		if i == index {
-			throw ScalarScannerError.ExpectedInt(at: self.scalars.startIndex.distanceTo(index))
+			throw ScalarScannerError.ExpectedInt(at: absoluteIndex)
 		}
 		index = i
 		return result
 	}
 	
 	/// Consume and return `count` scalars. `index` will be advanced by count. Throws if end of `scalars` occurs before consuming `count` scalars.
-	public mutating func requireScalars(count: Int) throws -> String {
-		if index + count > scalars.endIndex {
-			throw ScalarScannerError.EndedPrematurely(count: count, at: self.scalars.startIndex.distanceTo(index))
-		}
+	public mutating func readScalars(count: Int) throws -> String {
 		var result = String()
 		result.reserveCapacity(count)
+		var i = index
 		for _ in 0..<count {
-			result.append(scalars[index])
-			index = index.successor()
+			if i == scalars.endIndex {
+				throw ScalarScannerError.EndedPrematurely(count: count, at: absoluteIndex)
+			}
+			result.append(scalars[i])
+			i = i.successor()
 		}
+		index = i
 		return result
 	}
 
 	/// Returns a throwable error capturing the current scanner progress point.
 	public func unexpectedError() -> ScalarScannerError {
-		return ScalarScannerError.Unexpected(at: self.scalars.startIndex.distanceTo(index))
+		return ScalarScannerError.Unexpected(at: absoluteIndex)
 	}
+}
+
+extension Array {
+	func at(index: Int) -> Element? {
+		return self.indices.contains(index) ? self[index] : nil
+	}
+	func slice(range: Range<Int>) -> ArraySlice<Element> {
+		if range.startIndex > self.endIndex || range.endIndex < self.startIndex {
+			return ArraySlice()
+		} else {
+			return self[max(range.startIndex, self.startIndex)..<min(range.endIndex, self.endIndex)]
+		}
+	}
+}
+
+// Define Optional as a collection indexed by Bool
+public struct OptionalGenerator<Wrapped>: GeneratorType {
+	public typealias Element = Wrapped
+	var value: Wrapped?
+	public init(value: Wrapped?) {
+		self.value = value
+	}
+	public mutating func next() -> Element? {
+		let result = self.value
+		self.value = nil
+		return result
+	}
+}
+// Define Bool as a ForwardIndexType for a collection with a maximum 1 element. Indexes are "true" (for the element if it exists) and "false" (for the 1-past-the-end element).
+extension Bool: ForwardIndexType {
+	public typealias Distance = Int
+	public func successor() -> Bool {
+		return false
+	}
+	public func advancedBy(n: Distance) -> Bool {
+		return self ? (n == 0) : (n == -1)
+	}
+	public func advancedBy(n: Distance, limit: Bool) -> Bool {
+		return self ? (n == 0 || limit == true) : (n == -1 || (n < 0 && limit == true))
+	}
+	public func distanceTo(end: Bool) -> Distance {
+		return self == end ? 0 : (self ? 1 : -1)
+	}
+}
+extension Optional: CollectionType {
+    public typealias Generator = OptionalGenerator<Wrapped>
+    public func generate() -> Optional.Generator {
+		return OptionalGenerator(value: self)
+	}
+    public typealias Index = Bool
+    public var startIndex: Bool { return true }
+    public var endIndex: Bool { return false}
+    public subscript (position: Bool) -> Generator.Element {
+		precondition(position)
+		return self!
+	}
+}
+
+extension OutputStreamType {
+	mutating func write<S: SequenceType, T: SequenceType where T.Generator.Element == String?>(sequence: S, labels: T, @noescape render: (inout Self, S.Generator.Element) -> ()) {
+		var lg = labels.generate()
+		if let maybePrefix = lg.next(), let prefix = maybePrefix {
+			write(prefix)
+		}
+		for e in sequence {
+			render(&self, e)
+			if let maybeLabel = lg.next(), let label = maybeLabel {
+				write(label)
+			}
+		}
+	}
+
+	mutating func write<S: SequenceType>(sequence: S, prefix: String? = nil, separator: String? = nil, suffix: String? = nil, @noescape render: (inout Self, S.Generator.Element) -> ()) {
+		if let p = prefix {
+			write(p)
+		}
+		var first = true
+		for e in sequence {
+			if !first, let s = separator {
+				write(s)
+			}
+			render(&self, e)
+			first = false
+		}
+		if let s = suffix {
+			write(s)
+		}
+	}
+}
+
+struct PrintOptions: OptionSetType {
+    let rawValue: Int
+    init(rawValue: Int) { self.rawValue = rawValue }
+    
+    static let asContext = PrintOptions(rawValue: 1)
+    static let suppressType = PrintOptions(rawValue: 2)
+    static let hasName = PrintOptions(rawValue: 4)
+    static let hasType = PrintOptions(rawValue: 8)
+    static let hasTypeAndName = PrintOptions(rawValue: 12)
 }
 
 public struct SwiftName: CustomStringConvertible {
@@ -1271,7 +1180,7 @@ public struct SwiftName: CustomStringConvertible {
 		var description: String {
 			switch self {
 			case .None: return ""
-			case .Index(let i): return "\(i)"
+			case .Index(let i): return i.description
 			case .Name(let s): return s
 			}
 		}
@@ -1290,49 +1199,46 @@ public struct SwiftName: CustomStringConvertible {
 		return result
 	}
 	
-	func printChild<T: OutputStreamType>(inout output: T, index: Int, asContext: Bool = false, suppressType: Bool = false) {
-		if index >= 0 && children.count > index {
-			children[index].print(&output, asContext: asContext, suppressType: suppressType)
-		}
-	}
-	
 	func printFunction<T: OutputStreamType>(inout output: T) {
 		let startIndex = children.count == 3 ? 1 : 0
-		let suffix = children.count == 3 ? " throws" : ""
-		printChild(&output, index: startIndex)
-		output.write(suffix)
-		printChild(&output, index: startIndex + 1)
+		let separator: String? = children.count == 3 ? " throws" : nil
+		output.write(children[startIndex...(startIndex + 1)], separator: separator) { $1.print(&$0) }
 	}
 
-	func printEntity<T: OutputStreamType>(inout output: T, hasName: Bool, hasType: Bool, extraName: String, asContext: Bool, suppressType: Bool) {
-		printChild(&output, index: 0, asContext: true)
+	func printEntity<T: OutputStreamType>(inout output: T, extraName: String, options: PrintOptions) {
+		children.at(0)?.print(&output, PrintOptions.asContext)
 		output.write(".")
-		if hasType && !suppressType && asContext {
+		let printType = (options.contains(PrintOptions.hasType) && !options.contains(PrintOptions.suppressType))
+		let useParens = (printType && options.contains(PrintOptions.asContext))
+		
+		if useParens {
 			output.write("(")
 		}
-		if hasName {
-			printChild(&output, index: 1)
+		if options.contains(PrintOptions.hasName) {
+			children.at(1)?.print(&output)
 		}
 		output.write(extraName)
-		if hasType && !suppressType && children.count > (1 + (hasName ? 1 : 0)) {
-			let type = children[1 + (hasName ? 1 : 0)]
+		if printType, let type = children.at(1 + (options.contains(PrintOptions.hasName) ? 1 : 0)) {
 			output.write(useColonForType(type) ? " : " : " ")
 			type.print(&output)
 		}
-		if hasType && !suppressType && asContext {
+		if useParens {
 			output.write(")")
 		}
 	}
 	
 	@warn_unused_result
 	func indexFromChild(childIndex: Int = 1) -> UInt32 {
-		let index: UInt32
-		if children.count > childIndex, case .Index(let i) = children[childIndex].contents {
-			index = i
+		return children.at(childIndex)?.indexFromContents() ?? 0
+	}
+	
+	@warn_unused_result
+	func indexFromContents() -> UInt32 {
+		if case .Index(let i) = contents {
+			return i
 		} else {
-			index = 0
+			return 0
 		}
-		return index
 	}
 	
 	@warn_unused_result
@@ -1343,19 +1249,22 @@ public struct SwiftName: CustomStringConvertible {
 		
 		guard let unboundType = children[0].children.first where unboundType.children.count > 1 else { return .None }
 		let typeArgs = children[1]
+		let c0 = unboundType.children[0]
+		let c1 = unboundType.children[1]
+		
 		if kind == .BoundGenericEnum {
-			if unboundType.children[1].kind == .Identifier, case .Name(let s) = unboundType.children[1].contents where s == "Optional" && typeArgs.children.count == 1 && unboundType.children[0].kind == .Module, case .Name(let m) = unboundType.children[0].contents where m == stdlibName {
+			if c1.kind == .Identifier, case .Name(let s) = c1.contents where s == "Optional" && typeArgs.children.count == 1 && c0.kind == .Module, case .Name(let m) = c0.contents where m == stdlibName {
 				return .Optional
 			}
-			if unboundType.children[1].kind == .Identifier, case .Name(let s) = unboundType.children[1].contents where s == "ImplicitlyUnwrappedOptional" && typeArgs.children.count == 1 && unboundType.children[0].kind == .Module, case .Name(let m) = unboundType.children[0].contents where m == stdlibName {
+			if c1.kind == .Identifier, case .Name(let s) = c1.contents where s == "ImplicitlyUnwrappedOptional" && typeArgs.children.count == 1 && c0.kind == .Module, case .Name(let m) = c0.contents where m == stdlibName {
 				return .ImplicitlyUnwrappedOptional
 			}
 			return .None
 		}
-		if unboundType.children[1].kind == .Identifier, case .Name(let s) = unboundType.children[1].contents where s == "Array" && typeArgs.children.count == 1 && unboundType.children[0].kind == .Module, case .Name(let m) = unboundType.children[0].contents where m == stdlibName {
+		if c1.kind == .Identifier, case .Name(let s) = c1.contents where s == "Array" && typeArgs.children.count == 1 && c0.kind == .Module, case .Name(let m) = c0.contents where m == stdlibName {
 			return .Array
 		}
-		if unboundType.children[1].kind == .Identifier, case .Name(let s) = unboundType.children[1].contents where s == "Dictionary" && typeArgs.children.count == 2 && unboundType.children[0].kind == .Module, case .Name(let m) = unboundType.children[0].contents where m == stdlibName {
+		if c1.kind == .Identifier, case .Name(let s) = c1.contents where s == "Dictionary" && typeArgs.children.count == 2 && c0.kind == .Module, case .Name(let m) = c0.contents where m == stdlibName {
 			return .Dictionary
 		}
 		return .None
@@ -1363,15 +1272,8 @@ public struct SwiftName: CustomStringConvertible {
 	
 	func printBoundGenericNoSugar<T: OutputStreamType>(inout output: T) {
 		guard children.count >= 2 else { return }
-		printChild(&output, index: 0)
-		output.write("<")
-		for i in 1..<children.endIndex {
-			if i != 1 {
-				output.write(", ")
-			}
-			children[i].print(&output)
-		}
-		output.write(">")
+		children.at(0)?.print(&output)
+		output.write(children[1..<children.endIndex], prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
 	}
 	
 	func printBoundGeneric<T: OutputStreamType>(inout output: T) {
@@ -1379,31 +1281,16 @@ public struct SwiftName: CustomStringConvertible {
 		guard children.count == 2 else { printBoundGenericNoSugar(&output); return }
 		let sugarType = findSugar()
 		switch sugarType {
-		case .Optional where !children[0].children.isEmpty: fallthrough
-		case .ImplicitlyUnwrappedOptional where !children[0].children.isEmpty:
-			let type = children[1].children[0]
-			let needParens = !type.kind.isSimpleType
-			if needParens {
-				output.write("(")
+		case .Optional: fallthrough
+		case .ImplicitlyUnwrappedOptional:
+			if let type = children.at(1)?.children.at(0) {
+				let needParens = !type.kind.isSimpleType
+				output.write(Optional(type), prefix: needParens ? "(" : nil, suffix: needParens ? ")" : nil) { $1.print(&$0) }
+				output.write(sugarType == .Optional ? "?" : "!")
 			}
-			type.print(&output)
-			if needParens {
-				output.write(")")
-			}
-			output.write(sugarType == .Optional ? "?" : "!")
-		case .Array where !children[1].children.isEmpty:
-			let type = children[1].children[0]
-			output.write("[")
-			type.print(&output)
-			output.write("]")
-		case .Dictionary where children[1].children.count > 1:
-			let keyType = children[1].children[0]
-			let valueType = children[1].children[1]
-			output.write("[")
-			keyType.print(&output)
-			output.write(" : ")
-			valueType.print(&output)
-			output.write("]")
+		case .Array: fallthrough
+		case .Dictionary:
+			output.write(children[1].children, prefix: "[", separator: " : ", suffix: "]") { $1.print(&$0) }
 		default: printBoundGenericNoSugar(&output)
 		}
 	}
@@ -1462,59 +1349,62 @@ public struct SwiftName: CustomStringConvertible {
 		output.write("\"")
 	}
 	
-	public func print<T: OutputStreamType>(inout output: T, asContext: Bool = false, suppressType: Bool = false) {
+	func print<T: OutputStreamType>(inout output: T, _ options: PrintOptions = PrintOptions()) {
 		switch kind {
 		case .Static:
-			output.write("static ")
-			printChild(&output, index: 0, asContext: asContext, suppressType: suppressType)
+			output.write(children.at(0), prefix: "static ") { $1.print(&$0, options) }
 		case .Directness:
-			if case .Index(let i) = contents where i == 1 {
-				output.write("indirect ")
-			} else {
-				output.write("direct ")
-			}
+			output.write(indexFromContents() == 1 ? "indirect " : "direct ")
 		case .Extension:
-			output.write("(extension in ")
-			printChild(&output, index: 0, asContext: true)
-			output.write("):")
-			printChild(&output, index: 1, asContext: asContext)
-			printChild(&output, index: 2, asContext: true)
+			var index = 0
+			output.write(children.slice(0..<3), labels: ["(extension in ", "):"]) { o, e in
+				e.print(&o, index == 2 ? PrintOptions.asContext : options)
+				index += 1
+			}
 		case .Variable: fallthrough
 		case .Function: fallthrough
-		case .Subscript: printEntity(&output, hasName: true, hasType: true, extraName: "", asContext: asContext, suppressType: suppressType)
+		case .Subscript:
+			printEntity(&output, extraName: "", options: options.union(PrintOptions.hasTypeAndName))
 		case .ExplicitClosure: fallthrough
 		case .ImplicitClosure:
-			var extraName: String = "("
-			if case .ImplicitClosure = kind {
-				extraName += "implicit "
-			}
-			extraName += "closure #\(indexFromChild(1) + 1))"
-			printEntity(&output, hasName: false, hasType: false, extraName: extraName, asContext: asContext, suppressType: suppressType)
-		case .Global: children.forEach { $0.print(&output) }
+			printEntity(&output, extraName: "(\(kind == .ImplicitClosure ? "implicit " : "")closure #\((indexFromChild(1) + 1).description))", options: options)
+		case .Global:
+			output.write(children) { $1.print(&$0) }
 		case .Suffix:
 			output.write(" with unmangled suffix ")
 			quotedString(&output, value: contents.description)
-		case .Initializer: printEntity(&output, hasName: false, hasType: false, extraName: "(variable initialization expression)", asContext: asContext, suppressType: suppressType)
-		case .DefaultArgumentInitializer: printEntity(&output, hasName: false, hasType: false, extraName: "(default argument \(indexFromChild(1)))", asContext: asContext, suppressType: suppressType)
-		case .DeclContext: printChild(&output, index: 0, asContext: asContext)
-		case .Type: printChild(&output, index: 0, asContext: asContext)
-		case .TypeMangling: printChild(&output, index: 0)
+		case .Initializer:
+			printEntity(&output, extraName: "(variable initialization expression)", options: options)
+		case .DefaultArgumentInitializer:
+			printEntity(&output, extraName: "(default argument \(indexFromChild(1)))", options: options)
+		case .DeclContext:
+			children.at(0)?.print(&output, options.subtract(PrintOptions.suppressType))
+		case .Type:
+			children.at(0)?.print(&output, options.subtract(PrintOptions.suppressType))
+		case .TypeMangling:
+			children.at(0)?.print(&output)
 		case .Class: fallthrough
 		case .Structure: fallthrough
 		case .Enum: fallthrough
 		case .Protocol: fallthrough
-		case .TypeAlias: printEntity(&output, hasName: true, hasType: false, extraName: "", asContext: asContext, suppressType: suppressType)
+		case .TypeAlias:
+			printEntity(&output, extraName: "", options: options.union(PrintOptions.hasName))
 		case .LocalDeclName:
-			output.write("(")
-			printChild(&output, index: 1)
-			output.write(" #\(indexFromChild(0) + 1))")
+			output.write(children.at(1), prefix: "(") { $1.print(&$0) }
+			output.write(" #")
+			output.write((indexFromChild(0) + 1).description)
+			output.write(")")
 		case .PrivateDeclName:
-			output.write("(")
-			printChild(&output, index: 1)
-			output.write(" in \(children.first?.contents.description ?? String()))")
+			output.write(children.at(1), prefix: "(") { $1.print(&$0) }
+			if let c = children.first {
+				output.write(" in ")
+				output.write(c.contents.description)
+				output.write(")")
+			}
 		case .Module: fallthrough
 		case .Identifier: fallthrough
-		case .Index: output.write(contents.description)
+		case .Index:
+			output.write(contents.description)
 		case .AutoClosureType:
 			output.write("@autoclosure ")
 			printFunction(&output)
@@ -1522,190 +1412,105 @@ public struct SwiftName: CustomStringConvertible {
 			output.write("@convention(thin) ")
 			printFunction(&output)
 		case .FunctionType: fallthrough
-		case .UncurriedFunctionType: printFunction(&output)
+		case .UncurriedFunctionType:
+			printFunction(&output)
 		case .ArgumentTuple:
-			let needParens = children.count != 1 || (children[0].children.count != 0 && children[0].children[0].kind != .VariadicTuple && children[0].children[0].kind != .NonVariadicTuple)
-			output.write(needParens ? "(" : "")
-			children.forEach { $0.print(&output) }
-			output.write(needParens ? ")" : "")
+			let needParens: Bool
+			if let k = children.at(0)?.children.at(0)?.kind where k == .VariadicTuple || k == .NonVariadicTuple {
+				needParens = false
+			} else {
+				needParens = true
+			}
+			output.write(children, prefix: needParens ? "(" : nil, suffix: needParens ? ")" : nil) { $1.print(&$0) }
 		case .NonVariadicTuple: fallthrough
 		case .VariadicTuple:
-			output.write("(")
-			for i in children.indices {
-				if i != 0 {
-					output.write(", ")
-				}
-				children[i].print(&output)
-			}
-			output.write(kind == .VariadicTuple ? "...)" : ")")
+			output.write(children, prefix: "(", separator: ", ", suffix: kind == .VariadicTuple ? "...)" : ")") { $1.print(&$0) }
 		case .TupleElement:
-			if children.count == 1 {
-				printChild(&output, index: 0)
-			} else if children.count == 2 {
-				printChild(&output, index: 0)
-				printChild(&output, index: 1)
-			}
+			output.write(children.slice(0..<2)) { $1.print(&$0) }
 		case .TupleElementName:
 			output.write(contents.description)
 			output.write(" : ")
 		case .ReturnType:
-			if children.count == 0 {
-				output.write(" -> ")
-				output.write(contents.description)
-			} else {
-				output.write(" -> ")
-				children.forEach { $0.print(&output) }
-			}
+			output.write(children.count == 0 ? [self] : children, prefix: " -> ") { children.count == 0 ? $0.write(contents.description) : $1.print(&$0) }
 		case .Weak:
-			output.write("weak ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "weak ") { $1.print(&$0) }
 		case .Unowned:
-			output.write("unowned ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "unowned ") { $1.print(&$0) }
 		case .Unmanaged:
-			output.write("unowned(unsafe) ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "unowned(unsafe) ") { $1.print(&$0) }
 		case .InOut:
-			output.write("inout ")
-			printChild(&output, index: 0)
-		case .NonObjCAttribute: output.write("@nonobjc ")
-		case .ObjCAttribute: output.write("@objc ")
-		case .DirectMethodReferenceAttribute: output.write("super ")
-		case .DynamicAttribute: output.write("dynamic ")
-		case .VTableAttribute: output.write("override ")
+			output.write(children.at(0), prefix: "inout ") { $1.print(&$0) }
+		case .NonObjCAttribute:
+			output.write("@nonobjc ")
+		case .ObjCAttribute:
+			output.write("@objc ")
+		case .DirectMethodReferenceAttribute:
+			output.write("super ")
+		case .DynamicAttribute:
+			output.write("dynamic ")
+		case .VTableAttribute:
+			output.write("override ")
 		case .FunctionSignatureSpecialization: fallthrough
 		case .GenericSpecialization: fallthrough
 		case .GenericSpecializationNotReAbstracted:
+			let prefix: String
 			switch kind {
-			case .FunctionSignatureSpecialization: output.write("function signature specialization <")
-			case .GenericSpecialization: output.write("generic specialization <")
-			default: output.write("generic not re-abstracted specialization <")
+			case .FunctionSignatureSpecialization: prefix = "function signature specialization <"
+			case .GenericSpecialization: prefix = "generic specialization <"
+			default: prefix = "generic not re-abstracted specialization <"
 			}
-			var hasPrevious = false
-			for i in children.indices {
-				switch children[i].kind {
-				case .SpecializationPassID: continue
-				case .SpecializationIsFragile: break
-				case _ where children[i].children.count == 0: continue
-				default: break
-				}
-				if hasPrevious {
-					output.write(", ")
-				}
-				children[i].print(&output)
-				hasPrevious = true
-			}
-			output.write("> of ")
+			let cs = children.lazy.filter { (c: SwiftName) -> Bool in c.kind != .SpecializationPassID && (c.kind == .SpecializationIsFragile || c.children.count != 0) }
+			output.write(cs, prefix: prefix, separator: ", ", suffix: "> of ") { $1.print(&$0) }
 		case .SpecializationIsFragile: output.write("preserving fragile attribute")
 		case .GenericSpecializationParam:
-			for i in children.indices {
-				if i == 1 {
-					output.write(" with ")
-				} else if i > 1 {
-					output.write(" and ")
+			var index = 0
+			output.write(children) {
+				if index == 1 {
+					$0.write(" with ")
+				} else if index != 0 {
+					$0.write(" and ")
 				}
-				children[i].print(&output)
+				$1.print(&$0)
+				index += 1
 			}
 		case .FunctionSignatureSpecializationParam:
-			output.write("Arg[\(contents.description)] = ")
-			var childGenerator = children.generate()
-			var child = childGenerator.next()
-			while child != nil {
-				let k: FunctionSigSpecializationParamKind?
-				if case .Some(.Index(let i)) = child?.contents, let possibleK = FunctionSigSpecializationParamKind(rawValue: i) {
-					k = possibleK
-				} else {
-					k = nil
-				}
-				switch k {
+			output.write("Arg[")
+			output.write(contents.description)
+			output.write("] = ")
+			var index = 0
+			while index < children.endIndex {
+				switch FunctionSigSpecializationParamKind(rawValue: indexFromChild(index)) {
 				case .Some(.BoxToValue): fallthrough
-				case .Some(.BoxToStack): child?.print(&output)
+				case .Some(.BoxToStack):
+					children.at(index)?.print(&output)
 				case .Some(.ConstantPropFunction): fallthrough
 				case .Some(.ConstantPropGlobal):
-					output.write("[")
-					child?.print(&output)
-					output.write(" : ")
-					child = childGenerator.next()
-					let t = child?.contents.description ?? ""
-					do {
-						output.write(try demangleSwiftName(t).description)
-					} catch {
-						output.write(t)
+					if let t = children.at(index + 1)?.contents.description {
+						output.write(children.at(index), prefix: "[", suffix: " : ") { $1.print(&$0) }
+						output.write((try? demangleSwiftName(t).description) ?? t)
+						output.write("]")
+						index += 1
 					}
-					output.write("]")
 				case .Some(.ConstantPropInteger): fallthrough
 				case .Some(.ConstantPropFloat):
-					output.write("[")
-					child?.print(&output)
-					output.write(" : ")
-					child = childGenerator.next()
-					child?.print(&output)
-					output.write("]")
+					output.write(children.slice(index...(index + 1)), prefix: "[", separator: " : ", suffix: "]") { $1.print(&$0) }
+					index += 1
 				case .Some(.ConstantPropString):
-					output.write("[")
-					child?.print(&output)
-					output.write(" : ")
-					child = childGenerator.next()
-					child?.print(&output)
-					output.write("'")
-					child = childGenerator.next()
-					child?.print(&output)
-					output.write("']")
+					output.write(children.slice(index...(index + 2)), labels: ["[", " : ", "'", "']"]) { $1.print(&$0) }
+					index += 2
 				case .Some(.ClosureProp):
-					output.write("[")
-					child?.print(&output)
-					output.write(" : ")
-					child = childGenerator.next()
-					child?.print(&output)
-					output.write(", Argument Types : [")
-					child = childGenerator.next()
-					while child != nil {
-						if let c = child where c.kind != .Type {
-							fallthrough
-						}
-						child?.print(&output)
-						child = childGenerator.next()
-						if let c = child, case .Name = c.contents {
-							output.write(", ")
-						}
-					}
-					output.write("]")
-				default: child?.print(&output)
+					output.write(children.slice(index...(index + 1)), labels: ["[", " : ", ", Argument Types : ["]) { $1.print(&$0) }
+					index += 2
+					output.write(children.slice(index..<children.endIndex), separator: ", ", suffix: "]") { $1.print(&$0) }
+					index = children.endIndex
+				default: children.at(index)?.print(&output)
 				}
-				child = childGenerator.next()
+				index += 1
 			}
-		case .FunctionSignatureSpecializationParamPayload: output.write((try? demangleSwiftName(contents.description).description) ?? contents.description)
+		case .FunctionSignatureSpecializationParamPayload:
+			output.write((try? demangleSwiftName(contents.description).description) ?? contents.description)
 		case .FunctionSignatureSpecializationParamKind:
-			let raw: UInt32
-			if case .Index(let i) = contents {
-				raw = i
-			} else {
-				raw = 0
-			}
-			var printedOptionSet = false
-			if raw & FunctionSigSpecializationParamKind.Dead.rawValue != 0 {
-				printedOptionSet = true
-				output.write("Dead")
-			}
-			if raw & FunctionSigSpecializationParamKind.OwnedToGuaranteed.rawValue != 0 {
-				if printedOptionSet {
-					output.write(" and ")
-				} else {
-					printedOptionSet = true
-				}
-				output.write("Owned To Guaranteed")
-			}
-			if raw & FunctionSigSpecializationParamKind.SROA.rawValue != 0 {
-				if printedOptionSet {
-					output.write(" and ")
-				} else {
-					printedOptionSet = true
-				}
-				output.write("Exploded")
-			}
-			if printedOptionSet {
-				return
-			}
+			let raw = indexFromContents()
 			switch FunctionSigSpecializationParamKind(rawValue: raw) {
 			case .Some(.BoxToValue): output.write("Value Promoted from Box")
 			case .Some(.BoxToStack): output.write("Stack Promoted from Box")
@@ -1715,117 +1520,98 @@ public struct SwiftName: CustomStringConvertible {
 			case .Some(.ConstantPropFloat): output.write("Constant Propagated Float")
 			case .Some(.ConstantPropString): output.write("Constant Propagated String")
 			case .Some(.ClosureProp): output.write("Closure Propagated")
-			default: break
+			default:
+				if raw & FunctionSigSpecializationParamKind.Dead.rawValue != 0 {
+					output.write("Dead")
+				}
+				if raw & FunctionSigSpecializationParamKind.OwnedToGuaranteed.rawValue != 0 {
+					if raw & FunctionSigSpecializationParamKind.Dead.rawValue != 0 {
+						output.write(" and ")
+					}
+					output.write("Owned To Guaranteed")
+				}
+				if raw & FunctionSigSpecializationParamKind.SROA.rawValue != 0 {
+					if raw & (FunctionSigSpecializationParamKind.OwnedToGuaranteed.rawValue | FunctionSigSpecializationParamKind.Dead.rawValue) != 0 {
+						output.write(" and ")
+					}
+					output.write("Exploded")
+				}
 			}
-		case .SpecializationPassID: output.write(contents.description)
-		case .BuiltinTypeName: output.write(contents.description)
-		case .Number: output.write(contents.description)
-		case .InfixOperator: output.write(contents.description + " infix")
-		case .PrefixOperator: output.write(contents.description + " prefix")
-		case .PostfixOperator: output.write(contents.description + " postfix")
+		case .SpecializationPassID:
+			output.write(contents.description)
+		case .BuiltinTypeName:
+			output.write(contents.description)
+		case .Number:
+			output.write(contents.description)
+		case .InfixOperator:
+			output.write(contents.description + " infix")
+		case .PrefixOperator:
+			output.write(contents.description + " prefix")
+		case .PostfixOperator:
+			output.write(contents.description + " postfix")
 		case .LazyProtocolWitnessTableAccessor:
-			output.write("lazy protocol witness table accessor for type ")
-			printChild(&output, index: 0)
-			output.write(" and conformance ")
-			printChild(&output, index: 1)
+			output.write(children.slice(0..<2), labels: ["lazy protocol witness table accessor for type ", " and conformance "]) { $1.print(&$0) }
 		case .LazyProtocolWitnessTableCacheVariable:
-			output.write("lazy protocol witness table cache variable for type ")
-			printChild(&output, index: 0)
-			output.write(" and conformance ")
-			printChild(&output, index: 1)
+			output.write(children.slice(0..<2), labels: ["lazy protocol witness table cache variable for type ", " and conformance "]) { $1.print(&$0) }
 		case .ProtocolWitnessTableAccessor:
-			output.write("protocol witness table accessor for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "protocol witness table accessor for ") { $1.print(&$0) }
 		case .ProtocolWitnessTable:
-			output.write("protocol witness table for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "protocol witness table for ") { $1.print(&$0) }
 		case .GenericProtocolWitnessTable:
-			output.write("generic protocol witness table for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "generic protocol witness table for ") { $1.print(&$0) }
 		case .GenericProtocolWitnessTableInstantiationFunction:
-			output.write("instantiation function for generic protocol witness table for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "instantiation function for generic protocol witness table for ") { $1.print(&$0) }
 		case .ProtocolWitness:
-			output.write("protocol witness for ")
-			printChild(&output, index: 1)
-			output.write(" in conformance ")
-			printChild(&output, index: 0)
+			output.write([children.at(1), children.at(0)], labels: ["protocol witness for ", " in conformance "]) { $1?.print(&$0) }
 		case .PartialApplyForwarder:
 			output.write("partial apply forwarder")
-			output.write(children.isEmpty ? "" : " for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
 		case .PartialApplyObjCForwarder:
-			output.write("partial apply ObjC forwarder" )
-			output.write(children.isEmpty ? "" : " for ")
-			printChild(&output, index: 0)
+			output.write("partial apply ObjC forwarder")
+			output.write(children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
 		case .FieldOffset:
-			printChild(&output, index: 0)
-			output.write("field offset for ")
-			printChild(&output, index: 1)
+			output.write(children.slice(0..<2), separator: "field offset for ") { $1.print(&$0) }
 		case .ReabstractionThunk: fallthrough
 		case .ReabstractionThunkHelper:
 			output.write("reabstraction thunk ")
 			output.write(kind == .ReabstractionThunkHelper ? "helper " : "")
-			if let c = children.filter({ $0.kind == .DependentGenericSignature }).first {
-				c.print(&output)
-				output.write(" ")
-			}
-			output.write("from ")
-			printChild(&output, index: children.count - 2)
-			output.write(" to ")
-			printChild(&output, index: children.count - 1)
+			let dgs = children.lazy.filter({ $0.kind == .DependentGenericSignature }).first
+			let firstLabel: String? = dgs == nil ? "from " : nil
+			let labels: [String?] = (dgs == nil ? [firstLabel, " to "] : [firstLabel, " from ", " to "])
+			output.write([dgs, children.at(children.count - 2), children.at(children.count - 1)].flatMap { $0 }, labels: labels) { $1.print(&$0) }
 		case .GenericTypeMetadataPattern:
-			output.write("generic type metadata pattern for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "generic type metadata pattern for ") { $1.print(&$0) }
 		case .Metaclass:
-			output.write("metaclass for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "metaclass for ") { $1.print(&$0) }
 		case .ProtocolDescriptor:
-			output.write("protocol descriptor for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "protocol descriptor for ") { $1.print(&$0) }
 		case .FullTypeMetadata:
-			output.write("full type metadata for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "full type metadata for ") { $1.print(&$0) }
 		case .TypeMetadata:
-			output.write("type metadata for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "type metadata for ") { $1.print(&$0) }
 		case .TypeMetadataAccessFunction:
-			output.write("type metadata accessor for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "type metadata accessor for ") { $1.print(&$0) }
 		case .TypeMetadataLazyCache:
-			output.write("lazy cache variable for type metadata for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "lazy cache variable for type metadata for ") { $1.print(&$0) }
 		case .AssociatedTypeMetadataAccessor:
-			output.write("associated type metadata accessor for ")
-			printChild(&output, index: 1)
-			output.write(" in ")
-			printChild(&output, index: 0)
+			output.write([children.at(1), children.at(0)], labels: ["associated type metadata accessor for ", " in "]) { $1?.print(&$0) }
 		case .AssociatedTypeWitnessTableAccessor:
-			output.write("associated type witness table accessor for ")
-			printChild(&output, index: 1)
-			output.write(" : ")
-			printChild(&output, index: 2)
-			output.write(" in ")
-			printChild(&output, index: 0)
+			output.write([children.at(1), children.at(2), children.at(0)], labels: ["associated type witness table accessor for ", " : ", " in "]) { $1?.print(&$0) }
 		case .NominalTypeDescriptor:
-			output.write("nominal type descriptor for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "nominal type descriptor for ") { $1.print(&$0) }
 		case .ValueWitness:
-			if case .Index(let i) = contents, let vwk = ValueWitnessKind(rawValue: i) {
-				output.write(vwk.description)
-			}
-			output.write(" value witness for ")
-			printChild(&output, index: 0)
+			output.write(ValueWitnessKind(rawValue: indexFromContents())?.description ?? "")
+			output.write(children.at(0), prefix: " value witness for ") { $1.print(&$0) }
 		case .ValueWitnessTable:
-			output.write("value witness table for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "value witness table for ") { $1.print(&$0) }
 		case .WitnessTableOffset:
-			output.write("witness table offset for ")
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: "witness table offset for ") { $1.print(&$0) }
 		case .BoundGenericClass: fallthrough
 		case .BoundGenericStructure: fallthrough
-		case .BoundGenericEnum: printBoundGeneric(&output)
-		case .DynamicSelf: output.write("Self")
+		case .BoundGenericEnum:
+			printBoundGeneric(&output)
+		case .DynamicSelf:
+			output.write("Self")
 		case .CFunctionPointer:
 			output.write("@convention(c) ")
 			printFunction(&output)
@@ -1834,203 +1620,133 @@ public struct SwiftName: CustomStringConvertible {
 			printFunction(&output)
 		case .SILBoxType:
 			output.write("@box ")
-			printChild(&output, index: 0)
+			children.at(0)?.print(&output)
 		case .Metatype:
-			var childIndex = 0
-			switch children.count {
-			case 2:
-				printChild(&output, index: childIndex)
-				output.write(" ")
-				childIndex += 1
-				fallthrough
-			case 1:
-				let t = children[0]
-				t.print(&output)
-				if t.kind == .Type, let f = t.children.first where f.kind == .ExistentialMetatype || f.kind == .ProtocolList {
-					output.write(".Protocol")
-				} else {
-					output.write(".Type")
-				}
-			default: break
+			guard let c0 = children.at(0) else { return }
+			let suffix: String
+			if c0.kind == .Type, let f = c0.children.first where f.kind == .ExistentialMetatype || f.kind == .ProtocolList {
+				suffix = ".Protocol"
+			} else {
+				suffix = ".Type"
+			}
+			if let c1 = children.at(1) {
+				output.write([c1, c0], separator: " ", suffix: suffix) { $1.print(&$0) }
+			} else {
+				output.write(Optional(c0), suffix: suffix) { $1.print(&$0) }
 			}
 		case .ExistentialMetatype:
-			var childIndex = 0
-			switch children.count {
-			case 2:
-				printChild(&output, index: childIndex)
-				output.write(" ")
-				childIndex += 1
-				fallthrough
-			case 1:
-				printChild(&output, index: childIndex)
-				output.write(".Type")
-			default: break
+			guard let c0 = children.at(0) else { return }
+			if let c1 = children.at(1) {
+				output.write([c1, c0], separator: " ", suffix: ".Type") { $1.print(&$0) }
+			} else {
+				output.write(Optional(c0), suffix: ".Type") { $1.print(&$0) }
 			}
-		case .MetatypeRepresentation: output.write(contents.description)
-		case .ArchetypeRef: output.write(contents.description)
+		case .MetatypeRepresentation:
+			output.write(contents.description)
+		case .ArchetypeRef:
+			output.write(contents.description)
 		case .AssociatedTypeRef:
-			printChild(&output, index: 0)
-			output.write(".")
-			if children.count > 1 {
-				output.write(children[1].contents.description)
-			}
+			guard let c1 = children.at(1) else { return }
+			output.write(children.at(0), suffix: ".") { $1.print(&$0) }
+			output.write(c1.contents.description)
 		case .SelfTypeRef:
-			printChild(&output, index: 0)
-			output.write(".Self")
+			output.write(children.at(0), suffix: ".Self") { $1.print(&$0) }
 		case .ProtocolList:
-			if let c = children.first {
-				if c.children.count != 1 {
-					output.write("protocol<")
-				}
-				for i in c.children.indices {
-					if i != 0 {
-						output.write(", ")
-					}
-					c.children[i].print(&output)
-				}
-				if c.children.count != 1 {
-					output.write(">")
-				}
-			}
+			guard let p = children.at(0) else { return }
+			output.write(p.children, prefix: p.children.count != 1 ? "protocol<" : nil, separator: ", ", suffix: p.children.count != 1 ? ">" : nil) { $1.print(&$0) }
 		case .Generics:
-			guard !children.isEmpty else { return }
-			output.write("<")
-			printChild(&output, index: 0)
-			var index = 1
-			while index < children.count && children[index].kind == .Archetype {
-				output.write(", ")
-				children[index].print(&output)
-				index += 1
-			}
-			output.write(">")
+			output.write(children.lazy.filter { $0.kind == .Archetype }, prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
 		case .Archetype:
 			output.write(contents.description)
-			if !children.isEmpty {
-				output.write(" : ")
-			}
-			printChild(&output, index: 0)
+			output.write(children.at(0), prefix: children.isEmpty ? nil : " : ") { $1.print(&$0) }
 		case .AssociatedType: return
 		case .QualifiedArchetype:
-			guard children.count >= 2 else { return }
+			guard let c0 = children.at(0), let c1 = children.at(1) else { return }
 			output.write("(archetype ")
-			output.write(children[0].contents.description)
-			output.write(" of ")
-			printChild(&output, index: 1)
-			output.write(")")
+			output.write(c0.contents.description)
+			output.write(Optional(c1), prefix: " of ", suffix: ")") { $1.print(&$0) }
 		case .GenericType:
-			printChild(&output, index: 0)
-			if children.count > 1 {
-				children[1].printChild(&output, index: 0)
-			}
+			output.write([children.at(0), children.at(1)?.children.at(0)]) { $1?.print(&$0) }
 		case .OwningAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".owningAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".owningAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .OwningMutableAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".owningMutableAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".owningMutableAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .NativeOwningAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".nativeOwningAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".nativeOwningAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .NativeOwningMutableAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".nativeOwningMutableAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".nativeOwningMutableAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .NativePinningAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".nativePinningAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".nativePinningAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .NativePinningMutableAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".nativePinningMutableAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".nativePinningMutableAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .UnsafeAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".unsafeAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".unsafeAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .UnsafeMutableAddressor:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".unsafeMutableAddressor", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".unsafeMutableAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .GlobalGetter:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".getter", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".getter", options: options.union(PrintOptions.hasTypeAndName))
 		case .Getter:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".getter", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".getter", options: options.union(PrintOptions.hasTypeAndName))
 		case .Setter:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".setter", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".setter", options: options.union(PrintOptions.hasTypeAndName))
 		case .MaterializeForSet:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".materializeForSet", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".materializeForSet", options: options.union(PrintOptions.hasTypeAndName))
 		case .WillSet:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".willset", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".willset", options: options.union(PrintOptions.hasTypeAndName))
 		case .DidSet:
-			printEntity(&output, hasName: true, hasType: true, extraName: ".didset", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ".didset", options: options.union(PrintOptions.hasTypeAndName))
 		case .Allocator:
-			printEntity(&output, hasName: false, hasType: true, extraName: ((children.count > 0 && children[0].kind == .Class) ? "__allocating_init" : "init"), asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ((children.count > 0 && children[0].kind == .Class) ? "__allocating_init" : "init"), options: options.union(PrintOptions.hasType))
 		case .Constructor:
-			printEntity(&output, hasName: false, hasType: true, extraName: "init", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: "init", options: options.union(PrintOptions.hasType))
 		case .Destructor:
-			printEntity(&output, hasName: false, hasType: false, extraName: "deinit", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: "deinit", options: options)
 		case .Deallocator:
-			printEntity(&output, hasName: false, hasType: false, extraName: ((children.count > 0 && children[0].kind == .Class) ? "__deallocating_deinit" : "deinit"), asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: ((children.count > 0 && children[0].kind == .Class) ? "__deallocating_deinit" : "deinit"), options: options)
 		case .IVarInitializer:
-			printEntity(&output, hasName: false, hasType: false, extraName: "__ivar_initializer", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: "__ivar_initializer", options: options)
 		case .IVarDestroyer:
-			printEntity(&output, hasName: false, hasType: false, extraName: "__ivar_destroyer", asContext: asContext, suppressType: suppressType)
+			printEntity(&output, extraName: "__ivar_destroyer", options: options)
 		case .ProtocolConformance:
-			printChild(&output, index: 0)
-			output.write(" : ")
-			printChild(&output, index: 1)
-			output.write(" in ")
-			printChild(&output, index: 2)
-		case .TypeList: children.forEach { $0.print(&output) }
-		case .ImplConvention: output.write(contents.description)
-		case .ImplFunctionAttribute: output.write(contents.description)
+			output.write(children.slice(0..<3), labels: [nil, " : ", " in "]) { $1.print(&$0) }
+		case .TypeList:
+			output.write(children) { $1.print(&$0) }
+		case .ImplConvention:
+			output.write(contents.description)
+		case .ImplFunctionAttribute:
+			output.write(contents.description)
 		case .ImplErrorResult:
 			output.write("@error ")
 			fallthrough
 		case .ImplParameter: fallthrough
 		case .ImplResult:
-			for i in children.indices {
-				if i != 0 {
-					output.write(" ")
-				}
-				children[i].print(&output)
-			}
-		case .ImplFunctionType: printImplFunctionType(&output)
-		case .ErrorType: output.write("<ERROR TYPE>")
+			output.write(children, separator: " ") { $1.print(&$0) }
+		case .ImplFunctionType:
+			printImplFunctionType(&output)
+		case .ErrorType:
+			output.write("<ERROR TYPE>")
 		case .DependentGenericSignature:
-			output.write("<")
-			var depth: UInt32 = 0
-			while depth < UInt32(children.count) {
-				let c = children[Int(depth)]
-				if c.kind != .DependentGenericParamCount { break }
-				if depth != 0 {
-					output.write("><")
-				}
-				if case .Index(let index) = c.contents {
-					for i in 0..<index {
-						if i != 0 { output.write(", ") }
-						output.write(archetypeName(i, depth))
-					}
-				}
-				depth += 1
-			}
-			if depth != UInt32(children.count) {
-				output.write(" where ")
-				var i = depth
-				while i < UInt32(children.count) {
-					if i > depth {
-						output.write(", ")
-					}
-					printChild(&output, index: Int(i))
-					i += 1
+			let filteredChildren = children.filter { $0.kind == .DependentGenericParamCount }.enumerate()
+			var lastDepth = 0
+			output.write(filteredChildren, prefix: "<", separator: "><") { o, t in
+				lastDepth = t.index
+				o.write(0..<t.element.indexFromContents(), separator: ", ") {
+					output.write(archetypeName($1, UInt32(t.index)))
 				}
 			}
-			output.write(">")
+			let prefix: String? = (lastDepth + 1 < children.endIndex) ? " where " : nil
+			let s = children[(lastDepth + 1)..<children.endIndex]
+			output.write(s, prefix: prefix, separator: ", ", suffix: ">") { $1.print(&$0) }
 		case .DependentGenericParamCount: return
 		case .DependentGenericConformanceRequirement:
-			printChild(&output, index: 0)
-			output.write(": ")
-			printChild(&output, index: 1)
+			output.write(children, separator: ": ") { $1.print(&$0) }
 		case .DependentGenericSameTypeRequirement:
-			printChild(&output, index: 0)
-			output.write(" == ")
-			printChild(&output, index: 1)
+			output.write(children, separator: " == ") { $1.print(&$0) }
 		case .DependentGenericParamType: output.write(contents.description)
 		case .DependentGenericType:
-			printChild(&output, index: 0)
-			output.write(" ")
-			printChild(&output, index: 1)
+			output.write(children, separator: " ") { $1.print(&$0) }
 		case .DependentMemberType:
-			printChild(&output, index: 0)
-			output.write(".")
-			printChild(&output, index: 1)
+			output.write(children, separator: ".") { $1.print(&$0) }
 		case .DependentAssociatedTypeRef: output.write(contents.description)
 		case .ThrowsAnnotation:
 			output.write(" throws ")

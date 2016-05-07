@@ -13,23 +13,28 @@
 
 import Foundation
 
-let splitLines: Array<(input: String, output: String)>
+let splitLines: Array<(input: Array<UnicodeScalar>, output: String)>
 do {
 	let input = try String(contentsOfFile: "manglings.txt", encoding: NSUTF8StringEncoding)
 	let lines = input.componentsSeparatedByString("\n").filter { !$0.isEmpty }
-	splitLines = try lines.map { i -> (String, String) in
+	splitLines = try lines.map { i -> (Array<UnicodeScalar>, String) in
 		let components = i.componentsSeparatedByString(" ---> ")
 		if components.count != 2 {
 			enum InputError: ErrorType { case UnableToSplitLine(String) }
 			throw InputError.UnableToSplitLine(i)
 		}
-		return (components[0], components[1])
+		return (Array(components[0].unicodeScalars), components[1])
 	}
 } catch {
 	fatalError("Error reading manglings.txt file: \(error)")
 }
 
 for (input, output) in splitLines {
+#if !COMMAND_LINE_OUTPUT
+	for _ in 0..<10000 {
+		_ = try? demangleSwiftName(input).description
+	}
+#else
 	do {
 		let result = try demangleSwiftName(input).description
 		if result != output {
@@ -40,4 +45,5 @@ for (input, output) in splitLines {
 			print("Failed to demangle \(input). Raised \(error), expected \(output)")
 		}
 	}
+#endif
 }
