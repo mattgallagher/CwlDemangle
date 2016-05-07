@@ -1735,7 +1735,7 @@ public struct SwiftName: CustomStringConvertible {
 				}
 			}
 			let prefix: String? = (lastDepth + 1 < children.endIndex) ? " where " : nil
-			let s = children[(lastDepth + 1)..<children.endIndex]
+			let s = children.slice((lastDepth + 1)..<children.endIndex)
 			output.write(s, prefix: prefix, separator: ", ", suffix: ">") { $1.print(&$0) }
 		case .DependentGenericParamCount: return
 		case .DependentGenericConformanceRequirement:
