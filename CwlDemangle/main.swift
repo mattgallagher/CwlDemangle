@@ -15,13 +15,13 @@ import Foundation
 
 let splitLines: Array<(input: Array<UnicodeScalar>, output: String)>
 do {
-	let input = try String(contentsOfFile: "manglings.txt", encoding: NSUTF8StringEncoding)
-	let lines = input.componentsSeparatedByString("\n").filter { !$0.isEmpty }
+	let input = try String(contentsOfFile: "manglings.txt", encoding: String.Encoding.utf8)
+	let lines = input.components(separatedBy: "\n").filter { !$0.isEmpty }
 	splitLines = try lines.map { i -> (Array<UnicodeScalar>, String) in
-		let components = i.componentsSeparatedByString(" ---> ")
+		let components = i.components(separatedBy: " ---> ")
 		if components.count != 2 {
-			enum InputError: ErrorType { case UnableToSplitLine(String) }
-			throw InputError.UnableToSplitLine(i)
+			enum InputError: ErrorProtocol { case unableToSplitLine(String) }
+			throw InputError.unableToSplitLine(i)
 		}
 		return (Array(components[0].unicodeScalars), components[1])
 	}
