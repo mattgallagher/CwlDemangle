@@ -1084,49 +1084,6 @@ extension Array {
 	}
 }
 
-// Define Optional as a collection indexed by Bool
-public struct OptionalGenerator<Wrapped>: GeneratorType {
-	public typealias Element = Wrapped
-	var value: Wrapped?
-	public init(value: Wrapped?) {
-		self.value = value
-	}
-	public mutating func next() -> Element? {
-		let result = self.value
-		self.value = nil
-		return result
-	}
-}
-// Define Bool as a ForwardIndexType for a collection with a maximum 1 element. Indexes are "true" (for the element if it exists) and "false" (for the 1-past-the-end element).
-extension Bool: ForwardIndexType {
-	public typealias Distance = Int
-	public func successor() -> Bool {
-		return false
-	}
-	public func advancedBy(n: Distance) -> Bool {
-		return self ? (n == 0) : (n == -1)
-	}
-	public func advancedBy(n: Distance, limit: Bool) -> Bool {
-		return self ? (n == 0 || limit == true) : (n == -1 || (n < 0 && limit == true))
-	}
-	public func distanceTo(end: Bool) -> Distance {
-		return self == end ? 0 : (self ? 1 : -1)
-	}
-}
-extension Optional: CollectionType {
-    public typealias Generator = OptionalGenerator<Wrapped>
-    public func generate() -> Optional.Generator {
-		return OptionalGenerator(value: self)
-	}
-    public typealias Index = Bool
-    public var startIndex: Bool { return true }
-    public var endIndex: Bool { return false}
-    public subscript (position: Bool) -> Generator.Element {
-		precondition(position)
-		return self!
-	}
-}
-
 extension OutputStreamType {
 	mutating func write<S: SequenceType, T: SequenceType where T.Generator.Element == String?>(sequence: S, labels: T, @noescape render: (inout Self, S.Generator.Element) -> ()) {
 		var lg = labels.generate()
@@ -1157,6 +1114,18 @@ extension OutputStreamType {
 			write(s)
 		}
 	}
+
+    mutating func write<T>(optional: Optional<T>, prefix: String? = nil, suffix: String? = nil, @noescape render: (inout Self, T) -> ()) {
+        if let p = prefix {
+            write(p)
+        }
+        if let e = optional {
+            render(&self, e)
+        }
+        if let s = suffix {
+            write(s)
+        }
+    }
 }
 
 struct PrintOptions: OptionSetType {
