@@ -1131,56 +1131,6 @@ extension Array {
 	}
 }
 
-// Define Optional as a collection indexed by Bool
-public struct OptionalGenerator<Wrapped>: IteratorProtocol {
-	public typealias Element = Wrapped
-	var value: Wrapped?
-	public init(value: Wrapped?) {
-		self.value = value
-	}
-	public mutating func next() -> Element? {
-		let result = self.value
-		self.value = nil
-		return result
-	}
-}
-// Define Bool as a ForwardIndexType for a collection with a maximum 1 element. Indexes are "true" (for the element if it exists) and "false" (for the 1-past-the-end element).
-extension Bool: Comparable {
-	public typealias Distance = Int
-	public func successor() -> Bool {
-		return false
-	}
-	public func advancedBy(_ n: Distance) -> Bool {
-		return self ? (n == 0) : (n == -1)
-	}
-	public func advancedBy(_ n: Distance, limit: Bool) -> Bool {
-		return self ? (n == 0 || limit == true) : (n == -1 || (n < 0 && limit == true))
-	}
-	public func distanceTo(_ end: Bool) -> Distance {
-		return self == end ? 0 : (self ? 1 : -1)
-	}
-}
-public func <(left: Bool, right: Bool) -> Bool {
-	return left && !right
-}
-
-extension Optional: Collection {
-    public typealias Iterator = OptionalGenerator<Wrapped>
-    public func makeIterator() -> Optional.Iterator {
-		return OptionalGenerator(value: self)
-	}
-    public typealias Index = Bool
-    public var startIndex: Bool { return true }
-    public var endIndex: Bool { return false}
-    public subscript (position: Bool) -> Iterator.Element {
-		precondition(position)
-		return self!
-	}
-	public func index(after i: Bool) -> Bool {
-		return false
-	}
-}
-
 extension OutputStream {
 	mutating func write<S: Sequence, T: Sequence where T.Iterator.Element == String?>(sequence: S, labels: T, render: @noescape(inout Self, S.Iterator.Element) -> ()) {
 		var lg = labels.makeIterator()
@@ -1211,6 +1161,28 @@ extension OutputStream {
 			write(s)
 		}
 	}
+
+    mutating func write<T>(optional: Optional<T>, prefix: String? = nil, suffix: String? = nil, render: @noescape (inout Self, T) -> ()) {
+        if let p = prefix {
+            write(p)
+        }
+        if let e = optional {
+            render(&self, e)
+        }
+        if let s = suffix {
+            write(s)
+        }
+    }
+
+    mutating func write<T>(value: T, prefix: String? = nil, suffix: String? = nil, render: @noescape (inout Self, T) -> ()) {
+        if let p = prefix {
+            write(p)
+        }
+        render(&self, value)
+        if let s = suffix {
+            write(s)
+        }
+    }
 }
 
 struct PrintOptions: OptionSet {
@@ -1335,7 +1307,7 @@ public struct SwiftName: CustomStringConvertible {
 		case .implicitlyUnwrappedOptional:
 			if let type = children.at(1)?.children.at(0) {
 				let needParens = !type.kind.isSimpleType
-				output.write(sequence: Optional(type), prefix: needParens ? "(" : nil, suffix: needParens ? ")" : nil) { $1.print(&$0) }
+				output.write(value: type, prefix: needParens ? "(" : nil, suffix: needParens ? ")" : nil) { $1.print(&$0) }
 				output.write(sugarType == .optional ? "?" : "!")
 			}
 		case .array: fallthrough
@@ -1402,7 +1374,7 @@ public struct SwiftName: CustomStringConvertible {
 	func print<T: OutputStream>(_ output: inout T, _ options: PrintOptions = PrintOptions()) {
 		switch kind {
 		case .static:
-			output.write(sequence: children.at(0), prefix: "static ") { $1.print(&$0, options) }
+			output.write(optional: children.at(0), prefix: "static ") { $1.print(&$0, options) }
 		case .directness:
 			output.write(indexFromContents() == 1 ? "indirect " : "direct ")
 		case .extension:
@@ -1440,12 +1412,12 @@ public struct SwiftName: CustomStringConvertible {
 		case .typeAlias:
 			printEntity(&output, extraName: "", options: options.union(PrintOptions.hasName))
 		case .localDeclName:
-			output.write(sequence: children.at(1), prefix: "(") { $1.print(&$0) }
+			output.write(optional: children.at(1), prefix: "(") { $1.print(&$0) }
 			output.write(" #")
 			output.write((indexFromChild(0) + 1).description)
 			output.write(")")
 		case .privateDeclName:
-			output.write(sequence: children.at(1), prefix: "(") { $1.print(&$0) }
+			output.write(optional: children.at(1), prefix: "(") { $1.print(&$0) }
 			if let c = children.first {
 				output.write(" in ")
 				output.write(c.contents.description)
@@ -1483,13 +1455,13 @@ public struct SwiftName: CustomStringConvertible {
 		case .returnType:
 			output.write(sequence: children.count == 0 ? [self] : children, prefix: " -> ") { children.count == 0 ? $0.write(contents.description) : $1.print(&$0) }
 		case .weak:
-			output.write(sequence: children.at(0), prefix: "weak ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "weak ") { $1.print(&$0) }
 		case .unowned:
-			output.write(sequence: children.at(0), prefix: "unowned ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "unowned ") { $1.print(&$0) }
 		case .unmanaged:
-			output.write(sequence: children.at(0), prefix: "unowned(unsafe) ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "unowned(unsafe) ") { $1.print(&$0) }
 		case .inOut:
-			output.write(sequence: children.at(0), prefix: "inout ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "inout ") { $1.print(&$0) }
 		case .nonObjCAttribute:
 			output.write("@nonobjc ")
 		case .objCAttribute:
@@ -1536,7 +1508,7 @@ public struct SwiftName: CustomStringConvertible {
 				case .some(.constantPropFunction): fallthrough
 				case .some(.constantPropGlobal):
 					if let t = children.at(index + 1)?.contents.description {
-						output.write(sequence: children.at(index), prefix: "[", suffix: " : ") { $1.print(&$0) }
+						output.write(optional: children.at(index), prefix: "[", suffix: " : ") { $1.print(&$0) }
 						output.write((try? demangleSwiftName(t).description) ?? t)
 						output.write("]")
 						index += 1
@@ -1604,21 +1576,21 @@ public struct SwiftName: CustomStringConvertible {
 		case .lazyProtocolWitnessTableCacheVariable:
 			output.write(sequence: children.prefix(2), labels: ["lazy protocol witness table cache variable for type ", " and conformance "]) { $1.print(&$0) }
 		case .protocolWitnessTableAccessor:
-			output.write(sequence: children.at(0), prefix: "protocol witness table accessor for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "protocol witness table accessor for ") { $1.print(&$0) }
 		case .protocolWitnessTable:
-			output.write(sequence: children.at(0), prefix: "protocol witness table for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "protocol witness table for ") { $1.print(&$0) }
 		case .genericProtocolWitnessTable:
-			output.write(sequence: children.at(0), prefix: "generic protocol witness table for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "generic protocol witness table for ") { $1.print(&$0) }
 		case .genericProtocolWitnessTableInstantiationFunction:
-			output.write(sequence: children.at(0), prefix: "instantiation function for generic protocol witness table for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "instantiation function for generic protocol witness table for ") { $1.print(&$0) }
 		case .protocolWitness:
 			output.write(sequence: [children.at(1), children.at(0)], labels: ["protocol witness for ", " in conformance "]) { $1?.print(&$0) }
 		case .partialApplyForwarder:
 			output.write("partial apply forwarder")
-			output.write(sequence: children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
 		case .partialApplyObjCForwarder:
 			output.write("partial apply ObjC forwarder")
-			output.write(sequence: children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: children.isEmpty ? nil : " for ") { $1.print(&$0) }
 		case .fieldOffset:
 			output.write(sequence: children.prefix(2), separator: "field offset for ") { $1.print(&$0) }
 		case .reabstractionThunk: fallthrough
@@ -1630,32 +1602,32 @@ public struct SwiftName: CustomStringConvertible {
 			let labels: [String?] = (dgs == nil ? [firstLabel, " to "] : [firstLabel, " from ", " to "])
 			output.write(sequence: [dgs, children.at(children.count - 2), children.at(children.count - 1)].flatMap { $0 }, labels: labels) { $1.print(&$0) }
 		case .genericTypeMetadataPattern:
-			output.write(sequence: children.at(0), prefix: "generic type metadata pattern for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "generic type metadata pattern for ") { $1.print(&$0) }
 		case .metaclass:
-			output.write(sequence: children.at(0), prefix: "metaclass for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "metaclass for ") { $1.print(&$0) }
 		case .protocolDescriptor:
-			output.write(sequence: children.at(0), prefix: "protocol descriptor for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "protocol descriptor for ") { $1.print(&$0) }
 		case .fullTypeMetadata:
-			output.write(sequence: children.at(0), prefix: "full type metadata for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "full type metadata for ") { $1.print(&$0) }
 		case .typeMetadata:
-			output.write(sequence: children.at(0), prefix: "type metadata for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "type metadata for ") { $1.print(&$0) }
 		case .typeMetadataAccessFunction:
-			output.write(sequence: children.at(0), prefix: "type metadata accessor for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "type metadata accessor for ") { $1.print(&$0) }
 		case .typeMetadataLazyCache:
-			output.write(sequence: children.at(0), prefix: "lazy cache variable for type metadata for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "lazy cache variable for type metadata for ") { $1.print(&$0) }
 		case .associatedTypeMetadataAccessor:
 			output.write(sequence: [children.at(1), children.at(0)], labels: ["associated type metadata accessor for ", " in "]) { $1?.print(&$0) }
 		case .associatedTypeWitnessTableAccessor:
 			output.write(sequence: [children.at(1), children.at(2), children.at(0)], labels: ["associated type witness table accessor for ", " : ", " in "]) { $1?.print(&$0) }
 		case .nominalTypeDescriptor:
-			output.write(sequence: children.at(0), prefix: "nominal type descriptor for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "nominal type descriptor for ") { $1.print(&$0) }
 		case .valueWitness:
 			output.write(ValueWitnessKind(rawValue: indexFromContents())?.description ?? "")
-			output.write(sequence: children.at(0), prefix: " value witness for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: " value witness for ") { $1.print(&$0) }
 		case .valueWitnessTable:
-			output.write(sequence: children.at(0), prefix: "value witness table for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "value witness table for ") { $1.print(&$0) }
 		case .witnessTableOffset:
-			output.write(sequence: children.at(0), prefix: "witness table offset for ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: "witness table offset for ") { $1.print(&$0) }
 		case .boundGenericClass: fallthrough
 		case .boundGenericStructure: fallthrough
 		case .boundGenericEnum:
@@ -1682,14 +1654,14 @@ public struct SwiftName: CustomStringConvertible {
 			if let c1 = children.at(1) {
 				output.write(sequence: [c1, c0], separator: " ", suffix: suffix) { $1.print(&$0) }
 			} else {
-				output.write(sequence: Optional(c0), suffix: suffix) { $1.print(&$0) }
+				output.write(value: c0, suffix: suffix) { $1.print(&$0) }
 			}
 		case .existentialMetatype:
 			guard let c0 = children.at(0) else { return }
 			if let c1 = children.at(1) {
 				output.write(sequence: [c1, c0], separator: " ", suffix: ".Type") { $1.print(&$0) }
 			} else {
-				output.write(sequence: Optional(c0), suffix: ".Type") { $1.print(&$0) }
+				output.write(value: c0, suffix: ".Type") { $1.print(&$0) }
 			}
 		case .metatypeRepresentation:
 			output.write(contents.description)
@@ -1697,10 +1669,10 @@ public struct SwiftName: CustomStringConvertible {
 			output.write(contents.description)
 		case .associatedTypeRef:
 			guard let c1 = children.at(1) else { return }
-			output.write(sequence: children.at(0), suffix: ".") { $1.print(&$0) }
+			output.write(optional: children.at(0), suffix: ".") { $1.print(&$0) }
 			output.write(c1.contents.description)
 		case .selfTypeRef:
-			output.write(sequence: children.at(0), suffix: ".Self") { $1.print(&$0) }
+			output.write(optional: children.at(0), suffix: ".Self") { $1.print(&$0) }
 		case .protocolList:
 			guard let p = children.at(0) else { return }
 			output.write(sequence: p.children, prefix: p.children.count != 1 ? "protocol<" : nil, separator: ", ", suffix: p.children.count != 1 ? ">" : nil) { $1.print(&$0) }
@@ -1708,13 +1680,13 @@ public struct SwiftName: CustomStringConvertible {
 			output.write(sequence: children.lazy.filter { $0.kind == .archetype }, prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
 		case .archetype:
 			output.write(contents.description)
-			output.write(sequence: children.at(0), prefix: children.isEmpty ? nil : " : ") { $1.print(&$0) }
+			output.write(optional: children.at(0), prefix: children.isEmpty ? nil : " : ") { $1.print(&$0) }
 		case .associatedType: return
 		case .qualifiedArchetype:
 			guard let c0 = children.at(0), let c1 = children.at(1) else { return }
 			output.write("(archetype ")
 			output.write(c0.contents.description)
-			output.write(sequence: Optional(c1), prefix: " of ", suffix: ")") { $1.print(&$0) }
+			output.write(value: c1, prefix: " of ", suffix: ")") { $1.print(&$0) }
 		case .genericType:
 			output.write(sequence: [children.at(0), children.at(1)?.children.at(0)]) { $1?.print(&$0) }
 		case .owningAddressor:
