@@ -1319,24 +1319,24 @@ public struct SwiftName: CustomStringConvertible {
 		guard children.count == 2 else { return .none }
 		guard kind == .boundGenericEnum || kind == .boundGenericStructure else { return .none }
 		
-		guard let unboundType = children[0].children.first where unboundType.children.count > 1 else { return .none }
+		guard let unboundType = children[0].children.first, unboundType.children.count > 1 else { return .none }
 		let typeArgs = children[1]
 		let c0 = unboundType.children[0]
 		let c1 = unboundType.children[1]
 		
 		if kind == .boundGenericEnum {
-			if c1.kind == .identifier, case .name(let s) = c1.contents where s == "Optional" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents where m == stdlibName {
+			if c1.kind == .identifier, case .name(let s) = c1.contents, s == "Optional" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents, m == stdlibName {
 				return .optional
 			}
-			if c1.kind == .identifier, case .name(let s) = c1.contents where s == "ImplicitlyUnwrappedOptional" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents where m == stdlibName {
+			if c1.kind == .identifier, case .name(let s) = c1.contents, s == "ImplicitlyUnwrappedOptional" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents, m == stdlibName {
 				return .implicitlyUnwrappedOptional
 			}
 			return .none
 		}
-		if c1.kind == .identifier, case .name(let s) = c1.contents where s == "Array" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents where m == stdlibName {
+		if c1.kind == .identifier, case .name(let s) = c1.contents, s == "Array" && typeArgs.children.count == 1 && c0.kind == .module, case .name(let m) = c0.contents, m == stdlibName {
 			return .array
 		}
-		if c1.kind == .identifier, case .name(let s) = c1.contents where s == "Dictionary" && typeArgs.children.count == 2 && c0.kind == .module, case .name(let m) = c0.contents where m == stdlibName {
+		if c1.kind == .identifier, case .name(let s) = c1.contents, s == "Dictionary" && typeArgs.children.count == 2 && c0.kind == .module, case .name(let m) = c0.contents, m == stdlibName {
 			return .dictionary
 		}
 		return .none
@@ -1487,7 +1487,7 @@ public struct SwiftName: CustomStringConvertible {
 			printFunction(&output)
 		case .argumentTuple:
 			let needParens: Bool
-			if let k = children.at(0)?.children.at(0)?.kind where k == .variadicTuple || k == .nonVariadicTuple {
+			if let k = children.at(0)?.children.at(0)?.kind, k == .variadicTuple || k == .nonVariadicTuple {
 				needParens = false
 			} else {
 				needParens = true
@@ -1695,7 +1695,7 @@ public struct SwiftName: CustomStringConvertible {
 		case .metatype:
 			guard let c0 = children.at(0) else { return }
 			let suffix: String
-			if c0.kind == .type, let f = c0.children.first where f.kind == .existentialMetatype || f.kind == .protocolList {
+			if c0.kind == .type, let f = c0.children.first, f.kind == .existentialMetatype || f.kind == .protocolList {
 				suffix = ".Protocol"
 			} else {
 				suffix = ".Type"
@@ -1859,12 +1859,12 @@ public struct SwiftName: CustomStringConvertible {
 		case .deallocator: fallthrough
 		case .iVarDestroyer:
 			var ty = type.children.first
-			while case .some(let t) = ty where t.kind == .genericType || t.kind == .dependentGenericType {
+			while case .some(let t) = ty, t.kind == .genericType || t.kind == .dependentGenericType {
 				if t.children.count > 1 {
 					ty = t.children[1].children.first
 				}
 			}
-			if let t = ty where t.kind != .functionType && t.kind != .uncurriedFunctionType && t.kind != .cFunctionPointer && t.kind != .thinFunctionType {
+			if let t = ty, t.kind != .functionType && t.kind != .uncurriedFunctionType && t.kind != .cFunctionPointer && t.kind != .thinFunctionType {
 				return true
 			} else {
 				return false
