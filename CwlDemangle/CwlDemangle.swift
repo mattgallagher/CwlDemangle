@@ -17,10 +17,10 @@
 import Swift
 
 public func demangleSwiftName(_ mangled: String) throws -> SwiftName {
-	return try demangleSwiftName(Array<UnicodeScalar>(mangled.unicodeScalars))
+	return try demangleSwiftName(mangled.unicodeScalars)
 }
 
-public func demangleSwiftName(_ mangled: Array<UnicodeScalar>) throws -> SwiftName {
+public func demangleSwiftName<C: Collection>(_ mangled: C) throws -> SwiftName where C.Iterator.Element == UnicodeScalar {
 	var nameRefs = [SwiftName]()
 	var scanner = ScalarScanner(scalars: mangled)
 	
@@ -250,6 +250,49 @@ private func demangleProtocolNameGivenContext<C>(_ scanner: inout ScalarScanner<
 	return result
 }
 
+private func demangleNominalType<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inout [SwiftName]) throws -> SwiftName {
+	switch try scanner.readScalar() {
+	case "S": return try demangleSubstitutionIndex(&scanner, &nameRefs)
+	case "V": return try demangleDeclarationName(&scanner, &nameRefs, kind: .structure)
+	case "O": return try demangleDeclarationName(&scanner, &nameRefs, kind: .enum)
+	case "C": return try demangleDeclarationName(&scanner, &nameRefs, kind: .class)
+	case "P": return try demangleDeclarationName(&scanner, &nameRefs, kind: .protocol)
+	default: throw scanner.unexpectedError()
+	}
+}
+
+private func demangleBoundGenericArgs<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inout [SwiftName], nominalType initialNominal: SwiftName) throws -> SwiftName {
+	guard var parentOrModule = initialNominal.children.first else { throw scanner.unexpectedError() }
+
+	let nominalType: SwiftName
+	switch parentOrModule.kind {
+	case .module: fallthrough
+	case .function: fallthrough
+	case .extension: nominalType = initialNominal
+	default:
+		parentOrModule = try demangleBoundGenericArgs(&scanner, &nameRefs, nominalType: parentOrModule)
+
+		guard initialNominal.children.count > 1 else { throw scanner.unexpectedError() }
+		nominalType = SwiftName(kind: initialNominal.kind, children: [parentOrModule, initialNominal.children[1]])
+	}
+	
+	var children = [SwiftName]()
+	while !scanner.conditional(scalar: "_") {
+		children.append(try demangleType(&scanner, &nameRefs))
+	}
+	if children.isEmpty {
+		return nominalType
+	}
+	let args = SwiftName(kind: .typeList, children: children)
+	let unboundType = SwiftName(kind: .type, children: [nominalType])
+	switch nominalType.kind {
+	case .class: return SwiftName(kind: .boundGenericClass, children: [unboundType, args])
+	case .structure: return SwiftName(kind: .boundGenericStructure, children: [unboundType, args])
+	case .enum: return SwiftName(kind: .boundGenericEnum, children: [unboundType, args])
+	default: throw scanner.unexpectedError()
+	}
+}
+
 private func demangleEntity<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inout [SwiftName]) throws -> SwiftName {
 	let isStatic = scanner.conditional(scalar: "Z")
 	
@@ -259,12 +302,9 @@ private func demangleEntity<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: in
 	case "v": basicKind = .variable
 	case "I": basicKind = .initializer
 	case "i": basicKind = .subscript
-	case "S": return try demangleSubstitutionIndex(&scanner, &nameRefs)
-	case "V": return try demangleDeclarationName(&scanner, &nameRefs, kind: .structure)
-	case "O": return try demangleDeclarationName(&scanner, &nameRefs, kind: .enum)
-	case "C": return try demangleDeclarationName(&scanner, &nameRefs, kind: .class)
-	case "P": return try demangleDeclarationName(&scanner, &nameRefs, kind: .protocol)
-	default: throw scanner.unexpectedError()
+	default:
+		try scanner.backtrack()
+		return try demangleNominalType(&scanner, &nameRefs)
 	}
 	
 	let context = try demangleContext(&scanner, &nameRefs)
@@ -332,6 +372,7 @@ private func demangleContext<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: i
 		return SwiftName(kind: .extension, children: [module, type, signature])
 	case "S": return try demangleSubstitutionIndex(&scanner, &nameRefs)
 	case "s": return SwiftName(kind: .module, children: [], contents: .name(stdlibName))
+	case "G": return try demangleBoundGenericArgs(&scanner, &nameRefs, nominalType: demangleNominalType(&scanner, &nameRefs))
 	case "F": fallthrough
 	case "I": fallthrough
 	case "v": fallthrough
@@ -375,6 +416,8 @@ private func demangleSubstitutionIndex<C>(_ scanner: inout ScalarScanner<C>, _ n
 	case "d": return swiftStdLibType(.structure, named: "Double")
 	case "f": return swiftStdLibType(.structure, named: "Float")
 	case "i": return swiftStdLibType(.structure, named: "Int")
+	case "V": return swiftStdLibType(.structure, named: "UnsafeRawPointer")
+	case "v": return swiftStdLibType(.structure, named: "UnsafeMutableRawPointer")
 	case "P": return swiftStdLibType(.structure, named: "UnsafePointer")
 	case "p": return swiftStdLibType(.structure, named: "UnsafeMutablePointer")
 	case "q": return swiftStdLibType(.enum, named: "Optional")
@@ -393,7 +436,7 @@ private func demangleSubstitutionIndex<C>(_ scanner: inout ScalarScanner<C>, _ n
 	}
 }
 
-private func demangleGenericSignature<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inout [SwiftName]) throws -> SwiftName {
+private func demangleGenericSignature<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inout [SwiftName], isPseudo: Bool = false) throws -> SwiftName {
 	var children = [SwiftName]()
 	var c = try scanner.requirePeek()
 	while c != "R" && c != "r" {
@@ -561,20 +604,7 @@ private func demangleType<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inou
 		type = SwiftName(kind: .errorType, children: [], contents: .name(""))
 	case "F": type = try demangleFunctionType(&scanner, &nameRefs, kind: .functionType)
 	case "f": type = try demangleFunctionType(&scanner, &nameRefs, kind: .uncurriedFunctionType)
-	case "G":
-		let unboundType = try demangleType(&scanner, &nameRefs)
-		var children = [SwiftName]()
-		while !scanner.conditional(scalar: "_") {
-			children.append(try demangleType(&scanner, &nameRefs))
-		}
-		let kind: SwiftName.Kind
-		switch unboundType.children.first?.kind {
-		case .some(.class): kind = .boundGenericClass
-		case .some(.structure): kind = .boundGenericStructure
-		case .some(.enum): kind = .boundGenericEnum
-		default: throw scanner.unexpectedError()
-		}
-		type = SwiftName(kind: kind, children: [unboundType, SwiftName(kind: .typeList, children: children)])
+	case "G": type = try demangleBoundGenericArgs(&scanner, &nameRefs, nominalType: demangleNominalType(&scanner, &nameRefs))
 	case "X":
 		let c = try scanner.readScalar()
 		switch c {
@@ -614,11 +644,10 @@ private func demangleType<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs: inou
 				}
 				children.append(SwiftName(kind: .implFunctionAttribute, contents: .name(name)))
 			}
-			if scanner.conditional(scalar: "N") {
-				children.append(SwiftName(kind: .implFunctionAttribute, contents: .name("@noreturn")))
-			}
 			if scanner.conditional(scalar: "G") {
-				children.append(try demangleGenericSignature(&scanner, &nameRefs))
+				children.append(try demangleGenericSignature(&scanner, &nameRefs, isPseudo: false))
+			} else if scanner.conditional(scalar: "g") {
+				children.append(try demangleGenericSignature(&scanner, &nameRefs, isPseudo: true))
 			}
 			try scanner.match(scalar: "_")
 			while !scanner.conditional(scalar: "_") {
@@ -836,7 +865,7 @@ private func archetypeName(_ index: UInt32, _ depth: UInt32) -> String {
 /// A type for representing the different possible failure conditions when using ScalarScanner
 ///
 /// NAME and ACCESS NOTE: To avoid any dependencies on other files/frameworks, I chose to embed the ScalarScanner class in this file. I made the ScalarScanner private to avoid potential name conflicts. However, this error type might need to be handled externally, so it is public but I've *renamed* it so that it will not conflict with any public copies of ScalarScanner in the same namespace.
-public enum DemangleScannerError: ErrorProtocol {
+public enum DemangleScannerError: Error {
 	/// The scalar at the specified index doesn't match the expected grammar
 	case unexpected(at: Int)
 	
@@ -858,7 +887,7 @@ private typealias ScalarScannerError = DemangleScannerError
 
 /// A structure for traversing a `String.UnicodeScalarView`. A `context` field is provided but is not used by the scanner (it is entirely for storage by the scanner's user).
 /// This is a private copy of a class normally included in CwlUtils: http://github.com/mattgallagher/CwlUtils
-private struct ScalarScanner<C: Collection where C.Iterator.Element == UnicodeScalar, C.Index: Comparable> {
+private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeScalar, C.Index: Comparable {
 	/// The underlying storage
 	private let scalars: C
 	
@@ -1158,7 +1187,7 @@ private struct ScalarScanner<C: Collection where C.Iterator.Element == UnicodeSc
 	}
 	
 	/// Returns a throwable error capturing the current scanner progress point.
-	private func unexpectedError() -> ErrorProtocol {
+	private func unexpectedError() -> Error {
 		return ScalarScannerError.unexpected(at: consumed)
 	}
 	
@@ -1181,7 +1210,7 @@ private extension Array {
 }
 
 private extension OutputStream {
-	mutating func write<S: Sequence, T: Sequence where T.Iterator.Element == String?>(sequence: S, labels: T, render: @noescape(inout Self, S.Iterator.Element) -> ()) {
+	mutating func write<S: Sequence, T: Sequence>(sequence: S, labels: T, render: @noescape(inout Self, S.Iterator.Element) -> ()) where T.Iterator.Element == String? {
 		var lg = labels.makeIterator()
 		if let maybePrefix = lg.next(), let prefix = maybePrefix {
 			write(prefix)
@@ -1724,9 +1753,11 @@ public struct SwiftName: CustomStringConvertible {
 			output.write(optional: children.at(0), suffix: ".Self") { $1.print(&$0) }
 		case .protocolList:
 			guard let p = children.at(0) else { return }
-			output.write(sequence: p.children, prefix: p.children.count != 1 ? "protocol<" : nil, separator: ", ", suffix: p.children.count != 1 ? ">" : nil) { $1.print(&$0) }
-		case .generics:
-			output.write(sequence: children.lazy.filter { $0.kind == .archetype }, prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
+			if p.children.isEmpty {
+				output.write("Any")
+			} else {
+				output.write(sequence: p.children, separator: " & ") { $1.print(&$0) }
+			}
 		case .archetype:
 			output.write(contents.description)
 			output.write(optional: children.at(0), prefix: children.isEmpty ? nil : " : ") { $1.print(&$0) }
@@ -1736,8 +1767,6 @@ public struct SwiftName: CustomStringConvertible {
 			output.write("(archetype ")
 			output.write(c0.contents.description)
 			output.write(value: c1, prefix: " of ", suffix: ")") { $1.print(&$0) }
-		case .genericType:
-			output.write(sequence: [children.at(0), children.at(1)?.children.at(0)]) { $1?.print(&$0) }
 		case .owningAddressor:
 			printEntity(&output, extraName: ".owningAddressor", options: options.union(PrintOptions.hasTypeAndName))
 		case .owningMutableAddressor:
@@ -1796,6 +1825,7 @@ public struct SwiftName: CustomStringConvertible {
 			printImplFunctionType(&output)
 		case .errorType:
 			output.write("<ERROR TYPE>")
+		case .dependentPseudogenericSignature: fallthrough
 		case .dependentGenericSignature:
 			let filteredChildren = children.filter { $0.kind == .dependentGenericParamCount }.enumerated()
 			var lastDepth = 0
@@ -1859,7 +1889,7 @@ public struct SwiftName: CustomStringConvertible {
 		case .deallocator: fallthrough
 		case .iVarDestroyer:
 			var ty = type.children.first
-			while case .some(let t) = ty, t.kind == .genericType || t.kind == .dependentGenericType {
+			while case .some(let t) = ty, t.kind == .dependentGenericType {
 				if t.children.count > 1 {
 					ty = t.children[1].children.first
 				}
@@ -1898,6 +1928,7 @@ public struct SwiftName: CustomStringConvertible {
 		case dependentGenericParamCount
 		case dependentGenericConformanceRequirement
 		case dependentGenericSameTypeRequirement
+		case dependentPseudogenericSignature
 		case dependentGenericType
 		case dependentMemberType
 		case dependentGenericParamType
@@ -1920,13 +1951,11 @@ public struct SwiftName: CustomStringConvertible {
 		case functionSignatureSpecializationParamKind
 		case functionSignatureSpecializationParamPayload
 		case functionType
-		case generics
 		case genericProtocolWitnessTable
 		case genericProtocolWitnessTableInstantiationFunction
 		case genericSpecialization
 		case genericSpecializationNotReAbstracted
 		case genericSpecializationParam
-		case genericType
 		case genericTypeMetadataPattern
 		case getter
 		case global

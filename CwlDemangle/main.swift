@@ -20,7 +20,7 @@ do {
 	splitLines = try lines.map { i -> (Array<UnicodeScalar>, String) in
 		let components = i.components(separatedBy: " ---> ")
 		if components.count != 2 {
-			enum InputError: ErrorProtocol { case unableToSplitLine(String) }
+			enum InputError: Error { case unableToSplitLine(String) }
 			throw InputError.unableToSplitLine(i)
 		}
 		return (Array(components[0].unicodeScalars), components[1])
@@ -30,20 +30,22 @@ do {
 }
 
 for (input, output) in splitLines {
-#if !COMMAND_LINE_OUTPUT
-	for _ in 0..<10000 {
-		_ = try? demangleSwiftName(input).description
-	}
-#else
+#if !PERFORMANCE_TEST
 	do {
 		let result = try demangleSwiftName(input).description
 		if result != output {
 			print("Failed to demangle \(input). Got \(result), expected \(output)")
 		}
 	} catch {
-		if input != output {
+		var s = String()
+		s.unicodeScalars.append(contentsOf: input)
+		if s != output {
 			print("Failed to demangle \(input). Raised \(error), expected \(output)")
 		}
+	}
+#else
+	for _ in 0..<10000 {
+		_ = try? demangleSwiftName(input).description
 	}
 #endif
 }

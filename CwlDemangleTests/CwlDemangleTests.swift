@@ -212,6 +212,50 @@ class CwlDemangleTests: XCTestCase {
 		}
 	}
 	
+	func test_TtGSPSi_() {
+		let input = "_TtGSPSi_"
+		let output = "Swift.UnsafePointer<Swift.Int>"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TtGSpSi_() {
+		let input = "_TtGSpSi_"
+		let output = "Swift.UnsafeMutablePointer<Swift.Int>"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TtSV() {
+		let input = "_TtSV"
+		let output = "Swift.UnsafeRawPointer"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TtSv() {
+		let input = "_TtSv"
+		let output = "Swift.UnsafeMutableRawPointer"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
 	func test_TtGSaSS_() {
 		let input = "_TtGSaSS_"
 		let output = "[Swift.String]"
@@ -379,7 +423,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TtP_() {
 		let input = "_TtP_"
-		let output = "protocol<>"
+		let output = "Any"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -401,7 +445,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TtP3foo3barS_3bas_() {
 		let input = "_TtP3foo3barS_3bas_"
-		let output = "protocol<foo.bar, foo.bas>"
+		let output = "foo.bar & foo.bas"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -412,7 +456,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TtTP3foo3barS_3bas_PS1__PS1_S_3zimS0___() {
 		let input = "_TtTP3foo3barS_3bas_PS1__PS1_S_3zimS0___"
-		let output = "(protocol<foo.bar, foo.bas>, foo.bas, protocol<foo.bas, foo.zim, foo.bar>)"
+		let output = "(foo.bar & foo.bas, foo.bas, foo.bas & foo.zim & foo.bar)"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -1215,7 +1259,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TF21class_bound_protocols32class_bound_protocol_compositionFT1xPS_10ClassBoundS_13NotClassBound__PS0_S1__() {
 		let input = "_TF21class_bound_protocols32class_bound_protocol_compositionFT1xPS_10ClassBoundS_13NotClassBound__PS0_S1__"
-		let output = "class_bound_protocols.class_bound_protocol_composition (x : protocol<class_bound_protocols.ClassBound, class_bound_protocols.NotClassBound>) -> protocol<class_bound_protocols.ClassBound, class_bound_protocols.NotClassBound>"
+		let output = "class_bound_protocols.class_bound_protocol_composition (x : class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound) -> class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2029,7 +2073,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TtPMP_() {
 		let input = "_TtPMP_"
-		let output = "protocol<>.Type"
+		let output = "Any.Type"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2040,7 +2084,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TFCs13_NSSwiftArray29canStoreElementsOfDynamicTypefPMP_Sb() {
 		let input = "_TFCs13_NSSwiftArray29canStoreElementsOfDynamicTypefPMP_Sb"
-		let output = "Swift._NSSwiftArray.canStoreElementsOfDynamicType (protocol<>.Type) -> Swift.Bool"
+		let output = "Swift._NSSwiftArray.canStoreElementsOfDynamicType (Any.Type) -> Swift.Bool"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2051,7 +2095,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TFCs13_NSSwiftArrayg17staticElementTypePMP_() {
 		let input = "_TFCs13_NSSwiftArrayg17staticElementTypePMP_"
-		let output = "Swift._NSSwiftArray.staticElementType.getter : protocol<>.Type"
+		let output = "Swift._NSSwiftArray.staticElementType.getter : Any.Type"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2062,7 +2106,7 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TFCs17_DictionaryMirrorg9valueTypePMP_() {
 		let input = "_TFCs17_DictionaryMirrorg9valueTypePMP_"
-		let output = "Swift._DictionaryMirror.valueType.getter : protocol<>.Type"
+		let output = "Swift._DictionaryMirror.valueType.getter : Any.Type"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2313,9 +2357,9 @@ class CwlDemangleTests: XCTestCase {
 		}
 	}
 	
-	func test_TTRXFo_iT__iT_zoPs13ErrorProtocol__XFo__dT_zoPS___() {
-		let input = "_TTRXFo_iT__iT_zoPs13ErrorProtocol__XFo__dT_zoPS___"
-		let output = "reabstraction thunk helper from @callee_owned (@in ()) -> (@out (), @error @owned Swift.ErrorProtocol) to @callee_owned () -> (@unowned (), @error @owned Swift.ErrorProtocol)"
+	func test_TTRXFo_iT__iT_zoPs13Error__XFo__dT_zoPS___() {
+		let input = "_TTRXFo_iT__iT_zoPs5Error__XFo__dT_zoPS___"
+		let output = "reabstraction thunk helper from @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error) to @callee_owned () -> (@unowned (), @error @owned Swift.Error)"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2335,9 +2379,9 @@ class CwlDemangleTests: XCTestCase {
 		}
 	}
 	
-	func test_TF21$__lldb_module_for_E0au3$E0Ps13ErrorProtocol_() {
-		let input = "_TF21$__lldb_module_for_E0au3$E0Ps13ErrorProtocol_"
-		let output = "$__lldb_module_for_E0.$E0.unsafeMutableAddressor : Swift.ErrorProtocol"
+	func test_TF21$__lldb_module_for_E0au3$E0Ps13Error_() {
+		let input = "_TF21$__lldb_module_for_E0au3$E0Ps5Error_"
+		let output = "$__lldb_module_for_E0.$E0.unsafeMutableAddressor : Swift.Error"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
@@ -2349,6 +2393,50 @@ class CwlDemangleTests: XCTestCase {
 	func test_TMps10Comparable() {
 		let input = "_TMps10Comparable"
 		let output = "protocol descriptor for Swift.Comparable"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+
+	func test_TFC4testP33_83378C430F65473055F1BD53F3ADCDB71C5doFoofT_T_() {
+		let input = "_TFC4testP33_83378C430F65473055F1BD53F3ADCDB71C5doFoofT_T_"
+		let output = "test.(C in _83378C430F65473055F1BD53F3ADCDB7).doFoo () -> ()"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TFVV15nested_generics5Lunch6DinnerCfT11firstCoursex12secondCourseGSqqd___9leftoversx14transformationFxqd___GS1_x_qd___() {
+		let input = "_TFVV15nested_generics5Lunch6DinnerCfT11firstCoursex12secondCourseGSqqd___9leftoversx14transformationFxqd___GS1_x_qd___"
+		let output = "nested_generics.Lunch.Dinner.init (firstCourse : A, secondCourse : A1?, leftovers : A, transformation : (A) -> A1) -> nested_generics.Lunch<A>.Dinner<A1>"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TFVFC15nested_generics7HotDogs11applyRelishFT_T_L_6RelishCfT8materialx_GS1_x_() {
+		let input = "_TFVFC15nested_generics7HotDogs11applyRelishFT_T_L_6RelishCfT8materialx_GS1_x_"
+		let output = "nested_generics.HotDogs.(applyRelish () -> ()).(Relish #1).init (material : A) -> nested_generics.HotDogs.(applyRelish () -> ()).(Relish #1)<A>"
+		do {
+			let result = try demangleSwiftName(input).description
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func test_TFVFE15nested_genericsSS3fooFT_T_L_6CheeseCfT8materialx_GS0_x_() {
+		let input = "_TFVFE15nested_genericsSS3fooFT_T_L_6CheeseCfT8materialx_GS0_x_"
+		let output = "(extension in nested_generics):Swift.String.(foo () -> ()).(Cheese #1).init (material : A) -> (extension in nested_generics):Swift.String.(foo () -> ()).(Cheese #1)<A>"
 		do {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
