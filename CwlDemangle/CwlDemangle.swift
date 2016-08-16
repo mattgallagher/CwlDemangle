@@ -820,25 +820,25 @@ private func demangleIdentifier<C>(_ scanner: inout ScalarScanner<C>, _ nameRefs
 		identifier = ""
 		for scalar in source.unicodeScalars {
 			switch scalar {
-			case "a": identifier.append("&" as UnicodeScalar)
-			case "c": identifier.append("@" as UnicodeScalar)
-			case "d": identifier.append("/" as UnicodeScalar)
-			case "e": identifier.append("=" as UnicodeScalar)
-			case "g": identifier.append(">" as UnicodeScalar)
-			case "l": identifier.append("<" as UnicodeScalar)
-			case "m": identifier.append("*" as UnicodeScalar)
-			case "n": identifier.append("!" as UnicodeScalar)
-			case "o": identifier.append("|" as UnicodeScalar)
-			case "p": identifier.append("+" as UnicodeScalar)
-			case "q": identifier.append("?" as UnicodeScalar)
-			case "r": identifier.append("%" as UnicodeScalar)
-			case "s": identifier.append("-" as UnicodeScalar)
-			case "t": identifier.append("~" as UnicodeScalar)
-			case "x": identifier.append("^" as UnicodeScalar)
-			case "z": identifier.append("." as UnicodeScalar)
+			case "a": identifier.unicodeScalars.append("&" as UnicodeScalar)
+			case "c": identifier.unicodeScalars.append("@" as UnicodeScalar)
+			case "d": identifier.unicodeScalars.append("/" as UnicodeScalar)
+			case "e": identifier.unicodeScalars.append("=" as UnicodeScalar)
+			case "g": identifier.unicodeScalars.append(">" as UnicodeScalar)
+			case "l": identifier.unicodeScalars.append("<" as UnicodeScalar)
+			case "m": identifier.unicodeScalars.append("*" as UnicodeScalar)
+			case "n": identifier.unicodeScalars.append("!" as UnicodeScalar)
+			case "o": identifier.unicodeScalars.append("|" as UnicodeScalar)
+			case "p": identifier.unicodeScalars.append("+" as UnicodeScalar)
+			case "q": identifier.unicodeScalars.append("?" as UnicodeScalar)
+			case "r": identifier.unicodeScalars.append("%" as UnicodeScalar)
+			case "s": identifier.unicodeScalars.append("-" as UnicodeScalar)
+			case "t": identifier.unicodeScalars.append("~" as UnicodeScalar)
+			case "x": identifier.unicodeScalars.append("^" as UnicodeScalar)
+			case "z": identifier.unicodeScalars.append("." as UnicodeScalar)
 			default:
 				if scalar.value >= 128 {
-					identifier.append(scalar)
+					identifier.unicodeScalars.append(scalar)
 				} else {
 					throw scanner.unexpectedError()
 				}
@@ -853,7 +853,7 @@ private func archetypeName(_ index: UInt32, _ depth: UInt32) -> String {
 	var result = ""
 	var i = index
 	repeat {
-		result.append(UnicodeScalar(UnicodeScalar("A").value + i % 26))
+		result.unicodeScalars.append(UnicodeScalar(("A" as UnicodeScalar).value + i % 26)!)
 		i /= 26
 	} while i > 0
 	if depth != 0 {
@@ -887,18 +887,18 @@ private typealias ScalarScannerError = DemangleScannerError
 
 /// A structure for traversing a `String.UnicodeScalarView`. A `context` field is provided but is not used by the scanner (it is entirely for storage by the scanner's user).
 /// This is a private copy of a class normally included in CwlUtils: http://github.com/mattgallagher/CwlUtils
-private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeScalar, C.Index: Comparable {
+fileprivate struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeScalar, C.Index: Comparable {
 	/// The underlying storage
-	private let scalars: C
+	let scalars: C
 	
 	/// Current scanning index
-	private var index: C.Index
+	var index: C.Index
 	
 	/// Number of scalars consumed up to `index` (since String.UnicodeScalarView.Index is not a RandomAccessIndex, this makes determining the position *much* easier)
-	private var consumed: Int
+	var consumed: Int
 	
 	/// Construct from a String.UnicodeScalarView and a context value
-	private init(scalars: C) {
+	init(scalars: C) {
 		self.scalars = scalars
 		self.index = self.scalars.startIndex
 		self.consumed = 0
@@ -906,7 +906,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
 	/// WARNING: `string` is used purely for its `unicodeScalars` property and matching is purely based on direct scalar comparison (no decomposition or normalization is performed).
-	private mutating func match(string: String) throws {
+	mutating func match(string: String) throws {
 		let (newIndex, newConsumed) = try string.unicodeScalars.reduce((index: index, count: 0)) { (tuple: (index: C.Index, count: Int), scalar: UnicodeScalar) in
 			if tuple.index == self.scalars.endIndex || scalar != self.scalars[tuple.index] {
 				throw ScalarScannerError.matchFailed(wanted: string, at: consumed)
@@ -918,7 +918,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
-	private mutating func match(scalar: UnicodeScalar) throws {
+	mutating func match(scalar: UnicodeScalar) throws {
 		if index == scalars.endIndex || scalars[index] != scalar {
 			throw ScalarScannerError.matchFailed(wanted: String(scalar), at: consumed)
 		}
@@ -927,7 +927,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Consume scalars from the contained collection, up to but not including the first instance of `scalar` found. `index` is advanced to immediately before `scalar`. Returns all scalars consumed prior to `scalar` as a `String`. Throws if `scalar` is never found.
-	private mutating func readUntil(scalar: UnicodeScalar) throws -> String {
+	mutating func readUntil(scalar: UnicodeScalar) throws -> String {
 		var i = index
 		let previousConsumed = consumed
 		try skipUntil(scalar: scalar)
@@ -935,7 +935,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 		var result = ""
 		result.reserveCapacity(consumed - previousConsumed)
 		while i != index {
-			result.append(scalars[i])
+			result.unicodeScalars.append(scalars[i])
 			i = scalars.index(after: i)
 		}
 		
@@ -944,7 +944,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	
 	/// Consume scalars from the contained collection, up to but not including the first instance of `string` found. `index` is advanced to immediately before `string`. Returns all scalars consumed prior to `string` as a `String`. Throws if `string` is never found.
 	/// WARNING: `string` is used purely for its `unicodeScalars` property and matching is purely based on direct scalar comparison (no decomposition or normalization is performed).
-	private mutating func readUntil(string: String) throws -> String {
+	mutating func readUntil(string: String) throws -> String {
 		var i = index
 		let previousConsumed = consumed
 		try skipUntil(string: string)
@@ -952,7 +952,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 		var result = ""
 		result.reserveCapacity(consumed - previousConsumed)
 		while i != index {
-			result.append(scalars[i])
+			result.unicodeScalars.append(scalars[i])
 			i = scalars.index(after: i)
 		}
 		
@@ -960,13 +960,13 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Peeks at the scalar at the current `index`, testing it with function `f`. If `f` returns `true`, the scalar is appended to a `String` and the `index` increased. The `String` is returned at the end.
-	private mutating func readWhile(testTrue: @noescape (UnicodeScalar) -> Bool) -> String {
+	mutating func readWhile(testTrue: (UnicodeScalar) -> Bool) -> String {
 		var string = ""
 		while index != scalars.endIndex {
 			if !testTrue(scalars[index]) {
 				break
 			}
-			string.append(scalars[index])
+			string.unicodeScalars.append(scalars[index])
 			index = self.scalars.index(after: index)
 			consumed += 1
 		}
@@ -974,7 +974,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Repeatedly peeks at the scalar at the current `index`, testing it with function `f`. If `f` returns `true`, the `index` increased. If `false`, the function returns.
-	private mutating func skipWhile(testTrue: @noescape (UnicodeScalar) -> Bool) {
+	mutating func skipWhile(testTrue: (UnicodeScalar) -> Bool) {
 		while index != scalars.endIndex {
 			if !testTrue(scalars[index]) {
 				return
@@ -985,7 +985,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Consume scalars from the contained collection, up to but not including the first instance of `scalar` found. `index` is advanced to immediately before `scalar`. Throws if `scalar` is never found.
-	private mutating func skipUntil(scalar: UnicodeScalar) throws {
+	mutating func skipUntil(scalar: UnicodeScalar) throws {
 		var i = index
 		var c = 0
 		while i != scalars.endIndex && scalars[i] != scalar {
@@ -1001,7 +1001,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	
 	/// Consume scalars from the contained collection, up to but not including the first instance of `string` found. `index` is advanced to immediately before `string`. Throws if `string` is never found.
 	/// WARNING: `string` is used purely for its `unicodeScalars` property and matching is purely based on direct scalar comparison (no decomposition or normalization is performed).
-	private mutating func skipUntil(string: String) throws {
+	mutating func skipUntil(string: String) throws {
 		let match = string.unicodeScalars
 		guard let first = match.first else { return }
 		if match.count == 1 {
@@ -1043,7 +1043,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Attempt to advance the `index` by count, returning `false` and `index` unchanged if `index` would advance past the end, otherwise returns `true` and `index` is advanced.
-	private mutating func skip(count: Int = 1) throws {
+	mutating func skip(count: Int = 1) throws {
 		if count == 1 && index != scalars.endIndex {
 			index = scalars.index(after: index)
 			consumed += 1
@@ -1063,7 +1063,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Attempt to advance the `index` by count, returning `false` and `index` unchanged if `index` would advance past the end, otherwise returns `true` and `index` is advanced.
-	private mutating func backtrack(count: Int = 1) throws {
+	mutating func backtrack(count: Int = 1) throws {
 		if count <= consumed {
 			if count == 1 {
 				index = scalars.index(index, offsetBy: -1)
@@ -1081,10 +1081,10 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Returns all content after the current `index`. `index` is advanced to the end.
-	private mutating func remainder() -> String {
+	mutating func remainder() -> String {
 		var string: String = ""
 		while index != scalars.endIndex {
-			string.append(scalars[index])
+			string.unicodeScalars.append(scalars[index])
 			index = scalars.index(after: index)
 			consumed += 1
 		}
@@ -1093,7 +1093,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	
 	/// If the next scalars after the current `index` match `value`, advance over them and return `true`, otherwise, leave `index` unchanged and return `false`.
 	/// WARNING: `string` is used purely for its `unicodeScalars` property and matching is purely based on direct scalar comparison (no decomposition or normalization is performed).
-	private mutating func conditional(string: String) -> Bool {
+	mutating func conditional(string: String) -> Bool {
 		var i = index
 		var c = 0
 		for s in string.unicodeScalars {
@@ -1109,7 +1109,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// If the next scalar after the current `index` match `value`, advance over it and return `true`, otherwise, leave `index` unchanged and return `false`.
-	private mutating func conditional(scalar: UnicodeScalar) -> Bool {
+	mutating func conditional(scalar: UnicodeScalar) -> Bool {
 		if index == scalars.endIndex || scalar != scalars[index] {
 			return false
 		}
@@ -1119,7 +1119,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// If the `index` is at the end, throw, otherwise, return the next scalar at the current `index` without advancing `index`.
-	private func requirePeek() throws -> UnicodeScalar {
+	func requirePeek() throws -> UnicodeScalar {
 		if index == scalars.endIndex {
 			throw ScalarScannerError.endedPrematurely(count: 1, at: consumed)
 		}
@@ -1127,7 +1127,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// If `index` + `ahead` is within bounds, return the scalar at that location, otherwise return `nil`. The `index` will not be changed in any case.
-	private func peek(skipCount: Int = 0) -> UnicodeScalar? {
+	func peek(skipCount: Int = 0) -> UnicodeScalar? {
 		var i = index
 		var c = skipCount
 		while c > 0 && i != scalars.endIndex {
@@ -1141,7 +1141,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// If the `index` is at the end, throw, otherwise, return the next scalar at the current `index`, advancing `index` by one.
-	private mutating func readScalar() throws -> UnicodeScalar {
+	mutating func readScalar() throws -> UnicodeScalar {
 		if index == scalars.endIndex {
 			throw ScalarScannerError.endedPrematurely(count: 1, at: consumed)
 		}
@@ -1152,7 +1152,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Throws if scalar at the current `index` is not in the range `"0"` to `"9"`. Consume scalars `"0"` to `"9"` until a scalar outside that range is encountered. Return the integer representation of the value scanned, interpreted as a base 10 integer. `index` is advanced to the end of the number.
-	private mutating func readInt() throws -> Int {
+	mutating func readInt() throws -> Int {
 		var result = 0
 		var i = index
 		var c = 0
@@ -1170,7 +1170,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Consume and return `count` scalars. `index` will be advanced by count. Throws if end of `scalars` occurs before consuming `count` scalars.
-	private mutating func readScalars(count: Int) throws -> String {
+	mutating func readScalars(count: Int) throws -> String {
 		var result = String()
 		result.reserveCapacity(count)
 		var i = index
@@ -1178,7 +1178,7 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 			if i == scalars.endIndex {
 				throw ScalarScannerError.endedPrematurely(count: count, at: consumed)
 			}
-			result.append(scalars[i])
+			result.unicodeScalars.append(scalars[i])
 			i = self.scalars.index(after: i)
 		}
 		index = i
@@ -1187,11 +1187,11 @@ private struct ScalarScanner<C: Collection> where C.Iterator.Element == UnicodeS
 	}
 	
 	/// Returns a throwable error capturing the current scanner progress point.
-	private func unexpectedError() -> Error {
+	func unexpectedError() -> Error {
 		return ScalarScannerError.unexpected(at: consumed)
 	}
 	
-	private var isAtEnd: Bool {
+	var isAtEnd: Bool {
 		return index == scalars.endIndex
 	}
 }
@@ -1209,8 +1209,8 @@ private extension Array {
 	}
 }
 
-private extension OutputStream {
-	mutating func write<S: Sequence, T: Sequence>(sequence: S, labels: T, render: @noescape(inout Self, S.Iterator.Element) -> ()) where T.Iterator.Element == String? {
+private extension TextOutputStream {
+	mutating func write<S: Sequence, T: Sequence>(sequence: S, labels: T, render: (inout Self, S.Iterator.Element) -> ()) where T.Iterator.Element == String? {
 		var lg = labels.makeIterator()
 		if let maybePrefix = lg.next(), let prefix = maybePrefix {
 			write(prefix)
@@ -1223,7 +1223,7 @@ private extension OutputStream {
 		}
 	}
 
-	mutating func write<S: Sequence>(sequence: S, prefix: String? = nil, separator: String? = nil, suffix: String? = nil, render: @noescape(inout Self, S.Iterator.Element) -> ()) {
+	mutating func write<S: Sequence>(sequence: S, prefix: String? = nil, separator: String? = nil, suffix: String? = nil, render: (inout Self, S.Iterator.Element) -> ()) {
 		if let p = prefix {
 			write(p)
 		}
@@ -1240,7 +1240,7 @@ private extension OutputStream {
 		}
 	}
 
-    mutating func write<T>(optional: Optional<T>, prefix: String? = nil, suffix: String? = nil, render: @noescape (inout Self, T) -> ()) {
+    mutating func write<T>(optional: Optional<T>, prefix: String? = nil, suffix: String? = nil, render: (inout Self, T) -> ()) {
         if let p = prefix {
             write(p)
         }
@@ -1252,7 +1252,7 @@ private extension OutputStream {
         }
     }
 
-    mutating func write<T>(value: T, prefix: String? = nil, suffix: String? = nil, render: @noescape (inout Self, T) -> ()) {
+    mutating func write<T>(value: T, prefix: String? = nil, suffix: String? = nil, render: (inout Self, T) -> ()) {
         if let p = prefix {
             write(p)
         }
@@ -1303,13 +1303,13 @@ public struct SwiftName: CustomStringConvertible {
 		return result
 	}
 	
-	func printFunction<T: OutputStream>(_ output: inout T) {
+	func printFunction<T: TextOutputStream>(_ output: inout T) {
 		let startIndex = children.count == 3 ? 1 : 0
 		let separator: String? = children.count == 3 ? " throws" : nil
 		output.write(sequence: children[startIndex...(startIndex + 1)], separator: separator) { $1.print(&$0) }
 	}
 
-	private func printEntity<T: OutputStream>(_ output: inout T, extraName: String, options: PrintOptions) {
+	private func printEntity<T: TextOutputStream>(_ output: inout T, extraName: String, options: PrintOptions) {
 		children.at(0)?.print(&output, PrintOptions.asContext)
 		output.write(".")
 		let printType = (options.contains(PrintOptions.hasType) && !options.contains(PrintOptions.suppressType))
@@ -1371,12 +1371,12 @@ public struct SwiftName: CustomStringConvertible {
 		return .none
 	}
 	
-	func printBoundGenericNoSugar<T: OutputStream>(_ output: inout T) {
+	func printBoundGenericNoSugar<T: TextOutputStream>(_ output: inout T) {
 		children.at(0)?.print(&output)
 		output.write(sequence: children.slice(1, children.endIndex), prefix: "<", separator: ", ", suffix: ">") { $1.print(&$0) }
 	}
 	
-	func printBoundGeneric<T: OutputStream>(_ output: inout T) {
+	func printBoundGeneric<T: TextOutputStream>(_ output: inout T) {
 		guard children.count >= 2 else { return }
 		guard children.count == 2 else { printBoundGenericNoSugar(&output); return }
 		let sugarType = findSugar()
@@ -1396,7 +1396,7 @@ public struct SwiftName: CustomStringConvertible {
 	}
 
 	enum State { case attrs, inputs, results }
-	func printImplFunctionType<T: OutputStream>(_ output: inout T) {
+	func printImplFunctionType<T: TextOutputStream>(_ output: inout T) {
 		var curState: State = .attrs
 		childLoop: for c in children {
 			if c.kind == .implParameter {
@@ -1427,7 +1427,7 @@ public struct SwiftName: CustomStringConvertible {
 		}
 	}
 	
-	func quotedString<T: OutputStream>(_ output: inout T, value: String) {
+	func quotedString<T: TextOutputStream>(_ output: inout T, value: String) {
 		output.write("\"")
 		for c in value.unicodeScalars {
 			switch c {
@@ -1440,7 +1440,7 @@ public struct SwiftName: CustomStringConvertible {
 			default:
 				if c < UnicodeScalar(0x20) || c == UnicodeScalar(0x7f) {
 					output.write("\\x")
-					output.write(String(((c.value >> 4) > 9) ? UnicodeScalar(c.value + UnicodeScalar("A").value) : UnicodeScalar(c.value + UnicodeScalar("0").value)))
+					output.write(String(describing: ((c.value >> 4) > 9) ? UnicodeScalar(c.value + UnicodeScalar("A").value) : UnicodeScalar(c.value + UnicodeScalar("0").value)))
 				} else {
 					output.write(String(c))
 				}
@@ -1449,7 +1449,7 @@ public struct SwiftName: CustomStringConvertible {
 		output.write("\"")
 	}
 	
-	private func print<T: OutputStream>(_ output: inout T, _ options: PrintOptions = PrintOptions()) {
+	private func print<T: TextOutputStream>(_ output: inout T, _ options: PrintOptions = PrintOptions()) {
 		switch kind {
 		case .static:
 			output.write(optional: children.at(0), prefix: "static ") { $1.print(&$0, options) }
@@ -2210,7 +2210,7 @@ private func decodeSwiftPunycode(_ value: String) -> String {
 		bias = k
 		n = n + i / (output.count + 1)
 		i = i % (output.count + 1)
-		output.insert(UnicodeScalar(n), at: i)
+		output.insert(UnicodeScalar(n)!, at: i)
 		i += 1
 	}
 	return String(output.map { Character($0) })
