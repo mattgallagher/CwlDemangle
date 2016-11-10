@@ -21,7 +21,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -32,7 +32,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -43,7 +43,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -54,7 +54,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -65,7 +65,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -76,7 +76,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -87,7 +87,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -98,7 +98,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -109,7 +109,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -120,7 +120,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -131,7 +131,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -142,7 +142,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -153,7 +153,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -164,7 +164,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -175,7 +175,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -186,7 +186,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -197,7 +197,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -208,7 +208,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -219,7 +219,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -230,7 +230,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -241,7 +241,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -252,7 +252,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -263,7 +263,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -274,7 +274,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -285,7 +285,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -296,7 +296,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -307,7 +307,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -318,7 +318,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -329,7 +329,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -340,7 +340,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -351,7 +351,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -362,7 +362,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -373,7 +373,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -384,7 +384,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -395,7 +395,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -406,7 +406,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -417,7 +417,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -428,7 +428,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -439,7 +439,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -450,7 +450,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -461,7 +461,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -472,7 +472,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -483,7 +483,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -494,7 +494,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -505,7 +505,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -516,7 +516,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -527,7 +527,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -538,7 +538,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -549,7 +549,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -560,7 +560,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -571,7 +571,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -582,7 +582,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -593,7 +593,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -604,7 +604,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -615,7 +615,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -626,7 +626,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -637,7 +637,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -648,7 +648,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -659,7 +659,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -670,7 +670,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -681,7 +681,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -692,7 +692,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -703,7 +703,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -714,7 +714,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -725,7 +725,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -736,7 +736,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -747,7 +747,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -758,7 +758,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -769,7 +769,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -780,7 +780,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -791,7 +791,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -802,7 +802,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -813,7 +813,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -824,7 +824,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -835,7 +835,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -846,7 +846,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -857,7 +857,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -868,7 +868,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -879,7 +879,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -890,7 +890,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -901,7 +901,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -912,7 +912,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -923,7 +923,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -934,7 +934,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -945,7 +945,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -956,7 +956,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -967,7 +967,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -978,7 +978,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -989,7 +989,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1000,7 +1000,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1011,7 +1011,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1022,7 +1022,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1033,7 +1033,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1044,7 +1044,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1055,7 +1055,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1066,7 +1066,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1077,7 +1077,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1088,7 +1088,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1099,7 +1099,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1110,7 +1110,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1121,7 +1121,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1132,7 +1132,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1143,7 +1143,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1154,7 +1154,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1165,7 +1165,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1176,7 +1176,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1187,7 +1187,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1198,7 +1198,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1209,7 +1209,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1220,7 +1220,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1231,7 +1231,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1242,7 +1242,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1253,7 +1253,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1264,7 +1264,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1605,7 +1605,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1616,7 +1616,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1627,7 +1627,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1638,7 +1638,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1649,7 +1649,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1660,7 +1660,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1671,7 +1671,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1682,7 +1682,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1693,7 +1693,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1704,7 +1704,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1715,7 +1715,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1726,7 +1726,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1737,7 +1737,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1748,7 +1748,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1759,7 +1759,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1770,7 +1770,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1781,7 +1781,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1792,7 +1792,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1803,7 +1803,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1814,7 +1814,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1825,7 +1825,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1924,7 +1924,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1935,7 +1935,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1946,7 +1946,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1957,7 +1957,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1968,7 +1968,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1979,7 +1979,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1990,7 +1990,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2001,7 +2001,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2012,7 +2012,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2023,7 +2023,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2034,7 +2034,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2045,7 +2045,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2056,7 +2056,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2067,7 +2067,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2078,7 +2078,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2089,7 +2089,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2100,7 +2100,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2111,7 +2111,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2122,7 +2122,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2133,7 +2133,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2144,7 +2144,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2155,7 +2155,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2166,7 +2166,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2177,7 +2177,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2188,7 +2188,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2199,7 +2199,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2210,7 +2210,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2221,7 +2221,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2232,7 +2232,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2243,7 +2243,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2254,7 +2254,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2265,7 +2265,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2276,7 +2276,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2287,7 +2287,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2298,7 +2298,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2309,7 +2309,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2320,7 +2320,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2331,7 +2331,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2342,7 +2342,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2353,7 +2353,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2364,7 +2364,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2386,7 +2386,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2397,7 +2397,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 
@@ -2408,7 +2408,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2419,7 +2419,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2430,7 +2430,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2441,7 +2441,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 }
