@@ -1270,298 +1270,244 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TtZZ() {
 		let input = "_TtZZ"
-		let output = "_TtZZ"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtB() {
 		let input = "_TtB"
-		let output = "_TtB"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtBSi() {
 		let input = "_TtBSi"
-		let output = "_TtBSi"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtBx() {
 		let input = "_TtBx"
-		let output = "_TtBx"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtC() {
 		let input = "_TtC"
-		let output = "_TtC"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtT() {
 		let input = "_TtT"
-		let output = "_TtT"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtTSi() {
 		let input = "_TtTSi"
-		let output = "_TtTSi"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtQd_() {
 		let input = "_TtQd_"
-		let output = "_TtQd_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtU__FQo_Si() {
 		let input = "_TtU__FQo_Si"
-		let output = "_TtU__FQo_Si"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtU__FQD__Si() {
 		let input = "_TtU__FQD__Si"
-		let output = "_TtU__FQD__Si"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtU___FQ_U____FQd0__T_() {
 		let input = "_TtU___FQ_U____FQd0__T_"
-		let output = "_TtU___FQ_U____FQd0__T_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtU___FQ_U____FQd_1_T_() {
 		let input = "_TtU___FQ_U____FQd_1_T_"
-		let output = "_TtU___FQ_U____FQd_1_T_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TtU___FQ_U____FQ2_T_() {
 		let input = "_TtU___FQ_U____FQ2_T_"
-		let output = "_TtU___FQ_U____FQ2_T_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_Tw() {
 		let input = "_Tw"
-		let output = "_Tw"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWa() {
 		let input = "_TWa"
-		let output = "_TWa"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_Twal() {
 		let input = "_Twal"
-		let output = "_Twal"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_T() {
 		let input = "_T"
-		let output = "_T"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTo() {
 		let input = "_TTo"
-		let output = "_TTo"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TC() {
 		let input = "_TC"
-		let output = "_TC"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TM() {
 		let input = "_TM"
-		let output = "_TM"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TW() {
 		let input = "_TW"
-		let output = "_TW"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWV() {
 		let input = "_TWV"
-		let output = "_TWV"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWo() {
 		let input = "_TWo"
-		let output = "_TWo"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWv() {
 		let input = "_TWv"
-		let output = "_TWv"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWvd() {
 		let input = "_TWvd"
-		let output = "_TWvd"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWvi() {
 		let input = "_TWvi"
-		let output = "_TWvi"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TWvx() {
 		let input = "_TWvx"
-		let output = "_TWvx"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1572,7 +1518,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1583,7 +1529,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1594,7 +1540,7 @@ class CwlDemangleTests: XCTestCase {
 			let result = try demangleSwiftName(input).description
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -1831,89 +1777,73 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TTSgS() {
 		let input = "_TTSgS"
-		let output = "_TTSgS"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSg5S() {
 		let input = "_TTSg5S"
-		let output = "_TTSg5S"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSgSi() {
 		let input = "_TTSgSi"
-		let output = "_TTSgSi"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSg5Si() {
 		let input = "_TTSg5Si"
-		let output = "_TTSg5Si"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSgSi_() {
 		let input = "_TTSgSi_"
-		let output = "_TTSgSi_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSgSi__() {
 		let input = "_TTSgSi__"
-		let output = "_TTSgSi__"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSgSiS_() {
 		let input = "_TTSgSiS_"
-		let output = "_TTSgSiS_"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
 	func test_TTSgSi__xyz() {
 		let input = "_TTSgSi__xyz"
-		let output = "_TTSgSi__xyz"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
@@ -2370,12 +2300,10 @@ class CwlDemangleTests: XCTestCase {
 	
 	func test_TFE1a() {
 		let input = "_TFE1a"
-		let output = "_TFE1a"
 		do {
-			let result = try demangleSwiftName(input).description
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			_ = try demangleSwiftName(input).description
+			XCTFail("Invalid input \(input) should throw an error")
 		} catch {
-			XCTAssert(input == output, "Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	
