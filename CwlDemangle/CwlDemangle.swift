@@ -37,16 +37,22 @@ public func parseMangledSwiftSymbol<C: Collection>(_ mangled: C, isType: Bool = 
 	}
 }
 
-fileprivate extension Array {
-	func at(_ index: Int) -> Element? {
-		return self.indices.contains(index) ? self[index] : nil
+extension SwiftSymbol: CustomStringConvertible {
+	/// Overridden method to allow simple printing with default options
+	public var description: String {
+		var printer = SymbolPrinter()
+		_ = printer.printName(self)
+		return printer.target
 	}
-	func slice(_ from: Int, _ to: Int) -> ArraySlice<Element> {
-		if from > to || from > self.endIndex || to < self.startIndex {
-			return ArraySlice()
-		} else {
-			return self[(from > self.startIndex ? from : self.startIndex)..<(to < self.endIndex ? to : self.endIndex)]
-		}
+	
+	/// Prints `SwiftSymbol`s to a String with the full set of printing options.
+	///
+	/// - Parameter options: an option set containing the different `DemangleOptions` from the Swift project.
+	/// - Returns: `self` printed to a string according to the specified options. 
+	public func print(using options: SymbolPrintOptions = .default) -> String {
+		var printer = SymbolPrinter(options: options)
+		_ = printer.printName(self)
+		return printer.target
 	}
 }
 
@@ -2903,20 +2909,6 @@ fileprivate func decodeSwiftPunycode(_ value: String) -> String {
 
 // MARK: NodePrinter.cpp
 
-extension SwiftSymbol: CustomStringConvertible {
-	public var description: String {
-		var printer = SymbolPrinter()
-		_ = printer.printName(self)
-		return printer.target
-	}
-	
-	public func print(using options: SymbolPrintOptions = .default) -> String {
-		var printer = SymbolPrinter(options: options)
-		_ = printer.printName(self)
-		return printer.target
-	}
-}
-	
 fileprivate extension TextOutputStream {
 	mutating func write<S: Sequence, T: Sequence>(sequence: S, labels: T, render: (inout Self, S.Iterator.Element) -> ()) where T.Iterator.Element == String? {
 		var lg = labels.makeIterator()
@@ -4297,5 +4289,18 @@ fileprivate struct ScalarScanner<C: Collection> where C.Iterator.Element == Unic
 	
 	var isAtEnd: Bool {
 		return index == scalars.endIndex
+	}
+}
+
+fileprivate extension Array {
+	func at(_ index: Int) -> Element? {
+		return self.indices.contains(index) ? self[index] : nil
+	}
+	func slice(_ from: Int, _ to: Int) -> ArraySlice<Element> {
+		if from > to || from > self.endIndex || to < self.startIndex {
+			return ArraySlice()
+		} else {
+			return self[(from > self.startIndex ? from : self.startIndex)..<(to < self.endIndex ? to : self.endIndex)]
+		}
 	}
 }

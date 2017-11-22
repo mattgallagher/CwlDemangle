@@ -18,18 +18,27 @@ import Foundation
 //
 func demangle(input: String, expectedOutput: String) {
 	do {
+		// Parse the symbol
 		let swiftSymbol = try parseMangledSwiftSymbol(input)
-		let result = swiftSymbol.print(using: SymbolPrintOptions.default)
 		
+		// Print the symbol to a string (the .synthesizeSugarOnTypes option i
+		// specified to match those used to generate the "manglings.txt" file). 
+		let result = swiftSymbol.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+		
+		// Check we got the expected result
 		if result != expectedOutput {
-			print("Failed to demangle \(input). Got \(result), expected \(expectedOutput)")
+			print("Failed to demangle:\n   \(input)\nGot:\n   \(result)\nexpected:\n   \(expectedOutput)\n")
+		} else {
+			print("Successfully parsed and printed:\n   \(input)\nto:\n   \(expectedOutput)\n")
 		}
 	} catch {
 		// If parsing fails, the standard approach used by the `swift-demangle`
 		// tool is to copy the input to the output. We check if input equals
 		// output to see if a failure was expected.
 		if input != expectedOutput {
-			print("Failed to demangle \(input). Raised \(error), expected \(expectedOutput)")
+			print("Failed to demangle:\n   \(input)\nRaised:\n   \(error)\nexpected:\n   \(expectedOutput)\n")
+		} else {
+			print("As expected, \(input) failed to parse.\n")
 		}
 	}
 }
@@ -124,10 +133,8 @@ let manglings = readManglings()
 	generateTestCases(manglings)
 #elseif !PERFORMANCE_TEST
 	// Step 2b: demangle the contains of the file (default)
-	func demangle(_ manglings: [Mangling]) {
-		for mangling in manglings {
-			demangle(input: mangling.input, expectedOutput: mangling.output)
-		}
+	for mangling in manglings {
+		demangle(input: mangling.input, expectedOutput: mangling.output)
 	}
 #else
 	// Step 2c: run all of the test cases 10,000 times so it's easier to profile
