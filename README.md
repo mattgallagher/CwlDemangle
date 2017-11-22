@@ -1,6 +1,10 @@
 # CwlDemangle
 
-A translation of Swift's [Demangle.cpp](https://github.com/apple/swift/blob/master/lib/Basic/Demangle.cpp) into Swift.
+A translation (line-by-line in many cases) of Swift's [Demangler.cpp](https://github.com/apple/swift/blob/master/lib/Demangling/Demangler.cpp) into Swift.
+
+## License note
+
+I usually place my code under an ISC-style license but since this project is derived from the Swift project, it is covered by that project's [Apache License 2.0 with runtime library exception](https://github.com/apple/swift/blob/master/LICENSE.txt).
 
 ## Usage
 	
