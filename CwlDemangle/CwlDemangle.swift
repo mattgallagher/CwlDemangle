@@ -1606,7 +1606,7 @@ fileprivate extension Demangler {
 		case "s": return SwiftSymbol(kind: .outlinedRelease, child: try require(pop(kind: .type)))
 		case "b": return SwiftSymbol(kind: .outlinedInitializeWithTake, child: try require(pop(kind: .type)))
 		case "c": return SwiftSymbol(kind: .outlinedInitializeWithCopy, child: try require(pop(kind: .type)))
-		case "f": return SwiftSymbol(kind: .outlinedAssignWithTake, child: try require(pop(kind: .type)))
+		case "d": return SwiftSymbol(kind: .outlinedAssignWithTake, child: try require(pop(kind: .type)))
 		case "f": return SwiftSymbol(kind: .outlinedAssignWithCopy, child: try require(pop(kind: .type)))
 		default: throw failure
 		}
@@ -1851,7 +1851,7 @@ fileprivate extension Demangler {
 			case "E", "M":
 				size = try demangleIndexAsName()
 				alignment = try demangleIndexAsName()
-			case "e", "E":
+			case "e", "m":
 				size = try demangleIndexAsName()
 			default: throw failure
 			}
@@ -2301,7 +2301,6 @@ fileprivate extension Demangler {
 		case "I": fallthrough
 		case "v": fallthrough
 		case "P": fallthrough
-		case "s": fallthrough
 		case "Z": fallthrough
 		case "C": fallthrough
 		case "V": fallthrough
