@@ -128,7 +128,7 @@ func generateTestCases(_ manglings: [Mangling]) {
 // Step 1: read the file
 let manglings = readManglings()
 
-#if false
+#if true
 	// Step 2a: generate XCTest cases
 	generateTestCases(manglings)
 #elseif !PERFORMANCE_TEST

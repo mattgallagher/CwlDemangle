@@ -324,7 +324,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_TtCSo8NSObject() {
 		let input = "_TtCSo8NSObject"
-		let output = "__ObjC.NSObject"
+		let output = "__C.NSObject"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -907,7 +907,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_TTOFSC3fooFTSdSd_Sd() {
 		let input = "_TTOFSC3fooFTSdSd_Sd"
-		let output = "@nonobjc __C.foo(Swift.Double, Swift.Double) -> Swift.Double"
+		let output = "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -929,7 +929,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0SC3fooS2d_SdtFTO() {
 		let input = "_T0SC3fooS2d_SdtFTO"
-		let output = "@nonobjc __C.foo(Swift.Double, Swift.Double) -> Swift.Double"
+		let output = "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -938,8 +938,8 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_$S3foo3barC3basyAA3zimCAE_tFTo() {
-		let input = "_$S3foo3barC3basyAA3zimCAE_tFTo"
+	func test_$s3foo3barC3bas3zimyAaEC_tFTo() {
+		let input = "_$s3foo3barC3bas3zimyAaEC_tFTo"
 		let output = "@objc foo.bar.bas(zim: foo.zim) -> ()"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
@@ -949,9 +949,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_$SSC3fooS2d_SdtFTO() {
-		let input = "_$SSC3fooS2d_SdtFTO"
-		let output = "@nonobjc __C.foo(Swift.Double, Swift.Double) -> Swift.Double"
+	func test_$sSC3fooyS2d_SdtFTO() {
+		let input = "_$sSC3fooyS2d_SdtFTO"
+		let output = "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -960,8 +960,8 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test$S3foo3barC3basyAA3zimCAE_tFTo() {
-		let input = "$S3foo3barC3basyAA3zimCAE_tFTo"
+	func test_$S3foo3barC3bas3zimyAaEC_tFTo() {
+		let input = "_$S3foo3barC3bas3zimyAaEC_tFTo"
 		let output = "@objc foo.bar.bas(zim: foo.zim) -> ()"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
@@ -971,9 +971,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test$SSC3fooS2d_SdtFTO() {
-		let input = "$SSC3fooS2d_SdtFTO"
-		let output = "@nonobjc __C.foo(Swift.Double, Swift.Double) -> Swift.Double"
+	func test_$SSC3fooyS2d_SdtFTO() {
+		let input = "_$SSC3fooyS2d_SdtFTO"
+		let output = "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -1380,7 +1380,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_TFSCg5greenVSC5Color() {
 		let input = "_TFSCg5greenVSC5Color"
-		let output = "__C.green.getter : __C.Color"
+		let output = "__C_Synthesized.green.getter : __C_Synthesized.Color"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -1838,7 +1838,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_TFCSo1AE() {
 		let input = "_TFCSo1AE"
-		let output = "__ObjC.A.__ivar_destroyer"
+		let output = "__C.A.__ivar_destroyer"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -1849,7 +1849,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_TFCSo1Ae() {
 		let input = "_TFCSo1Ae"
-		let output = "__ObjC.A.__ivar_initializer"
+		let output = "__C.A.__ivar_initializer"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2307,9 +2307,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf0gs___TFVs11_StringCore15_invariantCheckfT_T_() {
-		let input = "_TTSf0gs___TFVs11_StringCore15_invariantCheckfT_T_"
-		let output = "function signature specialization <Arg[0] = Owned To Guaranteed and Exploded> of Swift._StringCore._invariantCheck() -> ()"
+	func test_TTSf0gs___TFVs17_LegacyStringCore15_invariantCheckfT_T_() {
+		let input = "_TTSf0gs___TFVs17_LegacyStringCore15_invariantCheckfT_T_"
+		let output = "function signature specialization <Arg[0] = Owned To Guaranteed and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2318,9 +2318,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf2g___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_() {
-		let input = "_TTSf2g___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_"
-		let output = "function signature specialization <Arg[0] = Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._StringCore.init(Swift._StringBuffer) -> Swift._StringCore"
+	func test_TTSf2g___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_() {
+		let input = "_TTSf2g___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_"
+		let output = "function signature specialization <Arg[0] = Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2329,9 +2329,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf2dg___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_() {
-		let input = "_TTSf2dg___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_"
-		let output = "function signature specialization <Arg[0] = Dead and Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._StringCore.init(Swift._StringBuffer) -> Swift._StringCore"
+	func test_TTSf2dg___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_() {
+		let input = "_TTSf2dg___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_"
+		let output = "function signature specialization <Arg[0] = Dead and Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2340,9 +2340,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf2dgs___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_() {
-		let input = "_TTSf2dgs___TTSf2s_d___TFVs11_StringCoreCfVs13_StringBufferS_"
-		let output = "function signature specialization <Arg[0] = Dead and Owned To Guaranteed and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._StringCore.init(Swift._StringBuffer) -> Swift._StringCore"
+	func test_TTSf2dgs___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_() {
+		let input = "_TTSf2dgs___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_"
+		let output = "function signature specialization <Arg[0] = Dead and Owned To Guaranteed and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2351,9 +2351,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf3d_i_d_i_d_i___TFVs11_StringCoreCfVs13_StringBufferS_() {
-		let input = "_TTSf3d_i_d_i_d_i___TFVs11_StringCoreCfVs13_StringBufferS_"
-		let output = "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[2] = Dead, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._StringCore.init(Swift._StringBuffer) -> Swift._StringCore"
+	func test_TTSf3d_i_d_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_() {
+		let input = "_TTSf3d_i_d_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_"
+		let output = "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[2] = Dead, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2362,9 +2362,9 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_TTSf3d_i_n_i_d_i___TFVs11_StringCoreCfVs13_StringBufferS_() {
-		let input = "_TTSf3d_i_n_i_d_i___TFVs11_StringCoreCfVs13_StringBufferS_"
-		let output = "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._StringCore.init(Swift._StringBuffer) -> Swift._StringCore"
+	func test_TTSf3d_i_n_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_() {
+		let input = "_TTSf3d_i_n_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_"
+		let output = "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2584,6 +2584,17 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+	func test_$Ss17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD015shiftingToStart5Indexs01_A9IndexablePQzAN_tFAKs01_M4BasePQzAQcfU_() {
+		let input = "_$Ss17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD015shiftingToStart5Indexs01_A9IndexablePQzAN_tFAKs01_M4BasePQzAQcfU_"
+		let output = "closure #1 (A.Index) -> A.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.SubSequence: Swift.MutableCollection, A.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Index) -> A.Index"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
 	func test_T03foo4_123ABTf3psbpsb_n() {
 		let input = "_T03foo4_123ABTf3psbpsb_n"
 		let output = "function signature specialization <Arg[0] = [Constant Propagated String : u8'123'], Arg[1] = [Constant Propagated String : u8'123']> of foo"
@@ -2606,8 +2617,30 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+	func test_$S4main5inneryys5Int32Vz_yADctF25closure_with_box_argumentxz_Bi32__lXXTf1nc_n() {
+		let input = "_$S4main5inneryys5Int32Vz_yADctF25closure_with_box_argumentxz_Bi32__lXXTf1nc_n"
+		let output = "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
 	func test_T03foo6testityyyc_yyctF1a1bTf3pfpf_n() {
 		let input = "_T03foo6testityyyc_yyctF1a1bTf3pfpf_n"
+		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S3foo6testityyyyc_yyctF1a1bTf3pfpf_n() {
+		let input = "_$S3foo6testityyyyc_yyctF1a1bTf3pfpf_n"
 		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
@@ -2691,6 +2724,72 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+	func test_$Ss10DictionaryV3t17E6Index2V1loiySbAEyxq__G_AGtFZ() {
+		let input = "_$Ss10DictionaryV3t17E6Index2V1loiySbAEyxq__G_AGtFZ"
+		let output = "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S8mangling14varargsVsArray3arr1nySid_SStF() {
+		let input = "_$S8mangling14varargsVsArray3arr1nySid_SStF"
+		let output = "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S8mangling14varargsVsArray3arr1nySaySiG_SStF() {
+		let input = "_$S8mangling14varargsVsArray3arr1nySaySiG_SStF"
+		let output = "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S8mangling14varargsVsArray3arr1nySaySiGd_SStF() {
+		let input = "_$S8mangling14varargsVsArray3arr1nySaySiGd_SStF"
+		let output = "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S8mangling14varargsVsArray3arrySid_tF() {
+		let input = "_$S8mangling14varargsVsArray3arrySid_tF"
+		let output = "mangling.varargsVsArray(arr: Swift.Int...) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S8mangling14varargsVsArray3arrySaySiGd_tF() {
+		let input = "_$S8mangling14varargsVsArray3arrySaySiGd_tF"
+		let output = "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
 	func test_T0s13_UnicodeViewsVss22RandomAccessCollectionRzs0A8EncodingR_11SubSequence_5IndexQZAFRtzsAcERpzAE_AEQZAIRSs15UnsignedInteger8Iterator_7ElementRPzAE_AlMQZANRS13EncodedScalar_AlMQY_AORSr0_lE13CharacterViewVyxq__G() {
 		let input = "_T0s13_UnicodeViewsVss22RandomAccessCollectionRzs0A8EncodingR_11SubSequence_5IndexQZAFRtzsAcERpzAE_AEQZAIRSs15UnsignedInteger8Iterator_7ElementRPzAE_AlMQZANRS13EncodedScalar_AlMQY_AORSr0_lE13CharacterViewVyxq__G"
 		let output = "(extension in Swift):Swift._UnicodeViews<A, B><A, B where A: Swift.RandomAccessCollection, B: Swift.UnicodeEncoding, A.Index == A.SubSequence.Index, A.SubSequence: Swift.RandomAccessCollection, A.SubSequence == A.SubSequence.SubSequence, A.Iterator.Element: Swift.UnsignedInteger, A.Iterator.Element == A.SubSequence.Iterator.Element, A.SubSequence.Iterator.Element == B.EncodedScalar.Iterator.Element>.CharacterView"
@@ -2704,7 +2803,18 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T010Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiSbAcDEAGOyAF_G_AKtFZ() {
 		let input = "_T010Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiSbAcDEAGOyAF_G_AKtFZ"
-		let output = "static (extension in SimulatorKit):Foundation.Measurement<A where A == __ObjC.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__ObjC.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__ObjC.UnitAngle>.Orientation) -> Swift.Bool"
+		let output = "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S10Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiySbAcDEAGOyAF_G_AKtFZ() {
+		let input = "_$S10Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiySbAcDEAGOyAF_G_AKtFZ"
+		let output = "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2726,6 +2836,17 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T04test6testitSiyt_tF() {
 		let input = "_T04test6testitSiyt_tF"
+		let output = "test.testit(()) -> Swift.Int"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S4test6testitySiyt_tF() {
+		let input = "_$S4test6testitySiyt_tF"
 		let output = "test.testit(()) -> Swift.Int"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
@@ -2811,8 +2932,30 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_T0SqWydot17() {
-		let input = "_T0SqWy.17"
+	func test_$S3abc6testityySiFTm() {
+		let input = "_$S3abc6testityySiFTm"
+		let output = "merged abc.testit(Swift.Int) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$S4main4TestC1xACSi_tc6_PRIV_Llfc() {
+		let input = "_$S4main4TestC1xACSi_tc6_PRIV_Llfc"
+		let output = "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0SqWOydot17() {
+		let input = "_T0SqWOy.17"
 		let output = "outlined copy of Swift.Optional with unmangled suffix \".17\""
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
@@ -2846,7 +2989,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0So11UITextFieldC4textSSSgvgToTepb_() {
 		let input = "_T0So11UITextFieldC4textSSSgvgToTepb_"
-		let output = "outlined bridged method (pb) of @objc __ObjC.UITextField.text.getter : Swift.String?"
+		let output = "outlined bridged method (pb) of @objc __C.UITextField.text.getter : Swift.String?"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2857,7 +3000,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0So11UITextFieldC4textSSSgvgToTeab_() {
 		let input = "_T0So11UITextFieldC4textSSSgvgToTeab_"
-		let output = "outlined bridged method (ab) of @objc __ObjC.UITextField.text.getter : Swift.String?"
+		let output = "outlined bridged method (ab) of @objc __C.UITextField.text.getter : Swift.String?"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2868,7 +3011,7 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0So5GizmoC11doSomethingSQyypGSQySaySSGGFToTembnn_() {
 		let input = "_T0So5GizmoC11doSomethingSQyypGSQySaySSGGFToTembnn_"
-		let output = "outlined bridged method (mbnn) of @objc __ObjC.Gizmo.doSomething([Swift.String]!) -> Any!"
+		let output = "outlined bridged method (mbnn) of @objc __C.Gizmo.doSomething([Swift.String]!) -> Any!"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2879,7 +3022,29 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0So5GizmoC12modifyStringSQySSGAD_Si10withNumberSQyypG0D6FoobartFToTembnnnb_() {
 		let input = "_T0So5GizmoC12modifyStringSQySSGAD_Si10withNumberSQyypG0D6FoobartFToTembnnnb_"
-		let output = "outlined bridged method (mbnnnb) of @objc __ObjC.Gizmo.modifyString(Swift.String!, withNumber: Swift.Int, withFoobar: Any!) -> Swift.String!"
+		let output = "outlined bridged method (mbnnnb) of @objc __C.Gizmo.modifyString(_: Swift.String!, withNumber: Swift.Int, withFoobar: Any!) -> Swift.String!"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$SSo5GizmoC11doSomethingySQyypGSQySaySSGGFToTembnn_() {
+		let input = "_$SSo5GizmoC11doSomethingySQyypGSQySaySSGGFToTembnn_"
+		let output = "outlined bridged method (mbnn) of @objc __C.Gizmo.doSomething([Swift.String]!) -> Any!"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$SSo5GizmoC12modifyString_10withNumber0D6FoobarSQySSGAF_SiSQyypGtFToTembnnnb_() {
+		let input = "_$SSo5GizmoC12modifyString_10withNumber0D6FoobarSQySSGAF_SiSQyypGtFToTembnnnb_"
+		let output = "outlined bridged method (mbnnnb) of @objc __C.Gizmo.modifyString(_: Swift.String!, withNumber: Swift.Int, withFoobar: Any!) -> Swift.String!"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
@@ -2897,6 +3062,171 @@ class CwlDemangleTests: XCTestCase {
 			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0s24_UnicodeScalarExceptions33_0E4228093681F6920F0AB2E48B4F1C69LLVACycfC() {
+		let input = "_T0s24_UnicodeScalarExceptions33_0E4228093681F6920F0AB2E48B4F1C69LLVACycfC"
+		let output = "Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69).init() -> Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69)"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0D() {
+		let input = "_T0D"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0s18EnumeratedIteratorVyxGs8Sequencess0B8ProtocolRzlsADP5splitSay03SubC0QzGSi9maxSplits_Sb25omittingEmptySubsequencesSb7ElementQzKc14whereSeparatortKFTW() {
+		let input = "_T0s18EnumeratedIteratorVyxGs8Sequencess0B8ProtocolRzlsADP5splitSay03SubC0QzGSi9maxSplits_Sb25omittingEmptySubsequencesSb7ElementQzKc14whereSeparatortKFTW"
+		let output = "protocol witness for Swift.Sequence.split(maxSplits: Swift.Int, omittingEmptySubsequences: Swift.Bool, whereSeparator: (A.Element) throws -> Swift.Bool) throws -> [A.SubSequence] in conformance <A where A: Swift.IteratorProtocol> Swift.EnumeratedIterator<A> : Swift.Sequence in Swift"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0s3SetVyxGs10CollectiotySivm() {
+		let input = "_T0s3SetVyxGs10CollectiotySivm"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_S$s3SetVyxGs10CollectiotySivm() {
+		let input = "_S$s3SetVyxGs10CollectiotySivm"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC() {
+		let input = "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC() {
+		let input = "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0iW() {
+		let input = "_T0iW"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_S$iW() {
+		let input = "_S$iW"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0s5print_9separator10terminatoryypfC() {
+		let input = "_T0s5print_9separator10terminatoryypfC"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_S$s5print_9separator10terminatoryypfC() {
+		let input = "_S$s5print_9separator10terminatoryypfC"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0So13GenericOptionas8HashableSCsACP9hashValueSivgTW() {
+		let input = "_T0So13GenericOptionas8HashableSCsACP9hashValueSivgTW"
+		let output = "protocol witness for Swift.Hashable.hashValue.getter : Swift.Int in conformance __C.GenericOption : Swift.Hashable in __C_Synthesized"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0So11CrappyColorVs16RawRepresentableSCMA() {
+		let input = "_T0So11CrappyColorVs16RawRepresentableSCMA"
+		let output = "reflection metadata associated type descriptor __C.CrappyColor : Swift.RawRepresentable in __C_Synthesized"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$S28protocol_conformance_records15NativeValueTypeVAA8RuncibleAAMc() {
+		let input = "$S28protocol_conformance_records15NativeValueTypeVAA8RuncibleAAMc"
+		let output = "protocol conformance descriptor for protocol_conformance_records.NativeValueType : protocol_conformance_records.Runcible in protocol_conformance_records"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$SSC9SomeErrorLeVD() {
+		let input = "$SSC9SomeErrorLeVD"
+		let output = "__C_Synthesized.related decl 'e' for SomeError"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$S20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PAAg_AiJ1QAAg1_GF() {
+		let input = "$S20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PAAg_AiJ1QAAg1_GF"
+		let output = "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0LiteralAByxGxd_tcfC() {
+		let input = "_T0LiteralAByxGxd_tcfC"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
+		}
+	}
+	func test_T0XZ() {
+		let input = "_T0XZ"
+		do {
+			_ = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error")
+		} catch {
 		}
 	}
 }

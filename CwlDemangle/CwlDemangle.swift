@@ -26,8 +26,9 @@ public func parseMangledSwiftSymbol(_ mangled: String, isType: Bool = false) thr
 ///   - isType: if true, no prefix is parsed and, on completion, the first item on the parse stack is returned.
 /// - Returns: the successfully parsed result
 /// - Throws: a SwiftSymbolParseError error that contains parse position when the error occurred.
-public func parseMangledSwiftSymbol<C: Collection>(_ mangled: C, isType: Bool = false) throws -> SwiftSymbol where C.Iterator.Element == UnicodeScalar {
+public func parseMangledSwiftSymbol<C: Collection>(_ mangled: C, isType: Bool = false, symbolicReferenceResolver: ((Int32, Int) throws -> SwiftSymbol)? = nil) throws -> SwiftSymbol where C.Iterator.Element == UnicodeScalar {
 	var demangler = Demangler(scalars: mangled)
+	demangler.symbolicReferenceResolver = symbolicReferenceResolver
 	if isType {
 		return try demangler.demangleType()
 	} else if getManglingPrefixLength(mangled) != 0 {
@@ -273,6 +274,18 @@ public struct SwiftSymbol {
 		default: return nil
 		}
 	}
+
+	fileprivate func changeChild(_ newChild: SwiftSymbol?, atIndex: Int) -> SwiftSymbol {
+		guard children.indices.contains(atIndex) else { return self }
+		 
+		var modifiedChildren = children
+		if let nc = newChild {
+			modifiedChildren[atIndex] = nc
+		} else {
+			modifiedChildren.remove(at: atIndex)
+		}
+		return SwiftSymbol(kind: kind, children: modifiedChildren, contents: contents)
+	}
 	
 	fileprivate func changeKind(_ newKind: Kind, additionalChildren: [SwiftSymbol] = []) -> SwiftSymbol {
 		if case .name(let text) = contents {
@@ -290,8 +303,11 @@ public struct SwiftSymbol {
 extension SwiftSymbol {
 	public enum Kind {
 		case allocator
+		case anonymousContext
+		case anonymousDescriptor
 		case argumentTuple
 		case associatedType
+		case associatedTypeGenericParamRef
 		case associatedTypeMetadataAccessor
 		case associatedTypeRef
 		case associatedTypeWitnessTableAccessor
@@ -299,11 +315,14 @@ extension SwiftSymbol {
 		case autoClosureType
 		case boundGenericClass
 		case boundGenericEnum
+		case boundGenericOtherNominalType
 		case boundGenericStructure
 		case builtinTypeName
 		case cFunctionPointer
 		case `class`
+		case classMetadataBaseOffset
 		case constructor
+		case coroutineContinuationPrototype
 		case curryThunk
 		case deallocator
 		case declContext
@@ -327,10 +346,13 @@ extension SwiftSymbol {
 		case dynamicSelf
 		case emptyList
 		case `enum`
+		case enumCase
 		case errorType
+		case escapingAutoClosureType
 		case existentialMetatype
 		case explicitClosure
 		case `extension`
+		case extensionDescriptor
 		case fieldOffset
 		case firstElementMarker
 		case fullTypeMetadata
@@ -371,6 +393,7 @@ extension SwiftSymbol {
 		case keyPathGetterThunkHelper
 		case keyPathHashThunkHelper
 		case keyPathSetterThunkHelper
+		case labelList
 		case lazyProtocolWitnessTableAccessor
 		case lazyProtocolWitnessTableCacheVariable
 		case localDeclName
@@ -380,25 +403,30 @@ extension SwiftSymbol {
 		case metatype
 		case metatypeRepresentation
 		case module
+		case moduleDescriptor
 		case nativeOwningAddressor
 		case nativeOwningMutableAddressor
 		case nativePinningAddressor
 		case nativePinningMutableAddressor
+		case noEscapeFunctionType
 		case nominalTypeDescriptor
 		case nonObjCAttribute
 		case number
 		case objCAttribute
 		case objCBlock
+		case otherNominalType
 		case outlinedAssignWithCopy
 		case outlinedAssignWithTake
 		case outlinedBridgedMethod
 		case outlinedConsume
 		case outlinedCopy
+		case outlinedDestroy
 		case outlinedInitializeWithCopy
 		case outlinedInitializeWithTake
 		case outlinedRelease
 		case outlinedRetain
 		case outlinedVariable
+		case owned
 		case owningAddressor
 		case owningMutableAddressor
 		case partialApplyForwarder
@@ -406,15 +434,19 @@ extension SwiftSymbol {
 		case postfixOperator
 		case prefixOperator
 		case privateDeclName
+		case propertyDescriptor
 		case `protocol`
 		case protocolConformance
+		case protocolConformanceDescriptor
 		case protocolDescriptor
 		case protocolList
 		case protocolListWithAnyObject
 		case protocolListWithClass
+		case protocolRequirementArray
 		case protocolWitness
 		case protocolWitnessTable
 		case protocolWitnessTableAccessor
+		case protocolWitnessTablePattern
 		case qualifiedArchetype
 		case reabstractionThunk
 		case reabstractionThunkHelper
@@ -422,6 +454,9 @@ extension SwiftSymbol {
 		case reflectionMetadataBuiltinDescriptor
 		case reflectionMetadataFieldDescriptor
 		case reflectionMetadataSuperclassDescriptor
+		case relatedEntityDeclName
+		case resilientProtocolWitnessTable
+		case retroactiveConformance
 		case returnType
 		case setter
 		case shared
@@ -436,6 +471,7 @@ extension SwiftSymbol {
 		case structure
 		case `subscript`
 		case suffix
+		case symbolicReference
 		case thinFunctionType
 		case throwsAnnotation
 		case tuple
@@ -447,10 +483,14 @@ extension SwiftSymbol {
 		case typeMangling
 		case typeMetadata
 		case typeMetadataAccessFunction
+		case typeMetadataCompletionFunction
+		case typeMetadataInstantiationCache
+		case typeMetadataInstantiationFunction
 		case typeMetadataLazyCache
 		case uncurriedFunctionType
 		case unmanaged
 		case unowned
+		case unresolvedSymbolicReference
 		case unsafeAddressor
 		case unsafeMutableAddressor
 		case valueWitness
@@ -467,8 +507,8 @@ extension SwiftSymbol {
 // MARK: Demangler.h
 
 fileprivate let stdlibName = "Swift"
-fileprivate let objcModule = "__ObjC"
-fileprivate let cModule = "__C"
+fileprivate let objcModule = "__C"
+fileprivate let cModule = "__C_Synthesized"
 fileprivate let lldbExpressionsModuleNamePrefix = "__lldb_expr_"
 fileprivate let maxRepeatCount = 2048
 fileprivate let maxNumWords = 26
@@ -478,6 +518,9 @@ fileprivate struct Demangler<C> where C: Collection, C.Iterator.Element == Unico
 	var nameStack: [SwiftSymbol] = []
 	var substitutions: [SwiftSymbol] = []
 	var words: [String] = []
+	var symbolicReferences: [Int32] = []
+	var isOldFunctionTypeMangling: Bool = false
+	var symbolicReferenceResolver: ((Int32, Int) throws -> SwiftSymbol)? = nil
 	
 	init(scalars: C) {
 		scanner = ScalarScanner(scalars: scalars)
@@ -488,41 +531,42 @@ fileprivate struct Demangler<C> where C: Collection, C.Iterator.Element == Unico
 
 fileprivate func getManglingPrefixLength<C: Collection>(_ scalars: C) -> Int where C.Iterator.Element == UnicodeScalar {
 	var scanner = ScalarScanner(scalars: scalars)
-	if scanner.conditional(string: "_T0") || scanner.conditional(string: "_$S") {
+	if scanner.conditional(string: "_T0") || scanner.conditional(string: "_$S") || scanner.conditional(string: "_$s") {
 		return 3
-	} else if scanner.conditional(string: "$S") {
+	} else if scanner.conditional(string: "$S") || scanner.conditional(string: "$s") {
 		return 2
 	}
 
 	return 0
-} 
+}
 
 fileprivate extension SwiftSymbol.Kind {
 	var isDeclName: Bool {
 		switch self {
-		case .identifier, .localDeclName, .privateDeclName, .prefixOperator: fallthrough
-		case .postfixOperator, .infixOperator: return true
+		case .identifier, .localDeclName, .privateDeclName, .relatedEntityDeclName: fallthrough
+		case .prefixOperator, .postfixOperator, .infixOperator: fallthrough
+		case .unresolvedSymbolicReference, .symbolicReference: return true
 		default: return false
 		}
 	}
 	
 	var isContext: Bool {
 		switch self {
-		case .allocator, .class, .constructor, .curryThunk, .deallocator, .defaultArgumentInitializer: fallthrough
+		case .allocator, .anonymousContext, .class, .constructor, .curryThunk, .deallocator, .defaultArgumentInitializer: fallthrough
 		case .destructor, .didSet, .dispatchThunk, .enum, .explicitClosure, .extension, .function: fallthrough
 		case .getter, .globalGetter, .iVarInitializer, .iVarDestroyer, .implicitClosure: fallthrough
 		case .initializer, .materializeForSet, .module, .nativeOwningAddressor: fallthrough
 		case .nativeOwningMutableAddressor, .nativePinningAddressor, .nativePinningMutableAddressor: fallthrough
-		case .owningAddressor, .owningMutableAddressor, .protocol, .setter, .static: fallthrough
-		case .structure, .subscript, .typeAlias, .unsafeAddressor, .unsafeMutableAddressor: fallthrough
+		case .otherNominalType, .owningAddressor, .owningMutableAddressor, .protocol, .setter, .static: fallthrough
+		case .structure, .subscript, .symbolicReference, .typeAlias, .unresolvedSymbolicReference, .unsafeAddressor, .unsafeMutableAddressor: fallthrough
 		case .variable, .willSet: return true
 		default: return false
 		}
 	}
 	
-	var isNominal: Bool {
+	var isAnyGeneric: Bool {
 		switch self {
-		case .structure, .class, .enum, .protocol: return true
+		case .structure, .class, .enum, .protocol, .otherNominalType, .typeAlias, .symbolicReference, .unresolvedSymbolicReference: return true
 		default: return false
 		}
 	}
@@ -573,8 +617,10 @@ fileprivate extension Demangler {
 	mutating func readManglingPrefix() throws {
 		switch (try scanner.readScalar(), try scanner.readScalar()) {
 		case ("_", "T"): try scanner.match(scalar: "0")
-		case ("_", "$"): try scanner.match(scalar: "S")
+		case ("_", "$") where scanner.conditional(scalar: "S"): return
+		case ("_", "$") where scanner.conditional(scalar: "s"): return
 		case ("$", "S"): return
+		case ("$", "s"): return
 		default: throw scanner.unexpectedError()
 		}
 	}
@@ -612,6 +658,9 @@ fileprivate extension Demangler {
 		
 		if scanner.conditional(string: "_Tt") {
 			return try demangleObjCTypeName()
+		} else if scanner.conditional(string: "_T") {
+			isOldFunctionTypeMangling = true
+			try scanner.backtrack(count: 2)
 		}
 		
 		try readManglingPrefix()
@@ -641,6 +690,7 @@ fileprivate extension Demangler {
 	
 	mutating func demangleOperator() throws -> SwiftSymbol {
 		switch try scanner.readScalar() {
+		case "\u{1}": return SwiftSymbol(kind: .unresolvedSymbolicReference)
 		case "A": return try demangleMultiSubstitutions()
 		case "B": return try demangleBuiltinType()
 		case "C": return try demangleAnyGenericType(kind: .class)
@@ -667,10 +717,12 @@ fileprivate extension Demangler {
 		case "c": return try require(popFunctionType(kind: .functionType))
 		case "d": return SwiftSymbol(kind: .variadicMarker)
 		case "f": return try demangleFunctionEntity()
+		case "g": return try demangleRetroactiveConformance()
 		case "h": return SwiftSymbol(typeWithChildKind: .shared, childChild: try require(popTypeAndGetChild()))
 		case "i": return try demangleSubscript()
 		case "l": return try demangleGenericSignature(hasParamCounts: false)
 		case "m": return SwiftSymbol(typeWithChildKind: .metatype, childChild: try require(pop(kind: .type)))
+		case "n": return SwiftSymbol(kind: .owned, child: try popTypeAndGetChild())
 		case "o": return try demangleOperatorIdentifier();
 		case "p": return try demangleProtocolListType();
 		case "q": return SwiftSymbol(kind: .type, child: try demangleGenericParamIndex())
@@ -757,14 +809,6 @@ fileprivate extension Demangler {
 		return nameStack.last.map({ cond($0.kind) }) == true ? pop() : nil
 	}
 	
-	mutating func popFunctionParams(kind: SwiftSymbol.Kind) throws -> SwiftSymbol {
-		if pop(kind: .emptyList) != nil {
-			return SwiftSymbol(kind: kind, child: SwiftSymbol(kind: .type, child: SwiftSymbol(kind: .tuple)))
-		} else {
-			return SwiftSymbol(kind: kind, child: try require(pop(kind: .type)))
-		}
-	}
-	
 	mutating func popFunctionType(kind: SwiftSymbol.Kind) throws -> SwiftSymbol {
 		var name = SwiftSymbol(kind: kind)
 		if let ta = pop(kind: .throwsAnnotation) {
@@ -775,14 +819,91 @@ fileprivate extension Demangler {
 		return SwiftSymbol(kind: .type, child: name)
 	}
 	
-	mutating func popTypeAndGetChild() throws -> SwiftSymbol {
-		return try require(pop(kind: .type)?.children.first)
+	mutating func popFunctionParams(kind: SwiftSymbol.Kind) throws -> SwiftSymbol {
+		let paramsType: SwiftSymbol
+		if pop(kind: .emptyList) != nil {
+			return SwiftSymbol(kind: kind, child: SwiftSymbol(kind: .type, child: SwiftSymbol(kind: .tuple)))
+		} else {
+			paramsType = try require(pop(kind: .type))
+		}
+		
+		if kind == .argumentTuple {
+			let params = try require(paramsType.children.first)
+			let numParams = params.kind == .tuple ? params.children.count : 1
+			return SwiftSymbol(kind: kind, children: [paramsType], contents: .index(UInt32(numParams)))
+		} else {
+			return SwiftSymbol(kind: kind, children: [paramsType]) 
+		}
 	}
 	
-	mutating func popTypeAndGetNominal() throws -> SwiftSymbol {
-		let child = try popTypeAndGetChild()
-		try require(child.kind.isNominal)
-		return child
+	mutating func getLabel(params: inout SwiftSymbol, idx: Int) throws -> SwiftSymbol {
+		if isOldFunctionTypeMangling {
+			let param = try require(params.children.at(idx))
+			if let label = param.children.enumerated().first(where: { $0.element.kind == .tupleElementName }) {
+				params.children[idx].children.remove(at: label.offset)
+				return SwiftSymbol(kind: .identifier, contents: .name(label.element.text ?? ""))
+			}
+			return SwiftSymbol(kind: .firstElementMarker)
+		}
+		return try require(pop())
+	}
+
+	mutating func popFunctionParamLabels(type: SwiftSymbol) throws -> (type: SwiftSymbol, labelList: SwiftSymbol)? {
+		if !isOldFunctionTypeMangling && pop(kind: .emptyList) != nil {
+			return (type: type, labelList: SwiftSymbol(kind: .labelList))
+		}
+		
+		guard type.kind == .type else { return nil }
+		
+		let topFuncType = try require(type.children.first)
+		let funcType: SwiftSymbol
+		if topFuncType.kind == .dependentGenericType {
+			funcType = try require(topFuncType.children.at(1)?.children.first)
+		} else {
+			funcType = topFuncType
+		}
+		
+		guard funcType.kind == .functionType || funcType.kind == .noEscapeFunctionType else { return nil }
+
+		var parameterType = try require(funcType.children.first)
+		if parameterType.kind == .throwsAnnotation {
+			parameterType = try require(funcType.children.at(1))
+		}
+		
+		try require(parameterType.kind == .argumentTuple)
+		guard let index = parameterType.index else { return nil }
+		
+		let possibleTupleType = parameterType.children.first
+		let possibleTuple = possibleTupleType?.children.first
+		if isOldFunctionTypeMangling && possibleTuple?.kind != .tuple {
+			return (type: type, labelList: SwiftSymbol(kind: .labelList))
+		}
+		let tupleType = try require(possibleTupleType)
+		var tuple = try require(possibleTuple)
+		
+		var hasLabels = false
+		var children = [SwiftSymbol]()
+		for i in 0..<index {
+			let label = try getLabel(params: &tuple, idx: Int(i))
+			try require(label.kind == .identifier || label.kind == .firstElementMarker)
+			children.append(label)
+			hasLabels = hasLabels || (label.kind != .firstElementMarker)
+		}
+		
+		if !hasLabels {
+			return (type: type, labelList: SwiftSymbol(kind: .labelList))
+		}
+		
+		let modifiedTupleType = tupleType.changeChild(tuple, atIndex: 0)
+		let modifiedParameterType = parameterType.changeChild(modifiedTupleType, atIndex: 0)
+		var modifiedFuncType = funcType.changeChild(modifiedParameterType, atIndex: funcType.children.first?.kind == .throwsAnnotation ? 1 : 0)
+		if type.children.first?.kind == .dependentGenericType {
+			let modifiedDependentType = try require(topFuncType.children.at(1)).changeChild(modifiedFuncType, atIndex: 0)
+			modifiedFuncType = modifiedDependentType.changeChild(modifiedDependentType, atIndex: 1)
+		}
+		let modifiedType = type.changeChild(modifiedFuncType, atIndex: 0)
+		
+		return (type: modifiedType, labelList: SwiftSymbol(kind: .labelList, children: isOldFunctionTypeMangling ? children : children.reversed()))
 	}
 	
 	mutating func popTuple() throws -> SwiftSymbol {
@@ -839,6 +960,16 @@ fileprivate extension Demangler {
 		return try require(pop { $0.isContext })
 	}
 	
+	mutating func popTypeAndGetChild() throws -> SwiftSymbol {
+		return try require(pop(kind: .type)?.children.first)
+	}
+	
+	mutating func popTypeAndGetAnyGeneric() throws -> SwiftSymbol {
+		let child = try popTypeAndGetChild()
+		try require(child.kind.isAnyGeneric)
+		return child
+	}
+	
 	mutating func popAssociatedTypeName() throws -> SwiftSymbol {
 		let proto = pop(kind: .type)
 		let id = try require(pop(kind: .identifier))
@@ -848,6 +979,16 @@ fileprivate extension Demangler {
 			result.children.append(p)
 		}
 		return result
+	}
+	
+	mutating func popAssociatedTypePath() throws -> SwiftSymbol {
+		var firstElem = false
+		var assocTypePath = [SwiftSymbol]()
+		repeat {
+			firstElem = pop(kind: .firstElementMarker) != nil
+			assocTypePath.append(try require(pop { $0.isDeclName }))
+		} while !firstElem
+		return SwiftSymbol(kind: .assocTypePath, children: assocTypePath.reversed())
 	}
 	
 	mutating func popProtocolConformance() throws -> SwiftSymbol {
@@ -1028,14 +1169,19 @@ fileprivate extension Demangler {
 	}
 	
 	mutating func demangleLocalIdentifier() throws -> SwiftSymbol {
-		if scanner.conditional(scalar: "L") {
+		let c = try scanner.readScalar()
+		switch c {
+		case "L":
 			let discriminator = try require(pop(kind: .identifier))
 			let name = try require(pop(where: { $0.isDeclName }))
 			return SwiftSymbol(kind: .privateDeclName, children: [discriminator, name])
-		} else if scanner.conditional(scalar: "l") {
+		case "l":
 			let discriminator = try require(pop(kind: .identifier))
 			return SwiftSymbol(kind: .privateDeclName, children: [discriminator])
-		} else {
+		case "a"..."j", "A"..."J":
+			return SwiftSymbol(kind: .relatedEntityDeclName, children: [try require(pop())], contents: .name(String(c)))
+		default:
+			try scanner.backtrack()
 			let discriminator = try demangleIndexAsName()
 			let name = try require(pop(where: { $0.isDeclName }))
 			return SwiftSymbol(kind: .localDeclName, children: [discriminator, name])
@@ -1082,7 +1228,7 @@ fileprivate extension Demangler {
 	mutating func demangleExtensionContext() throws -> SwiftSymbol {
 		let genSig = pop(kind: .dependentGenericSignature)
 		let module = try require(popModule())
-		let type = try popTypeAndGetNominal()
+		let type = try popTypeAndGetAnyGeneric()
 		if let g = genSig {
 			return SwiftSymbol(kind: .extension, children: [module, type, g])
 		} else {
@@ -1093,22 +1239,38 @@ fileprivate extension Demangler {
 	mutating func demanglePlainFunction() throws -> SwiftSymbol {
 		let genSig = pop(kind: .dependentGenericSignature)
 		var type = try popFunctionType(kind: .functionType)
+		let possibleModifiedTypeAndLabelList = try popFunctionParamLabels(type: type)
+		
 		if let g = genSig {
 			type = SwiftSymbol(typeWithChildKind: .dependentGenericType, childChildren: [g, type])
 		}
 		let name = try require(pop(where: { $0.isDeclName }))
 		let ctx = try popContext()
+		if let (modifiedType, labelList) = possibleModifiedTypeAndLabelList {
+			return SwiftSymbol(kind: .function, children: [ctx, name, labelList, modifiedType])
+		}
 		return SwiftSymbol(kind: .function, children: [ctx, name, type])
 	}
 	
+	mutating func demangleRetroactiveConformance() throws -> SwiftSymbol {
+		let index = try demangleIndexAsName()
+		let conformance = try popProtocolConformance()
+		return SwiftSymbol(kind: .retroactiveConformance, children: [index, conformance])
+	}
+	
 	mutating func demangleBoundGenericType() throws -> SwiftSymbol {
+		var retroactiveConformances: [SwiftSymbol] = []
+		while let conformance = pop(kind: .retroactiveConformance) {
+			retroactiveConformances.append(conformance)
+		}
+		
 		var array = [SwiftSymbol]()
 		while true {
 			var children = [SwiftSymbol]()
 			while let t = pop(kind: .type) {
-				children.insert(t, at: 0)
+				children.append(t)
 			}
-			array.append(SwiftSymbol(kind: .typeList, children: children))
+			array.append(SwiftSymbol(kind: .typeList, children: children.reversed()))
 			
 			if pop(kind: .emptyList) != nil {
 				break
@@ -1116,13 +1278,23 @@ fileprivate extension Demangler {
 				_ = try require(pop(kind: .firstElementMarker))
 			}
 		}
-		let nominal = try popTypeAndGetNominal()
-		let type = SwiftSymbol(kind: .type, child: try demangleBoundGenericArgs(nominal: nominal, array: array, index: 0))
+		let nominal = try popTypeAndGetAnyGeneric()
+		var children = [try demangleBoundGenericArgs(nominal: nominal, array: array, index: 0)]
+		if !retroactiveConformances.isEmpty {
+			children.append(SwiftSymbol(kind: .typeList, children: retroactiveConformances.reversed()))
+		}
+		let type = SwiftSymbol(kind: .type, children: children)
 		substitutions.append(type)
 		return type
 	}
 	
 	mutating func demangleBoundGenericArgs(nominal: SwiftSymbol, array: [SwiftSymbol], index: Int) throws -> SwiftSymbol {
+		
+		if nominal.kind == .symbolicReference || nominal.kind == .unresolvedSymbolicReference {
+			let remaining = array.reversed().flatMap { $0.children }
+			return SwiftSymbol(kind: .boundGenericOtherNominalType, children: [SwiftSymbol(kind: .type, child: nominal), SwiftSymbol(kind: .typeList, children: remaining)])
+		}
+		
 		try require(nominal.children.count >= 2)
 		let args = try require(array.at(index))
 		let context = try require(nominal.children.first)
@@ -1153,6 +1325,7 @@ fileprivate extension Demangler {
 		case .class: kind = .boundGenericClass
 		case .structure: kind = .boundGenericStructure
 		case .enum: kind = .boundGenericEnum
+		case .otherNominalType: kind = .boundGenericOtherNominalType
 		default: throw failure
 		}
 		
@@ -1257,20 +1430,44 @@ fileprivate extension Demangler {
 	
 	mutating func demangleMetatype() throws -> SwiftSymbol {
 		switch try scanner.readScalar() {
+		case "c": return SwiftSymbol(kind: .protocolConformanceDescriptor, child: try require(popProtocolConformance()))
 		case "f": return SwiftSymbol(kind: .fullTypeMetadata, child: try require(pop(kind: .type)))
 		case "P": return SwiftSymbol(kind: .genericTypeMetadataPattern, child: try require(pop(kind: .type)))
 		case "a": return SwiftSymbol(kind: .typeMetadataAccessFunction, child: try require(pop(kind: .type)))
+		case "I": return SwiftSymbol(kind: .typeMetadataInstantiationCache, child: try require(pop(kind: .type)))
+		case "i": return SwiftSymbol(kind: .typeMetadataInstantiationFunction, child: try require(pop(kind: .type)))
+		case "r": return SwiftSymbol(kind: .typeMetadataCompletionFunction, child: try require(pop(kind: .type)))
 		case "L": return SwiftSymbol(kind: .typeMetadataLazyCache, child: try require(pop(kind: .type)))
 		case "m": return SwiftSymbol(kind: .metaclass, child: try require(pop(kind: .type)))
 		case "n": return SwiftSymbol(kind: .nominalTypeDescriptor, child: try require(pop(kind: .type)))
+		case "o": return SwiftSymbol(kind: .classMetadataBaseOffset, child: try require(pop(kind: .type)))
 		case "p": return SwiftSymbol(kind: .protocolDescriptor, child: try popProtocol())
 		case "B": return SwiftSymbol(kind: .reflectionMetadataBuiltinDescriptor, child: try require(pop(kind: .type)))
 		case "F": return SwiftSymbol(kind: .reflectionMetadataFieldDescriptor, child: try require(pop(kind: .type)))
 		case "A": return SwiftSymbol(kind: .reflectionMetadataAssocTypeDescriptor, child: try popProtocolConformance())
 		case "C":
 			let t = try require(pop(kind: .type))
-			try require(t.children.first?.kind.isNominal == true)
+			try require(t.children.first?.kind.isAnyGeneric == true)
 			return SwiftSymbol(kind: .reflectionMetadataSuperclassDescriptor, child: try require(t.children.first))
+		case "V": return SwiftSymbol(kind: .propertyDescriptor, child: try require(pop { $0.isEntity }))
+		case "X": return try demanglePrivateContextDescriptor()
+		default: throw failure
+		}
+	}
+	
+	mutating func demanglePrivateContextDescriptor() throws -> SwiftSymbol {
+		switch try scanner.readScalar() {
+		case "E": return SwiftSymbol(kind: .extensionDescriptor, child: try popContext())
+		case "M": return SwiftSymbol(kind: .moduleDescriptor, child: try require(popModule()))
+		case "Y":
+			let discriminator = try require(pop())
+			let context = try popContext()
+			return SwiftSymbol(kind: .anonymousDescriptor, children: [context, discriminator])
+		case "X": return SwiftSymbol(kind: .anonymousDescriptor, child: try popContext())
+		case "A":
+			let path = try require(popAssociatedTypePath())
+			let base = try require(pop(kind: .type))
+			return SwiftSymbol(kind: .associatedTypeGenericParamRef, children: [base, path])
 		default: throw failure
 		}
 	}
@@ -1353,6 +1550,7 @@ fileprivate extension Demangler {
 		case "a": return SwiftSymbol(kind: .partialApplyObjCForwarder)
 		case "A": return SwiftSymbol(kind: .partialApplyForwarder)
 		case "m": return SwiftSymbol(kind: .mergedFunction)
+		case "C": return SwiftSymbol(kind: .coroutineContinuationPrototype, child: try require(pop(kind: .type)))
 		case "V":
 			let base = try require(pop(where: { $0.isEntity }))
 			let derived = try require(pop(where: { $0.isEntity }))
@@ -1565,6 +1763,7 @@ fileprivate extension Demangler {
 	
 	mutating func demangleWitness() throws -> SwiftSymbol {
 		switch try scanner.readScalar() {
+		case "C": return SwiftSymbol(kind: .enumCase, child: try require(pop(where: { $0.isEntity })))
 		case "V": return SwiftSymbol(kind: .valueWitnessTable, child: try require(pop(kind: .type)))
 		case "v":
 			let directness: UInt32
@@ -1575,8 +1774,11 @@ fileprivate extension Demangler {
 			}
 			return SwiftSymbol(kind: .fieldOffset, children: [SwiftSymbol(kind: .directness, contents: .index(directness)), try require(pop(where: { $0.isEntity }))])
 		case "P": return SwiftSymbol(kind: .protocolWitnessTable, child: try popProtocolConformance())
+		case "p": return SwiftSymbol(kind: .protocolWitnessTablePattern, child: try popProtocolConformance())
 		case "G": return SwiftSymbol(kind: .genericProtocolWitnessTable, child: try popProtocolConformance())
 		case "I": return SwiftSymbol(kind: .genericProtocolWitnessTableInstantiationFunction, child: try popProtocolConformance())
+		case "R": return SwiftSymbol(kind: .protocolRequirementArray, child: try popProtocol())
+		case "r": return SwiftSymbol(kind: .resilientProtocolWitnessTable, child: try popProtocolConformance())
 		case "l":
 			let conf = try popProtocolConformance()
 			let type = try require(pop(kind: .type))
@@ -1600,14 +1802,22 @@ fileprivate extension Demangler {
 				assocTypePath.children.insert(assocType, at: 0)
 			} while !firstElem
 			return SwiftSymbol(kind: .associatedTypeWitnessTableAccessor, children: [try popProtocolConformance(), assocTypePath, protoType])
-		case "y": return SwiftSymbol(kind: .outlinedCopy, child: try require(pop(kind: .type)))
-		case "e": return SwiftSymbol(kind: .outlinedConsume, child: try require(pop(kind: .type)))
-		case "r": return SwiftSymbol(kind: .outlinedRetain, child: try require(pop(kind: .type)))
-		case "s": return SwiftSymbol(kind: .outlinedRelease, child: try require(pop(kind: .type)))
-		case "b": return SwiftSymbol(kind: .outlinedInitializeWithTake, child: try require(pop(kind: .type)))
-		case "c": return SwiftSymbol(kind: .outlinedInitializeWithCopy, child: try require(pop(kind: .type)))
-		case "d": return SwiftSymbol(kind: .outlinedAssignWithTake, child: try require(pop(kind: .type)))
-		case "f": return SwiftSymbol(kind: .outlinedAssignWithCopy, child: try require(pop(kind: .type)))
+		case "O":
+			let sig = pop(kind: .dependentGenericSignature)
+			let type = try require(pop(kind: .type))
+			let children: [SwiftSymbol] = sig.map { [type, $0] } ?? [type]
+			switch try scanner.readScalar() {
+			case "y": return SwiftSymbol(kind: .outlinedCopy, children: children)
+			case "e": return SwiftSymbol(kind: .outlinedConsume, children: children)
+			case "r": return SwiftSymbol(kind: .outlinedRetain, children: children)
+			case "s": return SwiftSymbol(kind: .outlinedRelease, children: children)
+			case "b": return SwiftSymbol(kind: .outlinedInitializeWithTake, children: children)
+			case "c": return SwiftSymbol(kind: .outlinedInitializeWithCopy, children: children)
+			case "d": return SwiftSymbol(kind: .outlinedAssignWithTake, children: children)
+			case "f": return SwiftSymbol(kind: .outlinedAssignWithCopy, children: children)
+			case "h": return SwiftSymbol(kind: .outlinedDestroy, children: children)
+			default: throw failure
+			}
 		default: throw failure
 		}
 	}
@@ -1615,6 +1825,8 @@ fileprivate extension Demangler {
 	mutating func demangleSpecialType() throws -> SwiftSymbol {
 		let specialChar = try scanner.readScalar()
 		switch specialChar {
+		case "E": return try popFunctionType(kind: .noEscapeFunctionType)
+		case "A": return try popFunctionType(kind: .escapingAutoClosureType)
 		case "f": return try popFunctionType(kind: .thinFunctionType)
 		case "K": return try popFunctionType(kind: .autoClosureType)
 		case "U": return try popFunctionType(kind: .uncurriedFunctionType)
@@ -1622,7 +1834,7 @@ fileprivate extension Demangler {
 		case "C": return try popFunctionType(kind: .cFunctionPointer)
 		case "o": return SwiftSymbol(typeWithChildKind: .unowned, childChild: try require(pop(kind: .type)))
 		case "u": return SwiftSymbol(typeWithChildKind: .unmanaged, childChild: try require(pop(kind: .type)))
-		case "W": return SwiftSymbol(typeWithChildKind: .weak, childChild: try require(pop(kind: .type)))
+		case "w": return SwiftSymbol(typeWithChildKind: .weak, childChild: try require(pop(kind: .type)))
 		case "b": return SwiftSymbol(typeWithChildKind: .silBoxType, childChild: try require(pop(kind: .type)))
 		case "D": return SwiftSymbol(typeWithChildKind: .dynamicSelf, childChild: try require(pop(kind: .type)))
 		case "M":
@@ -1661,6 +1873,12 @@ fileprivate extension Demangler {
 				boxType.children.append(genericArgs)
 			}
 			return SwiftSymbol(kind: .type, child: boxType)
+		case "Y": return try demangleAnyGenericType(kind: .otherNominalType)
+		case "Z":
+			let types = try popTypeList()
+			let name = try require(pop(kind: .identifier))
+			let parent = try popContext()
+			return SwiftSymbol(kind: .anonymousContext, children: [name, parent, types])
 		case "e": return SwiftSymbol(kind: .type, child: SwiftSymbol(kind: .errorType))
 		default: throw failure
 		}
@@ -1725,21 +1943,26 @@ fileprivate extension Demangler {
 		default: throw failure
 		}
 		
-		let children: [SwiftSymbol]
+		var children = [SwiftSymbol]()
 		switch argsAndKind.args {
-		case .none: children = []
-		case .index: children = [try demangleIndexAsName()]
+		case .none: break
+		case .index: children.append(try demangleIndexAsName())
 		case .typeAndIndex:
 			let index = try demangleIndexAsName()
 			let type = try require(pop(kind: .type))
-			children = [index, type]
+			children += [index, type]
 		case .typeAndMaybePrivateName:
 			let privateName = pop(kind: .privateDeclName)
-			let type = try require(pop(kind: .type))
-			if let pn = privateName {
-				children = [pn, type]
+			let paramType = try require(pop(kind: .type))
+			let possibleModifiedTypeAndLabelList = try popFunctionParamLabels(type: paramType)
+			if let (modifiedType, labelList) = possibleModifiedTypeAndLabelList {
+				children.append(labelList)
+				children.append(modifiedType)
 			} else {
-				children = [type]
+				children.append(paramType)
+			}
+			if let pn = privateName {
+				children.append(pn)
 			}
 		}
 		return SwiftSymbol(kind: argsAndKind.kind, children: [try popContext()] + children)
@@ -2977,6 +3200,7 @@ fileprivate extension SwiftSymbol.Kind {
 		case .boundGenericClass: fallthrough
 		case .boundGenericEnum: fallthrough
 		case .boundGenericStructure: fallthrough
+		case .boundGenericOtherNominalType: fallthrough
 		case .builtinTypeName: fallthrough
 		case .class: fallthrough
 		case .dependentGenericType: fallthrough
@@ -2996,10 +3220,14 @@ fileprivate extension SwiftSymbol.Kind {
 		case .silBoxType: fallthrough
 		case .silBoxTypeWithLayout: fallthrough
 		case .structure: fallthrough
+		case .otherNominalType: fallthrough
 		case .tupleElementName: fallthrough
 		case .type: fallthrough
 		case .typeAlias: fallthrough
-		case .typeList: return true
+		case .typeList: fallthrough
+		case .labelList: fallthrough
+		case .symbolicReference: fallthrough
+		case .unresolvedSymbolicReference: return true
 		default: return false
 		}
 	}
@@ -3009,7 +3237,7 @@ fileprivate extension SwiftSymbol {
 	var needSpaceBeforeType: Bool {
 		switch self.kind {
 		case .type: return children.first?.needSpaceBeforeType ?? false
-		case .functionType, .uncurriedFunctionType, .dependentGenericType: return false
+		case .functionType, .noEscapeFunctionType, .uncurriedFunctionType, .dependentGenericType: return false
 		default: return true
 		}
 	}
@@ -3092,8 +3320,19 @@ fileprivate struct SymbolPrinter {
 		case .outlinedInitializeWithCopy: printFirstChild(name, prefix: "outlined init with copy of ")
 		case .outlinedAssignWithTake: printFirstChild(name, prefix: "outlined assign with take of ")
 		case .outlinedAssignWithCopy: name.children.at(0)?.index.map { target.write("outlined variable #\($0) of ") }
+		case .outlinedDestroy: target.write("outlined destroy of ")
 		case .outlinedVariable: target.write("outlined variable #\(name.index ?? 0) of ")
 		case .directness: name.index.flatMap { Directness(rawValue: $0)?.description }.map { target.write("\($0) ") }
+		case .anonymousContext:
+			if options.contains(.qualifyEntities) && options.contains(.displayExtensionContexts) {
+				_ = printOptional(name.children.at(1))
+				target.write(".(unknown context at " + (name.children.first?.text ?? "") + ")")
+				if let second = name.children.at(2), !second.children.isEmpty {
+					target.write("<")
+					_ = printName(second)
+					target.write(">")
+				}
+			}
 		case .extension:
 			if options.contains(.qualifyEntities) && options.contains(.displayExtensionContexts) {
 				printFirstChild(name, prefix: "(extension in ", suffix: "):", asPrefixContext: true)
@@ -3121,10 +3360,12 @@ fileprivate struct SymbolPrinter {
 		case .enum: fallthrough
 		case .protocol: fallthrough
 		case .typeAlias: return printEntity(name, asPrefixContext: asPrefixContext, typePrinting: .noType, hasName: true)
+		case .otherNominalType: return printEntity(name, asPrefixContext: asPrefixContext, typePrinting: .noType, hasName: true)
 		case .localDeclName: _ = printOptional(name.children.at(1), suffix: " #\((name.children.at(0)?.index ?? 0) + 1)")
 		case .privateDeclName:
 			_ = printOptional(name.children.at(1), prefix: options.contains(.showPrivateDiscriminators) ? "(" : nil)
 			target.write(options.contains(.showPrivateDiscriminators) ? "\(name.children.count > 1 ? " " : "(")in \(name.children.at(0)?.text ?? ""))" : "")
+		case .relatedEntityDeclName: printFirstChild(name, prefix: "related decl '\(name.text ?? "")' for ")
 		case .module:
 			if options.contains(.displayModuleNames) {
 				target.write(name.text ?? "")
@@ -3132,6 +3373,10 @@ fileprivate struct SymbolPrinter {
 		case .identifier:
 			target.write(name.text ?? "")
 		case .index: target.write("\(name.index ?? 0)")
+		case .noEscapeFunctionType: printFunctionType(name)
+		case .escapingAutoClosureType:
+			target.write("@autoclosure ")
+			printFunctionType(name)
 		case .autoClosureType:
 			target.write("@autoclosure ")
 			printFunctionType(name)
@@ -3141,19 +3386,15 @@ fileprivate struct SymbolPrinter {
 		case .functionType: fallthrough
 		case .uncurriedFunctionType: printFunctionType(name)
 		case .argumentTuple:
-			let needParens: Bool = !(name.children.count == 1 && name.children.first?.kind == .type && name.children.first?.children.first?.kind == .tuple)
-			printChildren(name, prefix: needParens ? "(" : nil, suffix: needParens ? ")" : nil)
+			printFunctionParameters(labelList: nil, parameterType: name, showTypes: options.contains(.showFunctionArgumentTypes))
 		case .tuple: printChildren(name, prefix: "(", suffix: ")", separator: ", ")
 		case .tupleElement:
-			let isVariadic = name.children.count >= 1 && name.children.first?.kind == .variadicMarker
-			let idx = isVariadic ? 1 : 0
-			if name.children.count == idx + 1 {
-				_ = printOptional(name.children.at(idx))
-			} else if name.children.count == idx + 2 {
-				_ = printOptional(name.children.at(idx))
-				_ = printOptional(name.children.at(idx + 1))
+			if let label = name.children.first(where: { $0.kind == .tupleElementName }) {
+				target.write("\(label.text ?? ""): ")
 			}
-			if isVariadic {
+			guard let type = name.children.first(where: { $0.kind == .type }) else { break }
+			_ = printName(type)
+			if let _ = name.children.first(where: { $0.kind == .variadicMarker }) {
 				target.write("...")
 			}
 		case .tupleElementName: target.write("\(name.text ?? ""): ")
@@ -3164,11 +3405,16 @@ fileprivate struct SymbolPrinter {
 			} else {
 				printChildren(name)
 			}
+		case .retroactiveConformance:
+			if name.children.count == 2 {
+				printChildren(name, prefix: "retroactive @ ")
+			}
 		case .weak: printFirstChild(name, prefix: "weak ")
 		case .unowned: printFirstChild(name, prefix: "unowned ")
 		case .unmanaged: printFirstChild(name, prefix: "unowned(unsafe) ")
 		case .inOut: printFirstChild(name, prefix: "inout ")
 		case .shared: printFirstChild(name, prefix: "__shared ")
+		case .owned: printFirstChild(name, prefix: "__owned ")
 		case .nonObjCAttribute: target.write("@nonobjc ")
 		case .objCAttribute: target.write("@objc ")
 		case .directMethodReferenceAttribute: target.write("super ")
@@ -3238,8 +3484,12 @@ fileprivate struct SymbolPrinter {
 			_ = printOptional(name.children.at(1), prefix: " and conformance ")
 		case .protocolWitnessTableAccessor: printFirstChild(name, prefix: "protocol witness table accessor for ")
 		case .protocolWitnessTable: printFirstChild(name, prefix: "protocol witness table for ")
+		case .protocolWitnessTablePattern: printFirstChild(name, prefix: "protocol witness table pattern for ")
 		case .genericProtocolWitnessTable: printFirstChild(name, prefix: "generic protocol witness table for ")
 		case .genericProtocolWitnessTableInstantiationFunction: printFirstChild(name, prefix: "instantiation function for generic protocol witness table for ")
+		case .resilientProtocolWitnessTable:
+			target.write("resilient protocol witness table for ")
+			printFirstChild(name)
 		case .vTableThunk:
 			_ = printOptional(name.children.at(1), prefix: "vtable thunk for ")
 			_ = printOptional(name.children.at(0), prefix: " dispatching to ")
@@ -3272,6 +3522,9 @@ fileprivate struct SymbolPrinter {
 		case .fieldOffset:
 			printFirstChild(name)
 			_ = printOptional(name.children.at(1), prefix: "field offset for ", asPrefixContext: true)
+		case .enumCase:
+			target.write("enum case for ")
+			printFirstChild(name, asPrefixContext: false)
 		case .reabstractionThunk: fallthrough
 		case .reabstractionThunkHelper:
 			if options.contains(.shortenThunk) {
@@ -3284,12 +3537,19 @@ fileprivate struct SymbolPrinter {
 			_ = printOptional(name.children.at(name.children.count - 2), prefix: "from ")
 			_ = printOptional(name.children.at(name.children.count - 1), prefix: " to ")
 		case .mergedFunction: target.write(!options.contains(.shortenThunk) ? "merged " : "")
+		case .symbolicReference: target.write("symbolic reference \(name.index ?? 0)")
+		case .unresolvedSymbolicReference: target.write("$\(name.index ?? 0)")
 		case .genericTypeMetadataPattern: printFirstChild(name, prefix: "generic type metadata pattern for ")
 		case .metaclass: printFirstChild(name, prefix: "metaclass for ")
+		case .protocolConformanceDescriptor: printFirstChild(name, prefix: "protocol conformance descriptor for ")
 		case .protocolDescriptor: printFirstChild(name, prefix: "protocol descriptor for ")
+		case .protocolRequirementArray: printFirstChild(name, prefix: "protocol requirement array for ")
 		case .fullTypeMetadata: printFirstChild(name, prefix: "full type metadata for ")
 		case .typeMetadata: printFirstChild(name, prefix: "type metadata for ")
 		case .typeMetadataAccessFunction: printFirstChild(name, prefix: "type metadata accessor for ")
+		case .typeMetadataInstantiationCache: printFirstChild(name, prefix: "type metadata instantiation cache for ")
+		case .typeMetadataInstantiationFunction: printFirstChild(name, prefix: "type metadata instantiation cache for ")
+		case .typeMetadataCompletionFunction: printFirstChild(name, prefix: "type metadata completion function for ")
 		case .typeMetadataLazyCache: printFirstChild(name, prefix: "lazy cache variable for type metadata for ")
 		case .associatedTypeMetadataAccessor:
 			_ = printOptional(name.children.at(1), prefix: "associated type metadata accessor for ")
@@ -3298,8 +3558,10 @@ fileprivate struct SymbolPrinter {
 			_ = printOptional(name.children.at(1), prefix: "associated type witness table accessor for ")
 			_ = printOptional(name.children.at(2), prefix: " : ")
 			_ = printOptional(name.children.at(0), prefix: " in ")
-		case .nominalTypeDescriptor:
-			printFirstChild(name, prefix: "nominal type descriptor for ")
+		case .classMetadataBaseOffset: printFirstChild(name, prefix: "class metadata base offset for ")
+		case .propertyDescriptor: printFirstChild(name, prefix: "property descriptor for ")
+		case .nominalTypeDescriptor: printFirstChild(name, prefix: "nominal type descriptor for ")
+		case .coroutineContinuationPrototype: printFirstChild(name, prefix: "coroutine continuation prototype for ")
 		case .valueWitness:
 			target.write(ValueWitnessKind(rawValue: name.index ?? 0)?.description ?? "")
 			target.write(options.contains(.shortenValueWitness) ? " for " : " value witness for ")
@@ -3308,7 +3570,8 @@ fileprivate struct SymbolPrinter {
 			printFirstChild(name, prefix: "value witness table for ")
 		case .boundGenericClass: fallthrough
 		case .boundGenericStructure: fallthrough
-		case .boundGenericEnum: printBoundGeneric(name)
+		case .boundGenericEnum: fallthrough
+		case .boundGenericOtherNominalType: printBoundGeneric(name)
 		case .dynamicSelf: target.write("Self")
 		case .cFunctionPointer:
 			target.write("@convention(c) ")
@@ -3410,6 +3673,7 @@ fileprivate struct SymbolPrinter {
 				}
 			}
 		case .typeList: printChildren(name)
+		case .labelList: break
 		case .implEscaping: target.write("@escaping")
 		case .implConvention: target.write(name.text ?? "")
 		case .implFunctionAttribute: target.write(name.text ?? "")
@@ -3498,6 +3762,10 @@ fileprivate struct SymbolPrinter {
 		case .silBoxImmutableField: fallthrough
 		case .silBoxMutableField: printFirstChild(name, prefix: name.kind == .silBoxImmutableField ? "let " : "var ")
 		case .assocTypePath: printChildren(name, separator: ".")
+		case .moduleDescriptor: printFirstChild(name, prefix: "module descriptor ")
+		case .anonymousDescriptor: printFirstChild(name, prefix: "anonymous descriptor ")
+		case .extensionDescriptor: printFirstChild(name, prefix: "extension descriptor ")
+		case .associatedTypeGenericParamRef: printChildren(name, prefix: "generic parameter reference for associated type ")
 		}
 		
 		return nil
@@ -3509,6 +3777,24 @@ fileprivate struct SymbolPrinter {
 		case .variable: return printEntity(n, asPrefixContext: asPrefixContext, typePrinting: .withColon, hasName: true, extraName: extraName)
 		case .subscript: return printEntity(n, asPrefixContext: asPrefixContext, typePrinting: .withColon, hasName: false, extraName: extraName, extraIndex: nil, overwriteName: "subscript")
 		default: return nil
+		}
+	}
+	
+	mutating func printEntityType(name: SwiftSymbol, type: SwiftSymbol) {
+		if let labelList = name.children.first(where: { $0.kind == .labelList }) {
+			var t = type
+			if type.kind == .dependentGenericType {
+				_ = printOptional(type.children.first)
+				if let dt = type.children.at(1) {
+					if dt.needSpaceBeforeType {
+						target.write(" ")
+					}
+					t = dt
+				}
+			}
+			printFunctionType(labelList: labelList, t)
+		} else {
+			_ = printName(type)
 		}
 	}
 
@@ -3542,7 +3828,14 @@ fileprivate struct SymbolPrinter {
 			if let o = overwriteName {
 				target.write(o)
 			} else {
-				_ = printOptional(name.children.at(1))
+				if let one = name.children.at(1) {
+					if one.kind != .privateDeclName {
+						_ = printName(one)
+					}
+					if let pdn = name.children.first(where: { $0.kind == .privateDeclName }) {
+						_ = printName(pdn)
+					}
+				}
 			}
 			if target.count != currentPos && !extraNameConsumed {
 				target.write(".")
@@ -3555,7 +3848,7 @@ fileprivate struct SymbolPrinter {
 			}
 		}
 		if typePrinting != .noType {
-			guard var type = name.children.at(1) else { return nil }
+			guard var type = name.children.first(where: { $0.kind == .type }) else { return nil }
 			if type.kind != .type {
 				guard let nextType = name.children.at(2) else { return nil }
 				type = nextType
@@ -3576,13 +3869,13 @@ fileprivate struct SymbolPrinter {
 			if typePr == .withColon {
 				if options.contains(.displayEntityTypes) {
 					target.write(" : ")
-					_ = printName(type)
+					printEntityType(name: name, type: type)
 				}
 			} else {
 				if multiWordName || type.needSpaceBeforeType {
 					target.write(" ")
 				}
-				_ = printName(type)
+				printEntityType(name: name, type: type)
 			}
 		}
 		if !asPrefixContext, let pfc = postfixContext {
@@ -3698,35 +3991,58 @@ fileprivate struct SymbolPrinter {
 		target.write("> of ")
 	}
 	
-	mutating func printFunctionType(_ name: SwiftSymbol) {
-		var startIndex = 0
-		var isThrow = false
-		if name.children.count == 3 {
-			startIndex += 1
-			isThrow = true
-		}
-		if options.contains(.showFunctionArgumentTypes) {
-			_ = printOptional(name.children.at(startIndex))
-			target.write(isThrow ? " throws" : "")
-			_ = printOptional(name.children.at(startIndex + 1))
-			return
-		}
-		guard let args = name.children.at(startIndex)?.children.first?.children.first else { return }
-		if args.kind != .tuple {
-			target.write("(_:)")
-			return
-		}
-		target.write("(")
-		for arg in args.children {
-			let nameIdx = arg.children.first?.kind == .variadicMarker ? 1 : 0
-			if let name = arg.children.at(nameIdx), name.kind == .tupleElementName {
-				target.write(name.text ?? "")
+	mutating func printFunctionParameters(labelList: SwiftSymbol?, parameterType: SwiftSymbol, showTypes: Bool) {
+		guard parameterType.kind == .argumentTuple else { return }
+		guard let t = parameterType.children.first, t.kind == .type else { return }
+		guard let parameters = t.children.first else { return }
+		
+		if parameters.kind != .tuple {
+			if showTypes {
+				target.write("(")
+				_ = printName(parameters)
+				target.write(")")
 			} else {
-				target.write("_")
+				target.write("(_:)")
 			}
-			target.write(":")
+			return
+		}
+		
+		target.write("(")
+		for tuple in parameters.children.enumerated() {
+		 	if let label = labelList?.children.at(tuple.offset) {
+		 		target.write("\(label.kind == .identifier ? (label.text ?? "") : "_"):")
+		 		if showTypes {
+		 			target.write(" ")
+		 		}
+		 	} else if !showTypes {
+		 		if let label = tuple.element.children.first(where: { $0.kind == .tupleElementName }) {
+		 			target.write("\(label.text ?? ""):")
+		 		} else {
+		 			target.write("_:")
+		 		}
+		 	}
+		 	
+		 	if showTypes {
+		 		_ = printName(tuple.element)
+		 		if tuple.offset != parameters.children.count - 1 {
+					target.write(", ")
+		 		}
+		 	}
 		}
 		target.write(")")
+	}
+	
+	mutating func printFunctionType(labelList: SwiftSymbol? = nil, _ name: SwiftSymbol) {
+		let startIndex = name.children.first?.kind == .throwsAnnotation ? 1 : 0
+		guard let parameterType = name.children.at(startIndex) else { return }
+		printFunctionParameters(labelList: labelList, parameterType: parameterType, showTypes: options.contains(.showFunctionArgumentTypes))
+		if !options.contains(.showFunctionArgumentTypes) {
+			return
+		}
+		if startIndex == 1 {
+			target.write(" throws")
+		}
+		_ = printOptional(name.children.at(startIndex + 1))
 	}
 
 	mutating func printBoundGenericNoSugar(_ name: SwiftSymbol) {
@@ -3851,6 +4167,9 @@ fileprivate struct SymbolPrinter {
 
 /// A type for representing the different possible failure conditions when using ScalarScanner
 public enum SwiftSymbolParseError: Error {
+	/// Attempted to convert the buffer to UnicodeScalars but the buffer contained invalid data
+	case utf8ParseError
+	
 	/// The scalar at the specified index doesn't match the expected grammar
 	case unexpected(at: Int)
 	
