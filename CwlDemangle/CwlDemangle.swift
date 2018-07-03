@@ -3123,8 +3123,9 @@ fileprivate func decodeSwiftPunycode(_ value: String) -> String {
 		bias = k
 		n = n + i / (output.count + 1)
 		i = i % (output.count + 1)
-		output.insert(UnicodeScalar(n)!, at: i)
-		i += 1
+        let validScalar = UnicodeScalar(n) ?? UnicodeScalar(".")!
+        output.insert(validScalar, at: i)
+        i += 1
 	}
 	return String(output.map { Character($0) })
 }

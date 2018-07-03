@@ -3213,6 +3213,18 @@ class CwlDemangleTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+    
+    func test_T011CryptoSwift3AESC0017sBoxstorage_wEEFc33_2FA9B7ACC72B80C564A140F8079C9914LLSays6UInt32VGSgvpWvd() {
+        let input = "_T011CryptoSwift3AESC0017sBoxstorage_wEEFc33_2FA9B7ACC72B80C564A140F8079C9914LLSays6UInt32VGSgvpWvd"
+        let output = "direct field offset for CryptoSwift.AES.(sBox.storage in _2FA9B7ACC72B80C564A140F8079C9914) : [Swift.UInt32]?"
+        do {
+            let parsed = try parseMangledSwiftSymbol(input)
+            let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+            XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+        } catch {
+            XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+        }
+    }
 	func test_T0LiteralAByxGxd_tcfC() {
 		let input = "_T0LiteralAByxGxd_tcfC"
 		do {
