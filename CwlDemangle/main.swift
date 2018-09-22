@@ -69,9 +69,12 @@ func readManglings() -> [Mangling] {
 	do {
 		let input = try String(contentsOfFile: "manglings.txt", encoding: String.Encoding.utf8)
 		let lines = input.components(separatedBy: "\n").filter { !$0.isEmpty }
-		return try lines.map { i -> Mangling in
+		return try lines.compactMap { i -> Mangling? in
 			let components = i.components(separatedBy: " ---> ")
 			if components.count != 2 {
+				if i.components(separatedBy: " --> ").count == 2 || i.components(separatedBy: " -> ").count >= 2 {
+					return nil
+				}
 				enum InputError: Error { case unableToSplitLine(String) }
 				throw InputError.unableToSplitLine(i)
 			}
@@ -101,8 +104,8 @@ func generateTestCases(_ manglings: [Mangling]) {
 				func test\(mangling.input.replacingOccurrences(of: ".", with: "dot"))() {
 					let input = "\(mangling.input)"
 					do {
-						_ = try parseMangledSwiftSymbol(input).description
-						XCTFail("Invalid input \\(input) should throw an error")
+						let demangled = try parseMangledSwiftSymbol(input).description
+						XCTFail("Invalid input \\(input) should throw an error, instead returned \\(demangled)")
 					} catch {
 					}
 				}
