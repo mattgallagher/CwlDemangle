@@ -4310,27 +4310,27 @@ public enum SwiftSymbolParseError: Error {
 /// NOTE: This extension is fileprivate to avoid clashing with CwlUtils (from which it is taken). If you want to use these functions outside this file, consider including CwlUtils.
 fileprivate extension UnicodeScalar {
 	/// Tests if the scalar is within a range
-	fileprivate func isInRange(_ range: ClosedRange<UnicodeScalar>) -> Bool {
+	func isInRange(_ range: ClosedRange<UnicodeScalar>) -> Bool {
 		return range.contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII digit
-	fileprivate var isDigit: Bool {
+	var isDigit: Bool {
 		return ("0"..."9").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet lowercase letter
-	fileprivate var isLower: Bool {
+	var isLower: Bool {
 		return ("a"..."z").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet uppercase letter
-	fileprivate var isUpper: Bool {
+	var isUpper: Bool {
 		return ("A"..."Z").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet letter
-	fileprivate var isLetter: Bool {
+	var isLetter: Bool {
 		return isLower || isUpper
 	}
 }
