@@ -1158,7 +1158,7 @@ fileprivate extension Demangler {
 				for c in text.unicodeScalars {
 					if word == nil, !c.isDigit && c != "_" && words.count < maxNumWords {
 						word = "\(c)"
-					} else if var w = word {
+					} else if let w = word {
 						if (c == "_") || (w.unicodeScalars.last?.isUpper == false && c.isUpper) {
 							if w.unicodeScalars.count >= 2 {
 								words.append(w)
