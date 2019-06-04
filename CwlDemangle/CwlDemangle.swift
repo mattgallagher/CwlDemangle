@@ -3166,7 +3166,7 @@ fileprivate func decodeSwiftPunycode(_ value: String) -> String {
 	var pos = input.startIndex
 	
 	// Unlike RFC3492, Swift uses underscore for delimiting
-	if let ipos = input.index(of: "_" as UnicodeScalar) {
+    if let ipos = input.firstIndex(of: "_" as UnicodeScalar) {
 		output.append(contentsOf: input[input.startIndex..<ipos].map { UnicodeScalar($0) })
 		pos = input.index(ipos, offsetBy: 1)
 	}
