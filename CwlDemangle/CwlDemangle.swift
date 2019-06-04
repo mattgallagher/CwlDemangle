@@ -63,22 +63,22 @@ extension SwiftSymbol: CustomStringConvertible {
 public struct SymbolPrintOptions: OptionSet {
 	public let rawValue: Int
 	
-	static let synthesizeSugarOnTypes = SymbolPrintOptions(rawValue: 1 << 0)
-	static let displayDebuggerGeneratedModule = SymbolPrintOptions(rawValue: 1 << 1)
-	static let qualifyEntities = SymbolPrintOptions(rawValue: 1 << 2)
-	static let displayExtensionContexts = SymbolPrintOptions(rawValue: 1 << 3)
-	static let displayUnmangledSuffix = SymbolPrintOptions(rawValue: 1 << 4)
-	static let displayModuleNames = SymbolPrintOptions(rawValue: 1 << 5)
-	static let displayGenericSpecializations = SymbolPrintOptions(rawValue: 1 << 6)
-	static let displayProtocolConformances = SymbolPrintOptions(rawValue: 1 << 5)
-	static let displayWhereClauses = SymbolPrintOptions(rawValue: 1 << 8)
-	static let displayEntityTypes = SymbolPrintOptions(rawValue: 1 << 9)
-	static let shortenPartialApply = SymbolPrintOptions(rawValue: 1 << 10)
-	static let shortenThunk = SymbolPrintOptions(rawValue: 1 << 11)
-	static let shortenValueWitness = SymbolPrintOptions(rawValue: 1 << 12)
-	static let shortenArchetype = SymbolPrintOptions(rawValue: 1 << 13)
-	static let showPrivateDiscriminators = SymbolPrintOptions(rawValue: 1 << 14)
-	static let showFunctionArgumentTypes = SymbolPrintOptions(rawValue: 1 << 15)
+	public static let synthesizeSugarOnTypes = SymbolPrintOptions(rawValue: 1 << 0)
+	public static let displayDebuggerGeneratedModule = SymbolPrintOptions(rawValue: 1 << 1)
+	public static let qualifyEntities = SymbolPrintOptions(rawValue: 1 << 2)
+	public static let displayExtensionContexts = SymbolPrintOptions(rawValue: 1 << 3)
+	public static let displayUnmangledSuffix = SymbolPrintOptions(rawValue: 1 << 4)
+	public static let displayModuleNames = SymbolPrintOptions(rawValue: 1 << 5)
+	public static let displayGenericSpecializations = SymbolPrintOptions(rawValue: 1 << 6)
+	public static let displayProtocolConformances = SymbolPrintOptions(rawValue: 1 << 5)
+	public static let displayWhereClauses = SymbolPrintOptions(rawValue: 1 << 8)
+	public static let displayEntityTypes = SymbolPrintOptions(rawValue: 1 << 9)
+	public static let shortenPartialApply = SymbolPrintOptions(rawValue: 1 << 10)
+	public static let shortenThunk = SymbolPrintOptions(rawValue: 1 << 11)
+	public static let shortenValueWitness = SymbolPrintOptions(rawValue: 1 << 12)
+	public static let shortenArchetype = SymbolPrintOptions(rawValue: 1 << 13)
+	public static let showPrivateDiscriminators = SymbolPrintOptions(rawValue: 1 << 14)
+	public static let showFunctionArgumentTypes = SymbolPrintOptions(rawValue: 1 << 15)
 	
 	public init(rawValue: Int) {
 		self.rawValue = rawValue
@@ -4386,18 +4386,18 @@ fileprivate struct ScalarScanner<C: Collection> where C.Iterator.Element == Unic
 	}
 	
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
-	mutating func match(where test: (UnicodeScalar) -> Bool) throws {
+	mutating func match(where test: @escaping (UnicodeScalar) -> Bool) throws {
 		if index == scalars.endIndex || !test(scalars[index]) {
-			throw SwiftSymbolParseError.matchFailed(wanted: "\(test)", at: consumed)
+            throw SwiftSymbolParseError.matchFailed(wanted: "\(String(describing: test))", at: consumed)
 		}
 		index = self.scalars.index(after: index)
 		consumed += 1
 	}
 	
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
-	mutating func read(where test: (UnicodeScalar) -> Bool) throws -> UnicodeScalar {
+	mutating func read(where test: @escaping (UnicodeScalar) -> Bool) throws -> UnicodeScalar {
 		if index == scalars.endIndex || !test(scalars[index]) {
-			throw SwiftSymbolParseError.matchFailed(wanted: "\(test)", at: consumed)
+            throw SwiftSymbolParseError.matchFailed(wanted: "\(String(describing: test))", at: consumed)
 		}
 		let s = scalars[index]
 		index = self.scalars.index(after: index)
