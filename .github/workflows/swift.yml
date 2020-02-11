@@ -1,10 +1,10 @@
-name: Test Swift Package
+name: Swift Package
 
 on: [push]
 
 jobs:
   build:
-
+    name: Build and test package
     runs-on: macOS-latest
 
     steps:
