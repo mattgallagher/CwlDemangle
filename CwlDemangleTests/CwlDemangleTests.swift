@@ -11,6 +11,9 @@
 //  See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
 
+#if SWIFT_PACKAGE
+	@testable import CwlDemangle
+#endif
 import XCTest
 
 class CwlDemangleTests: XCTestCase {
