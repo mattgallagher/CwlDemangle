@@ -1158,7 +1158,7 @@ fileprivate extension Demangler {
 				for c in text.unicodeScalars {
 					if word == nil, !c.isDigit && c != "_" && words.count < maxNumWords {
 						word = "\(c)"
-					} else if var w = word {
+					} else if let w = word {
 						if (c == "_") || (w.unicodeScalars.last?.isUpper == false && c.isUpper) {
 							if w.unicodeScalars.count >= 2 {
 								words.append(w)
@@ -3166,7 +3166,7 @@ fileprivate func decodeSwiftPunycode(_ value: String) -> String {
 	var pos = input.startIndex
 	
 	// Unlike RFC3492, Swift uses underscore for delimiting
-	if let ipos = input.index(of: "_" as UnicodeScalar) {
+	if let ipos = input.firstIndex(of: "_" as UnicodeScalar) {
 		output.append(contentsOf: input[input.startIndex..<ipos].map { UnicodeScalar($0) })
 		pos = input.index(ipos, offsetBy: 1)
 	}
@@ -3209,7 +3209,7 @@ fileprivate func decodeSwiftPunycode(_ value: String) -> String {
 		bias = k
 		n = n + i / (output.count + 1)
 		i = i % (output.count + 1)
-		let validScalar = UnicodeScalar(n) ?? UnicodeScalar(".")!
+		let validScalar = UnicodeScalar(n) ?? UnicodeScalar(".")
 		output.insert(validScalar, at: i)
 		i += 1
 	}
@@ -4309,29 +4309,29 @@ public enum SwiftSymbolParseError: Error {
 }
 
 /// NOTE: This extension is fileprivate to avoid clashing with CwlUtils (from which it is taken). If you want to use these functions outside this file, consider including CwlUtils.
-fileprivate extension UnicodeScalar {
+private extension UnicodeScalar {
 	/// Tests if the scalar is within a range
-	fileprivate func isInRange(_ range: ClosedRange<UnicodeScalar>) -> Bool {
+	func isInRange(_ range: ClosedRange<UnicodeScalar>) -> Bool {
 		return range.contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII digit
-	fileprivate var isDigit: Bool {
+	var isDigit: Bool {
 		return ("0"..."9").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet lowercase letter
-	fileprivate var isLower: Bool {
+	var isLower: Bool {
 		return ("a"..."z").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet uppercase letter
-	fileprivate var isUpper: Bool {
+	var isUpper: Bool {
 		return ("A"..."Z").contains(self)
 	}
 	
 	/// Tests if the scalar is a plain ASCII English alphabet letter
-	fileprivate var isLetter: Bool {
+	var isLetter: Bool {
 		return isLower || isUpper
 	}
 }
@@ -4389,7 +4389,7 @@ fileprivate struct ScalarScanner<C: Collection> where C.Iterator.Element == Unic
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
 	mutating func match(where test: (UnicodeScalar) -> Bool) throws {
 		if index == scalars.endIndex || !test(scalars[index]) {
-			throw SwiftSymbolParseError.matchFailed(wanted: "\(test)", at: consumed)
+			throw SwiftSymbolParseError.matchFailed(wanted: "Custom match", at: consumed)
 		}
 		index = self.scalars.index(after: index)
 		consumed += 1
@@ -4398,7 +4398,7 @@ fileprivate struct ScalarScanner<C: Collection> where C.Iterator.Element == Unic
 	/// Throw if the scalars at the current `index` don't match the scalars in `value`. Advance the `index` to the end of the match.
 	mutating func read(where test: (UnicodeScalar) -> Bool) throws -> UnicodeScalar {
 		if index == scalars.endIndex || !test(scalars[index]) {
-			throw SwiftSymbolParseError.matchFailed(wanted: "\(test)", at: consumed)
+			throw SwiftSymbolParseError.matchFailed(wanted: "Custom match", at: consumed)
 		}
 		let s = scalars[index]
 		index = self.scalars.index(after: index)
