@@ -121,7 +121,7 @@ func generateTestCases(_ manglings: [Mangling]) {
 					do {
 						let parsed = try parseMangledSwiftSymbol(input)
 						let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-						XCTAssert(result == output, "Failed to demangle \\(input). Got \\(result), expected \\(output)")
+						XCTAssert(result == output, "Failed to demangle \\(input).\nGot\n    \\(result)\nexpected\n    \\(output)")
 					} catch {
 						XCTFail("Failed to demangle \\(input). Got \\(error), expected \\(output)")
 					}

@@ -1,6 +1,6 @@
 //
-//  CwlDemangleTests.swift
-//  CwlDemangleTests
+//  CwlDemangleSwiftProjectDerivedTests.swift
+//  CwlDemangleSwiftProjectDerivedTests
 //
 //  Created by Matt Gallagher on 2016/04/30.
 //  Copyright © 2016 Matt Gallagher. All rights reserved.
@@ -12,18 +12,40 @@
 //
 
 #if SWIFT_PACKAGE
-	@testable import CwlDemangle
+@testable import CwlDemangle
 #endif
 import XCTest
 
-class CwlDemangleTests: XCTestCase {
-	func test_TtBf80_() {
-		let input = "_TtBf80_"
-		let output = "Builtin.Float80"
+class CwlDemangleSwiftProjectDerivedTests: XCTestCase {
+	func test_TtBf32_() {
+		let input = "_TtBf32_"
+		let output = "Builtin.FPIEEE32"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_TtBf64_() {
+		let input = "_TtBf64_"
+		let output = "Builtin.FPIEEE64"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_TtBf80_() {
+		let input = "_TtBf80_"
+		let output = "Builtin.FPIEEE80"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -34,7 +56,51 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$sBf32_() {
+		let input = "$sBf32_"
+		let output = "Builtin.FPIEEE32"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$sBf64_() {
+		let input = "$sBf64_"
+		let output = "Builtin.FPIEEE64"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$sBf80_() {
+		let input = "$sBf80_"
+		let output = "Builtin.FPIEEE80"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$sBi32_() {
+		let input = "$sBi32_"
+		let output = "Builtin.Int32"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -45,7 +111,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -56,7 +122,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -67,7 +133,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -78,7 +144,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -89,7 +155,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -100,7 +166,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -111,7 +177,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -122,7 +188,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -133,7 +199,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -144,7 +210,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -155,7 +221,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -166,7 +232,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -177,7 +243,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -188,7 +254,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -199,7 +265,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -210,7 +276,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -221,7 +287,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -232,7 +298,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -243,7 +309,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -254,7 +320,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -265,7 +331,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -276,7 +342,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -287,7 +353,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -298,7 +364,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -309,7 +375,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -320,7 +386,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -331,7 +397,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -342,7 +408,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -353,7 +419,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -364,7 +430,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -375,7 +441,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -386,7 +452,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -397,7 +463,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -408,7 +474,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -419,7 +485,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -430,7 +496,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -441,7 +507,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -452,7 +518,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -463,7 +529,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -474,7 +540,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -485,7 +551,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -496,7 +562,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -507,7 +573,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -518,7 +584,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -529,7 +595,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -540,7 +606,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -551,7 +617,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -562,7 +628,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -573,7 +639,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -584,7 +650,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -595,7 +661,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -606,7 +672,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -617,7 +683,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -628,7 +694,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -639,7 +705,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -650,7 +716,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -661,7 +727,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -672,7 +738,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -683,18 +749,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TtuRxs8Runciblexs8FungiblerFxwxPS_5Mince() {
 		let input = "_TtuRxs8Runciblexs8FungiblerFxwxPS_5Mince"
-		let output = "<A where A: Swift.Runcible, A: Swift.Fungible>(A) -> A.Mince"
+		let output = "<A where A: Swift.Runcible, A: Swift.Fungible>(A) -> A.Swift.Runcible.Mince"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -705,7 +771,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -716,7 +782,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -727,7 +793,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -738,7 +804,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -749,7 +815,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -760,7 +826,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -771,7 +837,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -782,7 +848,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -793,7 +859,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -804,7 +870,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -815,7 +881,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -826,7 +892,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -837,7 +903,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -848,7 +914,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -859,7 +925,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -870,7 +936,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -881,7 +947,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -892,7 +958,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -903,7 +969,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -914,7 +980,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -925,7 +991,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -936,7 +1002,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -947,7 +1013,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -958,7 +1024,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -969,7 +1035,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_$sTAdot123() {
+		let input = "_$sTA.123"
+		let output = "partial apply forwarder with unmangled suffix \".123\""
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -980,7 +1057,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -991,7 +1068,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1002,7 +1079,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1013,7 +1090,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1024,7 +1101,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1035,7 +1112,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1046,7 +1123,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1057,7 +1134,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1068,7 +1145,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1079,7 +1156,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1090,7 +1167,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1101,7 +1178,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1112,7 +1189,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1123,7 +1200,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1134,7 +1211,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1145,7 +1222,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1156,7 +1233,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1167,7 +1244,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1178,7 +1255,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1189,7 +1266,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1200,7 +1277,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1211,7 +1288,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1222,7 +1299,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1233,7 +1310,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1244,7 +1321,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1255,7 +1332,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1266,7 +1343,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1277,7 +1354,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1288,7 +1365,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1299,7 +1376,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1310,7 +1387,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1321,7 +1398,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1332,7 +1409,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1343,7 +1420,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1354,7 +1431,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1365,7 +1442,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1376,7 +1453,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1387,7 +1464,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1398,7 +1475,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1409,7 +1486,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1420,7 +1497,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1647,7 +1724,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1658,7 +1735,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1669,7 +1746,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1680,7 +1757,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1691,7 +1768,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1702,7 +1779,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1713,7 +1790,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1724,7 +1801,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1735,7 +1812,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1746,40 +1823,40 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTRXFo_dSc_dSb_XFo_iSc_iSb_() {
 		let input = "_TTRXFo_dSc_dSb_XFo_iSc_iSb_"
-		let output = "reabstraction thunk helper from @callee_owned (@unowned Swift.UnicodeScalar) -> (@unowned Swift.Bool) to @callee_owned (@in Swift.UnicodeScalar) -> (@out Swift.Bool)"
+		let output = "reabstraction thunk helper from @callee_owned (@in Swift.UnicodeScalar) -> (@out Swift.Bool) to @callee_owned (@unowned Swift.UnicodeScalar) -> (@unowned Swift.Bool)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTRXFo_dSi_dGSqSi__XFo_iSi_iGSqSi__() {
 		let input = "_TTRXFo_dSi_dGSqSi__XFo_iSi_iGSqSi__"
-		let output = "reabstraction thunk helper from @callee_owned (@unowned Swift.Int) -> (@unowned Swift.Int?) to @callee_owned (@in Swift.Int) -> (@out Swift.Int?)"
+		let output = "reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@out Swift.Int?) to @callee_owned (@unowned Swift.Int) -> (@unowned Swift.Int?)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTRGrXFo_iV18switch_abstraction1A_ix_XFo_dS0__ix_() {
 		let input = "_TTRGrXFo_iV18switch_abstraction1A_ix_XFo_dS0__ix_"
-		let output = "reabstraction thunk helper <A> from @callee_owned (@in switch_abstraction.A) -> (@out A) to @callee_owned (@unowned switch_abstraction.A) -> (@out A)"
+		let output = "reabstraction thunk helper <A> from @callee_owned (@unowned switch_abstraction.A) -> (@out A) to @callee_owned (@in switch_abstraction.A) -> (@out A)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1790,7 +1867,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1801,7 +1878,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1812,7 +1889,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1823,7 +1900,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1834,7 +1911,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1845,7 +1922,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1856,7 +1933,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1867,7 +1944,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1878,7 +1955,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1889,18 +1966,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSgq5Si___TFSqcfT_GSqx_() {
 		let input = "_TTSgq5Si___TFSqcfT_GSqx_"
-		let output = "generic specialization <preserving fragile attribute, Swift.Int> of Swift.Optional.init() -> A?"
+		let output = "generic specialization <serialized, Swift.Int> of Swift.Optional.init() -> A?"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1911,7 +1988,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1922,7 +1999,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -1997,40 +2074,40 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSrq5Si___TF4test7genericurFxx() {
 		let input = "_TTSrq5Si___TF4test7genericurFxx"
-		let output = "generic not re-abstracted specialization <preserving fragile attribute, Swift.Int> of test.generic<A>(A) -> A"
+		let output = "generic not re-abstracted specialization <serialized, Swift.Int> of test.generic<A>(A) -> A"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TPA__TTRXFo_oSSoSS_dSb_XFo_iSSiSS_dSb_() {
 		let input = "_TPA__TTRXFo_oSSoSS_dSb_XFo_iSSiSS_dSb_"
-		let output = "partial apply forwarder for reabstraction thunk helper from @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool)"
+		let output = "partial apply forwarder for reabstraction thunk helper from @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TPAo__TTRGrXFo_dGSPx__dGSPx_zoPs5Error__XFo_iGSPx__iGSPx_zoPS___() {
 		let input = "_TPAo__TTRGrXFo_dGSPx__dGSPx_zoPs5Error__XFo_iGSPx__iGSPx_zoPS___"
-		let output = "partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error)"
+		let output = "partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2041,7 +2118,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2052,7 +2129,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2063,7 +2140,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2074,7 +2151,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2085,7 +2162,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2096,7 +2173,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2107,7 +2184,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2118,7 +2195,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2129,7 +2206,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2140,7 +2217,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2151,7 +2228,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2162,7 +2239,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2173,7 +2250,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2184,7 +2261,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2195,7 +2272,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2206,7 +2283,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2217,7 +2294,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2228,18 +2305,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSfq1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TF7specgen12take_closureFFTSiSi_T_T_() {
 		let input = "_TTSfq1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TF7specgen12take_closureFFTSiSi_T_T_"
-		let output = "function signature specialization <preserving fragile attribute, Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+		let output = "function signature specialization <serialized, Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2250,7 +2327,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2261,29 +2338,29 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_dT__XFo_iSi_dT__() {
 		let input = "_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_dT__XFo_iSi_dT__"
-		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@unowned Swift.Int) -> (@unowned ()) to @callee_owned (@in Swift.Int) -> (@unowned ())"
+		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned ()) to @callee_owned (@unowned Swift.Int) -> (@unowned ())"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_DT__XFo_iSi_DT__() {
 		let input = "_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_DT__XFo_iSi_DT__"
-		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@unowned Swift.Int) -> (@unowned_inner_pointer ()) to @callee_owned (@in Swift.Int) -> (@unowned_inner_pointer ())"
+		let output = "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned_inner_pointer ()) to @callee_owned (@unowned Swift.Int) -> (@unowned_inner_pointer ())"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2294,7 +2371,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2305,7 +2382,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2316,7 +2393,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2327,7 +2404,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2338,7 +2415,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2349,7 +2426,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2360,7 +2437,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2371,7 +2448,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2382,7 +2459,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2393,7 +2470,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2404,7 +2481,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2415,7 +2492,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2426,7 +2503,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2437,7 +2514,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2448,7 +2525,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2459,18 +2536,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTRXFo_iT__iT_zoPs5Error__XFo__dT_zoPS___() {
 		let input = "_TTRXFo_iT__iT_zoPs5Error__XFo__dT_zoPS___"
-		let output = "reabstraction thunk helper from @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error) to @callee_owned () -> (@unowned (), @error @owned Swift.Error)"
+		let output = "reabstraction thunk helper from @callee_owned () -> (@unowned (), @error @owned Swift.Error) to @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error)"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2489,7 +2566,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2500,7 +2577,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2511,7 +2588,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2522,7 +2599,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2533,7 +2610,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2544,7 +2621,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2559,22 +2636,22 @@ class CwlDemangleTests: XCTestCase {
 	}
 	func test_T0s17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD05Indexs01_A9IndexablePQzAM15shiftingToStart_tFAJs01_J4BasePQzAQcfU_() {
 		let input = "_T0s17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD05Indexs01_A9IndexablePQzAM15shiftingToStart_tFAJs01_J4BasePQzAQcfU_"
-		let output = "closure #1 (A.Index) -> A.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.SubSequence: Swift.MutableCollection, A.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Index) -> A.Index"
+		let output = "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_$Ss17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD015shiftingToStart5Indexs01_A9IndexablePQzAN_tFAKs01_M4BasePQzAQcfU_() {
 		let input = "_$Ss17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD015shiftingToStart5Indexs01_A9IndexablePQzAN_tFAKs01_M4BasePQzAQcfU_"
-		let output = "closure #1 (A.Index) -> A.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.SubSequence: Swift.MutableCollection, A.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Index) -> A.Index"
+		let output = "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2585,7 +2662,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2596,7 +2673,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2607,7 +2684,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2618,7 +2695,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2629,7 +2706,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2648,7 +2725,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2659,7 +2736,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2670,7 +2747,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2681,7 +2758,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2692,7 +2769,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2703,7 +2780,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2714,7 +2791,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2725,7 +2802,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2736,7 +2813,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2747,7 +2824,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2758,7 +2835,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2769,7 +2846,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2780,7 +2857,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2791,7 +2868,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2802,7 +2879,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2813,7 +2890,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2824,7 +2901,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2835,7 +2912,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2846,7 +2923,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2857,7 +2934,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2900,7 +2977,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2911,7 +2988,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2922,7 +2999,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2933,7 +3010,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2944,7 +3021,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2955,7 +3032,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2966,7 +3043,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2977,7 +3054,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2988,7 +3065,18 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$sSo5GizmoC11doSomethingyypSgSaySSGSgFToTembgnn_() {
+		let input = "$sSo5GizmoC11doSomethingyypSgSaySSGSgFToTembgnn_"
+		let output = "outlined bridged method (mbgnn) of @objc __C.Gizmo.doSomething([Swift.String]?) -> Any?"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -2999,7 +3087,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3010,7 +3098,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3029,7 +3117,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3104,7 +3192,29 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test_T0So11CrappyColorVs16RawRepresentableSCMA() {
+		let input = "_T0So11CrappyColorVs16RawRepresentableSCMA"
+		let output = "reflection metadata associated type descriptor __C.CrappyColor : Swift.RawRepresentable in __C_Synthesized"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$S28protocol_conformance_records15NativeValueTypeVAA8RuncibleAAMc() {
+		let input = "$S28protocol_conformance_records15NativeValueTypeVAA8RuncibleAAMc"
+		let output = "protocol conformance descriptor for protocol_conformance_records.NativeValueType : protocol_conformance_records.Runcible in protocol_conformance_records"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3115,11 +3225,44 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+//	func test$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PAAyHCg_AiJ1QAAyHCg1_GF() {
+//		let input = "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PAAyHCg_AiJ1QAAyHCg1_GF"
+//		let output = "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
+//	func test$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHPyHCg_AiJ1QHPyHCg1_GF() {
+//		let input = "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHPyHCg_AiJ1QHPyHCg1_GF"
+//		let output = "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
+//	func test$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHpyHCg_AiJ1QHpyHCg1_GF() {
+//		let input = "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHpyHCg_AiJ1QHpyHCg1_GF"
+//		let output = "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
 	func test_T0LiteralAByxGxd_tcfC() {
 		let input = "_T0LiteralAByxGxd_tcfC"
 		do {
@@ -3142,7 +3285,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3153,7 +3296,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3164,7 +3307,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3175,13 +3318,29 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
 	func test_TTSf() {
 		let input = "_TTSf"
+		do {
+			let demangled = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error, instead returned \(demangled)")
+		} catch {
+		}
+	}
+	func test_TtW0_j() {
+		let input = "_TtW0_j"
+		do {
+			let demangled = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error, instead returned \(demangled)")
+		} catch {
+		}
+	}
+	func test_TtW_4m3a3v() {
+		let input = "_TtW_4m3a3v"
 		do {
 			let demangled = try parseMangledSwiftSymbol(input).description
 			XCTFail("Invalid input \(input) should throw an error, instead returned \(demangled)")
@@ -3210,7 +3369,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3247,24 +3406,35 @@ class CwlDemangleTests: XCTestCase {
 		} catch {
 		}
 	}
-	func test$S11TestSupport20MockPackageContainerC12dependenciesSDySSSaySS9container_0D5Graph0dE10ConstraintV11RequirementOySS_SSAF0dE10IdentifierAAg_G11requirementtGGvg() {
-		let input = "$S11TestSupport20MockPackageContainerC12dependenciesSDySSSaySS9container_0D5Graph0dE10ConstraintV11RequirementOySS_SSAF0dE10IdentifierAAg_G11requirementtGGvg"
-		let output = "TestSupport.MockPackageContainer.dependencies.getter : [Swift.String : [(container: Swift.String, requirement: PackageGraph.PackageContainerConstraint<Swift.String>.Requirement)]]"
+	func test$s4Test5ProtoP8IteratorV10collectionAEy_qd__Gqd___tcfc() {
+		let input = "$s4Test5ProtoP8IteratorV10collectionAEy_qd__Gqd___tcfc"
+		let output = "Test.Proto.Iterator.init(collection: A1) -> Test.Proto.Iterator<A1>"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
+//	func test$s4test3fooV4blahyAA1SV1fQryFQOy_Qo_AHF() {
+//		let input = "$s4test3fooV4blahyAA1SV1fQryFQOy_Qo_AHF"
+//		let output = "test.foo.blah(<<opaque return type of test.S.f() -> some>>.0) -> <<opaque return type of test.S.f() -> some>>.0"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
 	func test$S3nix8MystructV1xACyxGx_tcfc7MyaliasL_ayx__GD() {
 		let input = "$S3nix8MystructV1xACyxGx_tcfc7MyaliasL_ayx__GD"
 		let output = "Myalias #1 in nix.Mystruct<A>.init(x: A) -> nix.Mystruct<A>"
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3275,7 +3445,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3286,7 +3456,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3297,7 +3467,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3308,7 +3478,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3319,7 +3489,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3330,7 +3500,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3341,7 +3511,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3352,7 +3522,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3363,7 +3533,7 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -3374,20 +3544,116 @@ class CwlDemangleTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-	func test_T011CryptoSwift3AESC0017sBoxstorage_wEEFc33_2FA9B7ACC72B80C564A140F8079C9914LLSays6UInt32VGSgvpWvd() {
-		 let input = "_T011CryptoSwift3AESC0017sBoxstorage_wEEFc33_2FA9B7ACC72B80C564A140F8079C9914LLSays6UInt32VGSgvpWvd"
-		 let output = "direct field offset for CryptoSwift.AES.(sBox.storage in _2FA9B7ACC72B80C564A140F8079C9914) : [Swift.UInt32]?"
-		 do {
-			  let parsed = try parseMangledSwiftSymbol(input)
-			  let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			  XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
-		 } catch {
-			  XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
-		 }
+	func test$s1A1gyyxlFx_qd__t_Ti5() {
+		let input = "$s1A1gyyxlFx_qd__t_Ti5"
+		let output = "inlined generic function <(A, A1)> of A.g<A>(A) -> ()"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
 	}
+	func test$S1T19protocol_resilience17ResilientProtocolPTl() {
+		let input = "$S1T19protocol_resilience17ResilientProtocolPTl"
+		let output = "associated type descriptor for protocol_resilience.ResilientProtocol.T"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$S18resilient_protocol21ResilientBaseProtocolTL() {
+		let input = "$S18resilient_protocol21ResilientBaseProtocolTL"
+		let output = "protocol requirements base descriptor for resilient_protocol.ResilientBaseProtocol"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	func test$S1t1PP10AssocType2_AA1QTn() {
+		let input = "$S1t1PP10AssocType2_AA1QTn"
+		let output = "associated conformance descriptor for t.P.AssocType2: t.Q"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+//	func test$S1t1PP10AssocType2_AA1QTN() {
+//		let input = "$S1t1PP10AssocType2_AA1QTN"
+//		let output = "default associated conformance accessor for t.P.AssocType2: t.Q"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
+	func test$sSD5IndexVy__GD() {
+		let input = "$sSD5IndexVy__GD"
+		do {
+			let demangled = try parseMangledSwiftSymbol(input).description
+			XCTFail("Invalid input \(input) should throw an error, instead returned \(demangled)")
+		} catch {
+		}
+	}
+	func test$s4test3StrCACycfC() {
+		let input = "$s4test3StrCACycfC"
+		let output = "test.Str.__allocating_init() -> test.Str"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+//	func test$s18keypaths_inlinable13KeypathStructV8computedSSvpACTKq () {
+//		let input = "$s18keypaths_inlinable13KeypathStructV8computedSSvpACTKq "
+//		let output = "key path getter for keypaths_inlinable.KeypathStruct.computed : Swift.String : keypaths_inlinable.KeypathStruct, serialized"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
+//	func test$s3red4testyAA7OurTypeOy4them05TheirD0Vy5AssocQzGAjE0F8ProtocolAAxAA0c7DerivedH0HD1_AA0c4BaseH0HI1_AieKHA2__HCg_GxmAaLRzlF() {
+//		let input = "$s3red4testyAA7OurTypeOy4them05TheirD0Vy5AssocQzGAjE0F8ProtocolAAxAA0c7DerivedH0HD1_AA0c4BaseH0HI1_AieKHA2__HCg_GxmAaLRzlF"
+//		let output = "red.test<A where A: red.OurDerivedProtocol>(A.Type) -> red.OurType<them.TheirType<A.Assoc>>"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
+//	func test$sSo17OS_dispatch_queueC4sync7executeyyyXE_tFTOTA() {
+//		let input = "$sSo17OS_dispatch_queueC4sync7executeyyyXE_tFTOTA"
+//		let output = "partial apply forwarder for @nonobjc __C.OS_dispatch_queue.sync(execute: () -> ()) -> ()"
+//		do {
+//			let parsed = try parseMangledSwiftSymbol(input)
+//			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+//			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+//		} catch {
+//			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+//		}
+//	}
 }

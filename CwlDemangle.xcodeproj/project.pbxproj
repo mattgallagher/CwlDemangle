@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C98DE90C23F7B31900A3A287 /* CwlDemangleAdditionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98DE90B23F7B31900A3A287 /* CwlDemangleAdditionalTests.swift */; };
 		C9A6CE261FBBED8700F9D9A5 /* CwlDemangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A6CE251FBBED8700F9D9A5 /* CwlDemangle.swift */; };
 		C9A6CE271FBBEE1800F9D9A5 /* CwlDemangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A6CE251FBBED8700F9D9A5 /* CwlDemangle.swift */; };
 		C9E054DE1CD4AE3F001658AB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9E054DD1CD4AE3F001658AB /* main.swift */; };
 		C9E054E71CD4B2F2001658AB /* manglings.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E054E61CD4B2DF001658AB /* manglings.txt */; };
-		C9E054EF1CD4DDA1001658AB /* CwlDemangleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9E054EE1CD4DDA1001658AB /* CwlDemangleTests.swift */; };
+		C9E054EF1CD4DDA1001658AB /* CwlDemangleSwiftProjectDerivedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9E054EE1CD4DDA1001658AB /* CwlDemangleSwiftProjectDerivedTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,12 +29,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C98DE90B23F7B31900A3A287 /* CwlDemangleAdditionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CwlDemangleAdditionalTests.swift; sourceTree = "<group>"; };
 		C9A6CE251FBBED8700F9D9A5 /* CwlDemangle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CwlDemangle.swift; sourceTree = "<group>"; };
 		C9E054DA1CD4AE3F001658AB /* CwlDemangle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CwlDemangle; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9E054DD1CD4AE3F001658AB /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C9E054E61CD4B2DF001658AB /* manglings.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manglings.txt; sourceTree = "<group>"; };
 		C9E054EC1CD4DDA1001658AB /* CwlDemangleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CwlDemangleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C9E054EE1CD4DDA1001658AB /* CwlDemangleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CwlDemangleTests.swift; sourceTree = "<group>"; };
+		C9E054EE1CD4DDA1001658AB /* CwlDemangleSwiftProjectDerivedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CwlDemangleSwiftProjectDerivedTests.swift; sourceTree = "<group>"; };
 		C9E054F01CD4DDA1001658AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,7 +88,8 @@
 		C9E054ED1CD4DDA1001658AB /* CwlDemangleTests */ = {
 			isa = PBXGroup;
 			children = (
-				C9E054EE1CD4DDA1001658AB /* CwlDemangleTests.swift */,
+				C9E054EE1CD4DDA1001658AB /* CwlDemangleSwiftProjectDerivedTests.swift */,
+				C98DE90B23F7B31900A3A287 /* CwlDemangleAdditionalTests.swift */,
 				C9E054F01CD4DDA1001658AB /* Info.plist */,
 			);
 			path = CwlDemangleTests;
@@ -193,7 +196,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9A6CE271FBBEE1800F9D9A5 /* CwlDemangle.swift in Sources */,
-				C9E054EF1CD4DDA1001658AB /* CwlDemangleTests.swift in Sources */,
+				C98DE90C23F7B31900A3A287 /* CwlDemangleAdditionalTests.swift in Sources */,
+				C9E054EF1CD4DDA1001658AB /* CwlDemangleSwiftProjectDerivedTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
