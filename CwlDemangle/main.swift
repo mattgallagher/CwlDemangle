@@ -55,7 +55,7 @@ struct Mangling {
 		} else {
 			self.input = input
 		}
-		if output.starts(with: "{"), let endBrace = output.index(where: { $0 == "}" }), let space = output.index(endBrace, offsetBy: 2, limitedBy: output.endIndex) {
+		if output.starts(with: "{"), let endBrace = output.firstIndex(where: { $0 == "}" }), let space = output.index(endBrace, offsetBy: 2, limitedBy: output.endIndex) {
 			self.output = String(output[space...])
 		} else {
 			self.output = output
