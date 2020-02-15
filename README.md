@@ -1,7 +1,5 @@
 # CwlDemangle
 
-![Continuous Integration](https://github.com/ittybittyapps/reveal-api/workflows/Continuous%20Integration/badge.svg)
-
 A translation (line-by-line in many cases) of Swift's [Demangler.cpp](https://github.com/apple/swift/blob/master/lib/Demangling/Demangler.cpp) into Swift.
 
 ## License note
