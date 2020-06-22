@@ -822,7 +822,7 @@ fileprivate extension Demangler {
 			} else if c.isUpper {
 				return try pushMultiSubstitutions(repeatCount: repeatCount, index: Int(c.value - UnicodeScalar("A").value))
 			} else if c == "_" {
-				let idx = Int(repeatCount + 27)
+				let idx = Int(repeatCount + 26)
 				return try require(substitutions.at(idx))
 			} else {
 				try scanner.backtrack()
