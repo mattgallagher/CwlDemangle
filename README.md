@@ -10,12 +10,16 @@ I usually place my code under an ISC-style license but since this project is der
 	
 Parse a `String` containing a mangled Swift symbol with the `parseMangledSwiftSymbol` function:
 
-	let swiftSymbol = try parseMangledSwiftSymbol(input)
+```swift
+let swiftSymbol = try parseMangledSwiftSymbol(input)
+```
 		
 Print the symbol to a string with `description` (to get the `.default` printing options) or use the `print(using:)` function, e.g.:
 
-	let result = swiftSymbol.print(using:
-	   SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+```swift
+let result = swiftSymbol.print(using:
+   SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+```
 
 ## Article
 
