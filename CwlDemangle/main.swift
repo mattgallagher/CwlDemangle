@@ -81,7 +81,7 @@ func readManglings() -> [Mangling] {
 				enum InputError: Error { case unableToSplitLine(String) }
 				throw InputError.unableToSplitLine(i)
 			}
-			return Mangling(input: components[0], output: components[1])
+			return Mangling(input: components[0].trimmingCharacters(in: .whitespaces), output: components[1].trimmingCharacters(in: .whitespaces))
 		}
 	} catch {
 		fatalError("Error reading manglings.txt file: \(error)")
@@ -121,7 +121,7 @@ func generateTestCases(_ manglings: [Mangling]) {
 					do {
 						let parsed = try parseMangledSwiftSymbol(input)
 						let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-						XCTAssert(result == output, "Failed to demangle \\(input).\nGot\n    \\(result)\nexpected\n    \\(output)")
+						XCTAssert(result == output, "Failed to demangle \\(input).\\nGot\\n    \\(result)\\nexpected\\n    \\(output)")
 					} catch {
 						XCTFail("Failed to demangle \\(input). Got \\(error), expected \\(output)")
 					}
