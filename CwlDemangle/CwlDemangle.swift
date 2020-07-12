@@ -811,27 +811,29 @@ fileprivate extension Demangler {
 	}
 	
 	mutating func demangleMultiSubstitutions() throws -> SwiftSymbol {
-		var repeatCount: UInt64 = 0
+		var repeatCount: Int = -1
 		while true {
 			let c = try scanner.readScalar()
-			if c.isLower {
+			if c == "\0" {
+				throw scanner.unexpectedError()
+			} else if c.isLower {
 				let nd = try pushMultiSubstitutions(repeatCount: repeatCount, index: Int(c.value - UnicodeScalar("a").value))
 				nameStack.append(nd)
-				repeatCount = 0
+				repeatCount = -1
 				continue
 			} else if c.isUpper {
 				return try pushMultiSubstitutions(repeatCount: repeatCount, index: Int(c.value - UnicodeScalar("A").value))
 			} else if c == "_" {
-				let idx = Int(repeatCount + 26)
+				let idx = Int(repeatCount + 27)
 				return try require(substitutions.at(idx))
 			} else {
 				try scanner.backtrack()
-				repeatCount = try demangleNatural() ?? 0
+				repeatCount = Int(try demangleNatural() ?? 0)
 			}
 		}
 	}
 	
-	mutating func pushMultiSubstitutions(repeatCount: UInt64, index: Int) throws -> SwiftSymbol {
+	mutating func pushMultiSubstitutions(repeatCount: Int, index: Int) throws -> SwiftSymbol {
 		try require(repeatCount <= maxRepeatCount)
 		let nd = try require(substitutions.at(index))
 		if repeatCount > 1 {
