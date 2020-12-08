@@ -70,7 +70,7 @@ public struct SymbolPrintOptions: OptionSet {
 	public static let displayUnmangledSuffix = SymbolPrintOptions(rawValue: 1 << 4)
 	public static let displayModuleNames = SymbolPrintOptions(rawValue: 1 << 5)
 	public static let displayGenericSpecializations = SymbolPrintOptions(rawValue: 1 << 6)
-	public static let displayProtocolConformances = SymbolPrintOptions(rawValue: 1 << 5)
+	public static let displayProtocolConformances = SymbolPrintOptions(rawValue: 1 << 7)
 	public static let displayWhereClauses = SymbolPrintOptions(rawValue: 1 << 8)
 	public static let displayEntityTypes = SymbolPrintOptions(rawValue: 1 << 9)
 	public static let shortenPartialApply = SymbolPrintOptions(rawValue: 1 << 10)
