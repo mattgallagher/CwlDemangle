@@ -36,18 +36,30 @@ class CwlDemangleAdditionalTests: XCTestCase {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
 	}
-    
-    func testLargeMethodNameIssueWithGraphZahl() {
-        let input = "$s11rentXserver8RentXApiO5QueryC13createBooking6userId03carI09startDate03endL03lat4long16bookingConfirmed5price8discount5isNew3NIO15EventLoopFutureCyAA0G0CG10Foundation4UUIDV_AyW0L0VA_S2fSbS2dSbtF"
-        
-        let output = "rentXserver.RentXApi.Query.createBooking(userId: Foundation.UUID, carId: Foundation.UUID, startDate: Foundation.Date, endDate: Foundation.Date, lat: Swift.Float, long: Swift.Float, bookingConfirmed: Swift.Bool, price: Swift.Double, discount: Swift.Double, isNew: Swift.Bool) -> NIO.EventLoopFuture<rentXserver.Booking>"
-        
-        do {
-            let parsed = try parseMangledSwiftSymbol(input)
-            let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-            XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
-        } catch {
-            XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
-        }
-    }
+	
+	func testLargeMethodNameIssueWithGraphZahl() {
+		let input = "$s11rentXserver8RentXApiO5QueryC13createBooking6userId03carI09startDate03endL03lat4long16bookingConfirmed5price8discount5isNew3NIO15EventLoopFutureCyAA0G0CG10Foundation4UUIDV_AyW0L0VA_S2fSbS2dSbtF"
+		
+		let output = "rentXserver.RentXApi.Query.createBooking(userId: Foundation.UUID, carId: Foundation.UUID, startDate: Foundation.Date, endDate: Foundation.Date, lat: Swift.Float, long: Swift.Float, bookingConfirmed: Swift.Bool, price: Swift.Double, discount: Swift.Double, isNew: Swift.Bool) -> NIO.EventLoopFuture<rentXserver.Booking>"
+		
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
+		}
+	}
+	
+	func testIssue16() {
+		let input = "$s20EagleFilerSwiftTests07EFErrorD0C00141$s20EagleFilerSwiftTests07EFErrorD0C20nsErrorRoundTripping4TestfMp_62__$test_container__function__funcnsErrorRoundTripping__throwsfMu__FnFBDlO7__testsSay7Testing4TestVGvgZyyYaYbKcfu_TQ0_"
+		let output = "(1) await resume partial function for implicit closure #1 @Sendable () async throws -> () in static EagleFilerSwiftTests.EFErrorTests.$s20EagleFilerSwiftTests07EFErrorD0C20nsErrorRoundTripping4TestfMp_62__🟠$test_container__function__funcnsErrorRoundTripping__throwsfMu_.__tests.getter : [Testing.Test]"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input). Got\n\n\(result)\n, expected\n\n\(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error)")
+		}
+	}
 }
