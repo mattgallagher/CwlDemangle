@@ -3936,18 +3936,17 @@ fileprivate struct SymbolPrinter {
 		case .identifier:
 			target.write(name.text ?? "")
 		case .index: target.write("\(name.index ?? 0)")
-		case .noEscapeFunctionType: printFunctionType(name)
-		case .escapingAutoClosureType:
-			target.write("@autoclosure ")
-			printFunctionType(name)
-		case .autoClosureType:
-			target.write("@autoclosure ")
-			printFunctionType(name)
-		case .thinFunctionType:
-			target.write("@convention(thin) ")
-			printFunctionType(name)
+            
+        case .cFunctionPointer: fallthrough
+        case .objCBlock: fallthrough
+		case .noEscapeFunctionType:  fallthrough
+		case .escapingAutoClosureType: fallthrough
+		case .autoClosureType: fallthrough
+		case .thinFunctionType: fallthrough
 		case .functionType: fallthrough
-		case .uncurriedFunctionType: printFunctionType(name)
+        case .escapingObjCBlock: fallthrough
+        case .uncurriedFunctionType:
+            printFunctionType(name)
 		case .argumentTuple:
 			printFunctionParameters(labelList: nil, parameterType: name, showTypes: options.contains(.showFunctionArgumentTypes))
 		case .tuple: printChildren(name, prefix: "(", suffix: ")", separator: ", ")
@@ -4133,12 +4132,6 @@ fileprivate struct SymbolPrinter {
 		case .boundGenericOtherNominalType: fallthrough
 		case .boundGenericTypeAlias: printBoundGeneric(name)
 		case .dynamicSelf: target.write("Self")
-		case .cFunctionPointer:
-			target.write("@convention(c) ")
-			printFunctionType(name)
-		case .objCBlock:
-			target.write("@convention(block) ")
-			printFunctionType(name)
 		case .silBoxType:
 			target.write("@box ")
 			printFirstChild(name)
@@ -4569,8 +4562,6 @@ fileprivate struct SymbolPrinter {
 		case .uniqueExtendedExistentialTypeShapeSymbolicReference:
 			target.write("non-unique existential shape symbolic reference 0x")
 			target.writeHex(name.index ?? 0)
-		case .escapingObjCBlock:
-			printFunctionType(name)
 		}
 		
 		return nil
@@ -4859,6 +4850,7 @@ fileprivate struct SymbolPrinter {
 			_ = printName(firstChild)
 			target.write("\"")
 		}
+        target.write(") ")
 	}
 	
 	mutating func printFunctionType(labelList: SwiftSymbol? = nil, _ name: SwiftSymbol) {
