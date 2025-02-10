@@ -70,7 +70,7 @@ struct Mangling {
 // in the Swift github repostory.
 func readManglings() -> [Mangling] {
 	do {
-		let input = try String(contentsOfFile: "manglings.txt", encoding: String.Encoding.utf8)
+		let input = try String(contentsOfFile: "./CwlDemangle_CwlDemangleTool.bundle/Contents/Resources/manglings.txt", encoding: String.Encoding.utf8)
 		let lines = input.components(separatedBy: "\n").filter { !$0.isEmpty }
 		return try lines.compactMap { i -> Mangling? in
 			let components = i.components(separatedBy: " ---> ")
@@ -104,7 +104,7 @@ func generateTestCases(_ manglings: [Mangling]) {
 		existing.insert(mangling.input)
 		if mangling.input == mangling.output {
 			print ("""
-				func test\(mangling.input.replacingOccurrences(of: ".", with: "dot"))() {
+				func test\(mangling.input.replacingOccurrences(of: ".", with: "dot").replacingOccurrences(of: "@", with: "at"))() {
 					let input = "\(mangling.input)"
 					do {
 						let demangled = try parseMangledSwiftSymbol(input).description
@@ -115,7 +115,7 @@ func generateTestCases(_ manglings: [Mangling]) {
 				""")
 		} else {
 			print ("""
-				func test\(mangling.input.replacingOccurrences(of: ".", with: "dot"))() {
+				func test\(mangling.input.replacingOccurrences(of: ".", with: "dot").replacingOccurrences(of: "@", with: "at"))() {
 					let input = "\(mangling.input)"
 					let output = "\(mangling.output.replacingOccurrences(of: "\"", with: "\\\""))"
 					do {

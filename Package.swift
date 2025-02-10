@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -18,7 +18,8 @@ let package = Package(
             name: "CwlDemangleTool",
             dependencies: ["CwlDemangle"],
             path: "CwlDemangle",
-            sources: ["main.swift"]
+            sources: ["main.swift"],
+            resources: [.copy("manglings.txt")]
         ),
         .testTarget(
             name: "CwlDemangleTests",

@@ -323,6 +323,7 @@ extension SwiftSymbol {
 		case `static`
 		case `subscript`
 		case allocator
+		case accessibleFunctionRecord
 		case accessorFunctionaReference
 		case accessorAttachedMacroExpansion
 		case anonymousContext
@@ -342,6 +343,8 @@ extension SwiftSymbol {
 		case asyncFunctionPointer
 		case asyncSuspendResumePartialFunction
 		case autoClosureType
+		case backDeploymentThunk
+		case backDeploymentFallback
 		case bodyAttachedMacroExpansion
 		case boundGenericClass
 		case boundGenericEnum
@@ -388,6 +391,11 @@ extension SwiftSymbol {
 		case directMethodReferenceAttribute
 		case directness
 		case dispatchThunk
+		case distributedAccessor
+		case distributedThunk
+		case dynamicallyReplaceableFunctionImpl
+		case dynamicallyReplaceableFunctionKey
+		case dynamicallyReplaceableFunctionVar
 		case dynamicAttribute
 		case dynamicSelf
 		case emptyList
@@ -415,6 +423,8 @@ extension SwiftSymbol {
 		case genericProtocolWitnessTable
 		case genericProtocolWitnessTableInstantiationFunction
 		case genericSpecialization
+		case genericSpecializationInResilienceDomain
+		case genericSpecializationPrespecialized
 		case genericSpecializationNotReAbstracted
 		case genericSpecializationParam
 		case genericTypeMetadataPattern
@@ -423,6 +433,7 @@ extension SwiftSymbol {
 		case global
 		case globalActorFunctionType
 		case globalGetter
+		case hasSymbolQuery
 		case identifier
 		case implConvention
 		case implDifferentiability
@@ -496,16 +507,21 @@ extension SwiftSymbol {
 		case opaqueTypeDescriptorSymbolicReference
 		case otherNominalType
 		case outlinedAssignWithCopy
+		case outlinedAssignWithCopyNoValueWitness
 		case outlinedAssignWithTake
+		case outlinedAssignWithTakeNoValueWitness
 		case outlinedBridgedMethod
 		case outlinedConsume
 		case outlinedCopy
 		case outlinedDestroy
+		case outlinedDestroyNoValueWitness
 		case outlinedInitializeWithCopy
+		case outlinedInitializeWithCopyNoValueWitness
 		case outlinedInitializeWithTake
 		case outlinedRelease
 		case outlinedRetain
 		case outlinedVariable
+		case outlinedReadOnlyObject
 		case owned
 		case owningAddressor
 		case owningMutableAddressor
@@ -679,13 +695,16 @@ fileprivate extension SwiftSymbol.Kind {
 	
 	var isFunctionAttr: Bool {
 		switch self {
-		case .functionSignatureSpecialization, .genericSpecialization, .inlinedGenericFunction: fallthrough
+		case .functionSignatureSpecialization, .genericSpecialization, .genericSpecializationPrespecialized, .inlinedGenericFunction: fallthrough
 		case .genericSpecializationNotReAbstracted, .genericPartialSpecialization: fallthrough
-		case .genericPartialSpecializationNotReAbstracted, .objCAttribute, .nonObjCAttribute: fallthrough
+		case .genericPartialSpecializationNotReAbstracted, .genericSpecializationInResilienceDomain, .objCAttribute, .nonObjCAttribute: fallthrough
 		case .dynamicAttribute, .directMethodReferenceAttribute, .vTableAttribute, .partialApplyForwarder: fallthrough
-		case .partialApplyObjCForwarder, .outlinedVariable, .outlinedBridgedMethod, .mergedFunction: fallthrough
-		case .asyncAwaitResumePartialFunction, .asyncSuspendResumePartialFunction: fallthrough
-		case .asyncFunctionPointer: return true
+		case .partialApplyObjCForwarder, .outlinedVariable, .outlinedReadOnlyObject, .outlinedBridgedMethod, .mergedFunction: fallthrough
+		case .distributedThunk, .distributedAccessor: fallthrough
+		case .dynamicallyReplaceableFunctionImpl, .dynamicallyReplaceableFunctionKey, .dynamicallyReplaceableFunctionVar: fallthrough
+		case .asyncFunctionPointer, .asyncAwaitResumePartialFunction, .asyncSuspendResumePartialFunction: fallthrough
+		case .accessibleFunctionRecord, .backDeploymentThunk, .backDeploymentFallback: fallthrough
+		case .hasSymbolQuery: return true
 		default: return false
 		}
 	}
@@ -745,8 +764,6 @@ fileprivate extension Demangler {
 			default: parent.children.append(name)
 			}
 		}
-		
-		try require(parent.children.count != 0)
 	}
 	
 	mutating func demangleSymbol() throws -> SwiftSymbol {
@@ -762,8 +779,13 @@ fileprivate extension Demangler {
 		try readManglingPrefix()
 		try parseAndPushNames()
 		
+		let suffix = pop(kind: .suffix)
 		var topLevel = SwiftSymbol(kind: .global)
 		try popTopLevelInto(&topLevel)
+		if let suffix {
+			topLevel.children.append(suffix)
+		}
+		try require(topLevel.children.count != 0)
 		return topLevel
 	}
 	
@@ -1999,7 +2021,13 @@ fileprivate extension Demangler {
 				result.children.append(SwiftSymbol(kind: .isSerialized))
 			}
 			return result
-		case "v": return SwiftSymbol(kind: .outlinedVariable, contents: .index(try demangleIndex()))
+		case "v":
+			let index = try demangleIndex()
+			if scanner.conditional(scalar: "r") {
+				return SwiftSymbol(kind: .outlinedReadOnlyObject, contents: .index(index))
+			} else {
+				return SwiftSymbol(kind: .outlinedVariable, contents: .index(index))
+			}
 		case "e": return SwiftSymbol(kind: .outlinedBridgedMethod, contents: .name(try demangleBridgedMethodParams()))
 		case "u": return SwiftSymbol(kind: .asyncFunctionPointer)
 		default: throw failure
@@ -2238,6 +2266,10 @@ fileprivate extension Demangler {
 			let type = try require(pop(kind: .type))
 			let children: [SwiftSymbol] = sig.map { [type, $0] } ?? [type]
 			switch try scanner.readScalar() {
+			case "C": return SwiftSymbol(kind: .outlinedInitializeWithCopyNoValueWitness, children: children)
+			case "D": return SwiftSymbol(kind: .outlinedAssignWithTakeNoValueWitness, children: children)
+			case "F": return SwiftSymbol(kind: .outlinedAssignWithCopyNoValueWitness, children: children)
+			case "H": return SwiftSymbol(kind: .outlinedDestroyNoValueWitness, children: children)
 			case "y": return SwiftSymbol(kind: .outlinedCopy, children: children)
 			case "e": return SwiftSymbol(kind: .outlinedConsume, children: children)
 			case "r": return SwiftSymbol(kind: .outlinedRetain, children: children)
@@ -2973,6 +3005,7 @@ fileprivate extension Demangler {
 		
 		let c = try scanner.readScalar()
 		switch c {
+		case "Z": (kind, hasType) = (.isolatedDeallocator, false)
 		case "D": (kind, hasType) = (.deallocator, false)
 		case "d": (kind, hasType) = (.destructor, false)
 		case "e": (kind, hasType) = (.iVarInitializer, false)
@@ -3315,7 +3348,7 @@ fileprivate extension Demangler {
 				case "p": (name, size) = ("xRawPointer", "")
 				case "i": fallthrough
 				case "f":
-					(name, size) = (c == "i" ? "xInt" : "xFloat", try "\(scanner.readInt())")
+					(name, size) = (c == "i" ? "xInt" : "xFPIEEE", try "\(scanner.readInt())")
 					try scanner.match(scalar: "_")
 				default: throw scanner.unexpectedError()
 				}
@@ -3650,12 +3683,12 @@ fileprivate func decodeSwiftPunycode(_ value: String) throws -> String {
 				pos = input.index(pos, offsetBy: 1)
 			}
 			
-			i = i + (digit * w)
+			i = i &+ (digit &* w)
 			let t = max(min(k - bias, alphaCount), 1)
 			if (digit < t) {
 				break
 			}
-			w = w * (symbolCount - t)
+			w = w &* (symbolCount - t)
 		}
 		
 		// Bias adaptation function
@@ -3878,11 +3911,16 @@ fileprivate struct SymbolPrinter {
 		case .outlinedRetain: printFirstChild(name, prefix: "outlined retain of ")
 		case .outlinedRelease: printFirstChild(name, prefix: "outlined release of ")
 		case .outlinedInitializeWithTake: printFirstChild(name, prefix: "outlined init with take of ")
-		case .outlinedInitializeWithCopy: printFirstChild(name, prefix: "outlined init with copy of ")
-		case .outlinedAssignWithTake: printFirstChild(name, prefix: "outlined assign with take of ")
-		case .outlinedAssignWithCopy: name.children.at(0)?.index.map { target.write("outlined variable #\($0) of ") }
-		case .outlinedDestroy: target.write("outlined destroy of ")
+		case .outlinedInitializeWithCopy: fallthrough
+		case .outlinedInitializeWithCopyNoValueWitness: printFirstChild(name, prefix: "outlined init with copy of ")
+		case .outlinedAssignWithTake: fallthrough
+		case .outlinedAssignWithTakeNoValueWitness: printFirstChild(name, prefix: "outlined assign with take of ")
+		case .outlinedAssignWithCopy: fallthrough
+		case .outlinedAssignWithCopyNoValueWitness: printFirstChild(name, prefix: "outlined assign with copy of ")
+		case .outlinedDestroy: fallthrough
+		case .outlinedDestroyNoValueWitness: printFirstChild(name, prefix: "outlined destroy of ")
 		case .outlinedVariable: target.write("outlined variable #\(name.index ?? 0) of ")
+		case .outlinedReadOnlyObject: target.write("outlined read-only object #\(name.index ?? 0) of ")
 		case .directness: name.index.flatMap { Directness(rawValue: $0)?.description }.map { target.write("\($0) ") }
 		case .anonymousContext:
 			if options.contains(.qualifyEntities) && options.contains(.displayExtensionContexts) {
@@ -3936,17 +3974,17 @@ fileprivate struct SymbolPrinter {
 		case .identifier:
 			target.write(name.text ?? "")
 		case .index: target.write("\(name.index ?? 0)")
-            
-        case .cFunctionPointer: fallthrough
-        case .objCBlock: fallthrough
+			
+		case .cFunctionPointer: fallthrough
+		case .objCBlock: fallthrough
 		case .noEscapeFunctionType:  fallthrough
 		case .escapingAutoClosureType: fallthrough
 		case .autoClosureType: fallthrough
 		case .thinFunctionType: fallthrough
 		case .functionType: fallthrough
-        case .escapingObjCBlock: fallthrough
-        case .uncurriedFunctionType:
-            printFunctionType(name)
+		case .escapingObjCBlock: fallthrough
+		case .uncurriedFunctionType:
+			printFunctionType(name)
 		case .argumentTuple:
 			printFunctionParameters(labelList: nil, parameterType: name, showTypes: options.contains(.showFunctionArgumentTypes))
 		case .tuple: printChildren(name, prefix: "(", suffix: ")", separator: ", ")
@@ -3984,7 +4022,8 @@ fileprivate struct SymbolPrinter {
 		case .functionSignatureSpecialization: printSpecializationPrefix(name, description: "function signature specialization")
 		case .genericPartialSpecialization: printSpecializationPrefix(name, description: "generic partial specialization", paramPrefix: "Signature = ")
 		case .genericPartialSpecializationNotReAbstracted: printSpecializationPrefix(name, description: "generic not re-abstracted partial specialization", paramPrefix: "Signature = ")
-		case .genericSpecialization: printSpecializationPrefix(name, description: "generic specialization")
+		case .genericSpecialization, .genericSpecializationInResilienceDomain: printSpecializationPrefix(name, description: "generic specialization")
+		case .genericSpecializationPrespecialized: printSpecializationPrefix(name, description: "generic pre-specialization")
 		case .genericSpecializationNotReAbstracted: printSpecializationPrefix(name, description: "generic not re-abstracted specialization")
 		case .inlinedGenericFunction: printSpecializationPrefix(name, description: "inlined generic function")
 		case .isSerialized: target.write("serialized")
@@ -4398,6 +4437,38 @@ fileprivate struct SymbolPrinter {
 		case .opaqueTypeDescriptorSymbolicReference:
 			target.write("opaque type symbolic reference 0x")
 			target.writeHex(name.index ?? 0)
+		case .distributedThunk:
+			if !options.contains(.shortenThunk) {
+				target.write("distributed thunk ")
+			}
+		case .distributedAccessor:
+			if !options.contains(.shortenThunk) {
+				target.write("distributed accessor for ")
+			}
+		case .accessibleFunctionRecord:
+			if !options.contains(.shortenThunk) {
+				target.write("accessible function runtime record for ")
+			}
+		case .dynamicallyReplaceableFunctionKey:
+			if !options.contains(.shortenThunk) {
+				target.write("dynamically replaceable key for ")
+			}
+		case .dynamicallyReplaceableFunctionImpl:
+			if !options.contains(.shortenThunk) {
+				target.write("dynamically replaceable thunk for ")
+			}
+		case .dynamicallyReplaceableFunctionVar:
+			if !options.contains(.shortenThunk) {
+				target.write("dynamically replaceable variable for ")
+			}
+		case .backDeploymentThunk:
+			if !options.contains(.shortenThunk) {
+				target.write("back deployment thunk for ")
+			}
+		case .backDeploymentFallback:
+			if !options.contains(.shortenThunk) {
+				target.write("back deployment fallback for ")
+			}
 		case .implDifferentiable:
 			target.write("@differentiable")
 		case .implInvocationSubstitutions:
@@ -4562,6 +4633,8 @@ fileprivate struct SymbolPrinter {
 		case .uniqueExtendedExistentialTypeShapeSymbolicReference:
 			target.write("non-unique existential shape symbolic reference 0x")
 			target.writeHex(name.index ?? 0)
+		case .hasSymbolQuery:
+			target.write("#_hasSymbol query for ")
 		}
 		
 		return nil
@@ -4673,7 +4746,7 @@ fileprivate struct SymbolPrinter {
 					t = next
 				}
 				switch t.kind {
-				case .functionType, .uncurriedFunctionType, .cFunctionPointer, .thinFunctionType: break
+				case .functionType, .noEscapeFunctionType, .uncurriedFunctionType, .cFunctionPointer, .thinFunctionType: break
 				default: typePr = .withColon
 				}
 			}
@@ -4850,7 +4923,7 @@ fileprivate struct SymbolPrinter {
 			_ = printName(firstChild)
 			target.write("\"")
 		}
-        target.write(") ")
+		target.write(") ")
 	}
 	
 	mutating func printFunctionType(labelList: SwiftSymbol? = nil, _ name: SwiftSymbol) {
