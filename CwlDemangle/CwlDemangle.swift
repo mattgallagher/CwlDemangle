@@ -1211,7 +1211,7 @@ fileprivate extension Demangler {
 		var assocTypePath = [SwiftSymbol]()
 		repeat {
 			firstElem = pop(kind: .firstElementMarker) != nil
-			assocTypePath.append(try require(pop { $0.isDeclName }))
+			assocTypePath.append(try require(popAssociatedTypeName()))
 		} while !firstElem
 		return SwiftSymbol(kind: .assocTypePath, children: assocTypePath.reversed())
 	}
