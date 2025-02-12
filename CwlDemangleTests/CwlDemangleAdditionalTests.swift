@@ -20,7 +20,7 @@ class CwlDemangleAdditionalTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -31,7 +31,7 @@ class CwlDemangleAdditionalTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -45,7 +45,7 @@ class CwlDemangleAdditionalTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got \(result), expected \(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error), expected \(output)")
 		}
@@ -57,26 +57,29 @@ class CwlDemangleAdditionalTests: XCTestCase {
 		do {
 			let parsed = try parseMangledSwiftSymbol(input)
 			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-			XCTAssert(result == output, "Failed to demangle \(input). Got\n\n\(result)\n, expected\n\n\(output)")
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
 		} catch {
 			XCTFail("Failed to demangle \(input). Got \(error)")
 		}
 	}
-    
-    func testIssue18() throws {
-        let symbol = try parseMangledSwiftSymbol("_$s7SwiftUI17_Rotation3DEffectV14animatableDataAA14AnimatablePairVySdAFy12CoreGraphics7CGFloatVAFyAiFyAiFyAFyA2IGAJGGGGGvpMV")
-        print(symbol.description)
-    }
-    
-    func testIssue19() throws {
-        let input = "_$s10AppIntents19CameraCaptureIntentP0A7ContextAC_SETn"
-        let output = "associated conformance descriptor for AppIntents.CameraCaptureIntent.AppIntents.CameraCaptureIntent.AppContext: Swift.Encodable"
-        do {
-            let parsed = try parseMangledSwiftSymbol(input)
-            let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
-            XCTAssert(result == output, "Failed to demangle \(input). Got\n\n\(result)\n, expected\n\n\(output)")
-        } catch {
-            XCTFail("Failed to demangle \(input). Got \(error)")
-        }
-    }
+	
+	func testIssue18() async throws {
+		let task = Task.detached {
+			let symbol = try parseMangledSwiftSymbol("_$s7SwiftUI17_Rotation3DEffectV14animatableDataAA14AnimatablePairVySdAFy12CoreGraphics7CGFloatVAFyAiFyAiFyAFyA2IGAJGGGGGvpMV")
+			print(symbol.description) // Crash
+		}
+		try await task.value
+	}
+	
+	func testIssue19() throws {
+		let input = "_$s10AppIntents19CameraCaptureIntentP0A7ContextAC_SETn"
+		let output = "associated conformance descriptor for AppIntents.CameraCaptureIntent.AppIntents.CameraCaptureIntent.AppContext: Swift.Encodable"
+		do {
+			let parsed = try parseMangledSwiftSymbol(input)
+			let result = parsed.print(using: SymbolPrintOptions.default.union(.synthesizeSugarOnTypes))
+			XCTAssert(result == output, "Failed to demangle \(input).\nGot\n    \(result)\nexpected\n    \(output)")
+		} catch {
+			XCTFail("Failed to demangle \(input). Got \(error)")
+		}
+	}
 }
