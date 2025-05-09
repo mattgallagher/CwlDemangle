@@ -6,8 +6,6 @@
 //  Copyright © 2017 Matt Gallagher. All rights reserved.
 //
 
-import Foundation
-
 // MARK: Public interface
 
 /// This is likely to be the primary entry point to this file. Pass a string containing a Swift mangled symbol or type, get a parsed SwiftSymbol structure which can then be directly examined or printed.
@@ -5636,7 +5634,7 @@ fileprivate struct SymbolPrinter {
 		case .protocolSelfConformanceDescriptor: printFirstChild(name, prefix: "protocol self-conformance descriptor for ")
 		case .protocolSelfConformanceWitness: printFirstChild(name, prefix: "protocol self-conformance witness for ")
 		case .protocolSelfConformanceWitnessTable: printFirstChild(name, prefix: "protocol self-conformance witness table for ")
-		case .protocolSymbolicReference: target.write("protocol symbolic reference \(String(format:"0x%X", name.index ?? 0))")
+		case .protocolSymbolicReference: target.write("protocol symbolic reference \("0x" + String(name.index ?? 0, radix: 16, uppercase: true))")
 		case .protocolWitness: printProtocolWitness(name)
 		case .protocolWitnessTable: printFirstChild(name, prefix: "protocol witness table for ")
 		case .protocolWitnessTableAccessor: printFirstChild(name, prefix: "protocol witness table accessor for ")
@@ -5691,7 +5689,7 @@ fileprivate struct SymbolPrinter {
 		case .typeMetadataInstantiationFunction: printFirstChild(name, prefix: "type metadata instantiation cache for ")
 		case .typeMetadataLazyCache: printFirstChild(name, prefix: "lazy cache variable for type metadata for ")
 		case .typeMetadataSingletonInitializationCache: printFirstChild(name, prefix: "type metadata singleton initialization cache for ")
-		case .typeSymbolicReference: target.write("type symbolic reference \(String(format:"0x%X", name.index ?? 0))")
+        case .typeSymbolicReference: target.write("type symbolic reference \("0x" + String(name.index ?? 0, radix: 16, uppercase: true))")
 		case .uniquable: printFirstChild(name, prefix: "uniquable ")
 		case .uniqueExtendedExistentialTypeShapeSymbolicReference: target.writeHex(prefix: "non-unique existential shape symbolic reference 0x", name.index ?? 0)
 		case .unknownIndex: target.write("unknown index")
@@ -6667,7 +6665,7 @@ fileprivate extension String {
 		if let prefix = prefix {
 			write(prefix)
 		}
-		write(String(format: "%llX", value))
+		write(String(value, radix: 16, uppercase: true))
 	}
 }
 
